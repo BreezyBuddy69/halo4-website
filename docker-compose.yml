@@ -1,8 +1,17 @@
 services:
- app:
- image: subbo69/halovisionai:latest
- ports:
- - "8081:8081"
- restart: unless-stopped
- environment:
- - NODE_ENV=production
+  app:
+    image: ghcr.io/breezybuddy69/halo4-website:main
+    container_name: my-website-app
+    restart: unless-stopped
+    command: npm run dev -- --host 0.0.0.0 --port 8081
+    networks:
+      - traefik-proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.halovisionai.rule=Host(`halovisionai.cloud`)"
+      - "traefik.http.routers.halovisionai.tls=true"
+      - "traefik.http.services.halovisionai.loadbalancer.server.port=8081"
+
+networks:
+  traefik-proxy:
+    external: true
