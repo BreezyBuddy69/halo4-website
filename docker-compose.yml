@@ -1,0 +1,8 @@
+services:
+ app:
+ image: subbo69/halovisionai:latest
+ ports:
+ - "8081:8081"
+ restart: unless-stopped
+ environment:
+ - NODE_ENV=production
