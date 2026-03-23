@@ -60,19 +60,24 @@ export function useCursor(
     const onEnter  = () => { targetPageRef.current = 1 }
 
     const tick = (now: number) => {
-      const dt = lastTimeRef.current === null
-        ? 1 / 60
-        : Math.min((now - lastTimeRef.current) / 1000, 1 / 20)
+      const rawDt = lastTimeRef.current === null ? 1 / 60 : (now - lastTimeRef.current) / 1000
+      const dt = Math.min(rawDt, 1 / 20)
       lastTimeRef.current = now
 
       const cursor = cursorRef.current
       if (cursor) {
+        // If frame took >100ms (jank/cold start), snap directly to avoid rubber-band effect
+        if (rawDt > 0.1) {
+          currentRef.current = { x: targetRef.current.x, y: targetRef.current.y }
+          velRef.current = { x: 0, y: 0 }
+        } else {
         const ax = (-STIFFNESS * (currentRef.current.x - targetRef.current.x) - DAMPING * velRef.current.x) / MASS
         const ay = (-STIFFNESS * (currentRef.current.y - targetRef.current.y) - DAMPING * velRef.current.y) / MASS
         velRef.current.x += ax * dt
         velRef.current.y += ay * dt
         currentRef.current.x += velRef.current.x * dt
         currentRef.current.y += velRef.current.y * dt
+        }
         cursor.style.transform = `translate(${currentRef.current.x}px,${currentRef.current.y}px) translate(-50%,-50%)`
       }
 
@@ -113,7 +118,15 @@ export function useCursor(
     document.addEventListener('mousemove', onMove)
     document.addEventListener('mouseleave', onLeave)
     document.addEventListener('mouseenter', onEnter)
-    rafRef.current = requestAnimationFrame(tick)
+
+    // Delay RAF start until page is fully loaded to avoid competing
+    // with Vanta/Three.js init which would cause 5fps jank on first load
+    const startRaf = () => { rafRef.current = requestAnimationFrame(tick) }
+    if (document.readyState === 'complete') {
+      startRaf()
+    } else {
+      window.addEventListener('load', startRaf, { once: true })
+    }
 
     return () => {
       document.removeEventListener('mousemove', onMove)
