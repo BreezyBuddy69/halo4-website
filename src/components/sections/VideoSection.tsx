@@ -147,7 +147,7 @@ export function VideoSection({ isActive, language }: VideoSectionProps) {
     >
       <video
         ref={videoRef}
-        className="absolute inset-0 w-full h-full object-contain md:object-cover"
+        className="absolute inset-0 w-full h-full object-contain"
         src="/halovisionai3.3.mp4"
         muted
         loop

@@ -248,30 +248,31 @@ export function HeroSection({ language, isActive, onBooking, inputRef, introDone
                         })()}
                       </div>
                     ) : msg.role === 'user' ? (
-                      /* User bubble */
+                      /* User bubble — Liquid Glass */
                       <div
-                        className="max-w-[78%] rounded-2xl px-4 py-2.5 text-[13px] leading-relaxed"
+                        className="max-w-[78%] rounded-[18px] px-4 py-2.5 text-[13px] leading-relaxed"
                         style={{
-                          background: 'rgba(255,255,255,0.14)',
-                          border: '1px solid rgba(255,255,255,0.20)',
-                          boxShadow: '0 2px 20px rgba(0,0,0,0.10), inset 0 1px 0 rgba(255,255,255,0.18)',
-                          color: 'rgba(255,255,255,0.92)',
-                          backdropFilter: 'blur(20px)',
+                          background: 'linear-gradient(145deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.10) 100%)',
+                          border: '1px solid rgba(255,255,255,0.28)',
+                          boxShadow: '0 4px 32px rgba(0,0,0,0.12), 0 1px 0 rgba(255,255,255,0.06) inset, inset 0 1px 0 rgba(255,255,255,0.32)',
+                          color: 'rgba(255,255,255,0.93)',
+                          backdropFilter: 'blur(48px) saturate(180%)',
+                          WebkitBackdropFilter: 'blur(48px) saturate(180%)',
                         }}
                       >
                         {renderContent(msg.content)}
                       </div>
                     ) : (
-                      /* AI bubble — glass morphism */
+                      /* AI bubble — Liquid Glass */
                       <div
-                        className="max-w-[86%] rounded-2xl px-5 py-4 text-[13px] leading-[1.70]"
+                        className="max-w-[86%] rounded-[20px] px-5 py-4 text-[13px] leading-[1.70]"
                         style={{
-                          background: 'rgba(255,255,255,0.09)',
-                          border: '1px solid rgba(255,255,255,0.16)',
-                          backdropFilter: 'blur(28px)',
-                          WebkitBackdropFilter: 'blur(28px)',
-                          color: 'rgba(255,255,255,0.90)',
-                          boxShadow: '0 8px 40px rgba(0,0,0,0.10), inset 0 1px 0 rgba(255,255,255,0.20), inset 0 -1px 0 rgba(0,0,0,0.05)',
+                          background: 'linear-gradient(160deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.06) 60%, rgba(255,255,255,0.10) 100%)',
+                          border: '1px solid rgba(255,255,255,0.22)',
+                          backdropFilter: 'blur(60px) saturate(200%)',
+                          WebkitBackdropFilter: 'blur(60px) saturate(200%)',
+                          color: 'rgba(255,255,255,0.91)',
+                          boxShadow: '0 8px 48px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.36), inset 0 -1px 0 rgba(255,255,255,0.04), 0 0 0 0.5px rgba(255,255,255,0.08)',
                         }}
                       >
                         {/* Halo AI label */}
@@ -303,12 +304,13 @@ export function HeroSection({ language, isActive, onBooking, inputRef, introDone
                 ))}
                 {isLoading && (
                   <motion.div key="loading" initial={{ opacity: 0, y: 8, scale: 0.9 }} animate={{ opacity: 1, y: 0, scale: 1 }} className="flex justify-start">
-                    <div className="rounded-2xl px-5 py-3.5"
+                    <div className="rounded-[20px] px-5 py-3.5"
                       style={{
-                        background: 'rgba(255,255,255,0.09)',
-                        border: '1px solid rgba(255,255,255,0.16)',
-                        backdropFilter: 'blur(28px)',
-                        boxShadow: '0 8px 40px rgba(0,0,0,0.10), inset 0 1px 0 rgba(255,255,255,0.20)',
+                        background: 'linear-gradient(160deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.06) 100%)',
+                        border: '1px solid rgba(255,255,255,0.22)',
+                        backdropFilter: 'blur(60px) saturate(200%)',
+                        WebkitBackdropFilter: 'blur(60px) saturate(200%)',
+                        boxShadow: '0 8px 48px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.36)',
                       }}>
                       <ThinkingProcess language={language} />
                     </div>
@@ -334,12 +336,13 @@ export function HeroSection({ language, isActive, onBooking, inputRef, introDone
                   </p>
                 )}
                 <GlassPanel
-                  className="flex items-end gap-3 rounded-2xl px-4 py-3"
+                  className="flex items-end gap-3 rounded-[20px] px-4 py-3"
                   style={{
-                    background: 'rgba(255,255,255,0.06)',
-                    border: '1px solid rgba(255,255,255,0.10)',
-                    backdropFilter: 'blur(24px)',
-                    boxShadow: '0 0 40px rgba(200,100,50,0.07), 0 0 0 1px rgba(255,255,255,0.07), inset 0 1px 0 rgba(255,255,255,0.10)',
+                    background: 'linear-gradient(160deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.07) 60%, rgba(255,255,255,0.12) 100%)',
+                    border: '1px solid rgba(255,255,255,0.26)',
+                    backdropFilter: 'blur(60px) saturate(200%)',
+                    WebkitBackdropFilter: 'blur(60px) saturate(200%)',
+                    boxShadow: '0 8px 48px rgba(0,0,0,0.14), inset 0 1px 0 rgba(255,255,255,0.40), inset 0 -1px 0 rgba(255,255,255,0.06), 0 0 0 0.5px rgba(255,255,255,0.10)',
                   }}
                 >
                   <textarea

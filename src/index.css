@@ -22,9 +22,11 @@
     scrollbar-color: rgba(255,255,255,0.14) transparent;
   }
 
-  /* Hide cursor — custom circle takes over everywhere */
-  [data-cursor], [data-cursor] * {
-    cursor: none !important;
+  /* Hide native cursor on real pointer devices — custom cursor takes over */
+  @media (pointer: fine) {
+    *, *::before, *::after {
+      cursor: none !important;
+    }
   }
 
   /* Mobile: allow normal scroll */
