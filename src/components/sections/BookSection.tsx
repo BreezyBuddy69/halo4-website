@@ -10,7 +10,7 @@ import { Clock, CheckCircle } from 'lucide-react'
 
 // More neutral / muted purple-gray — less saturated
 const BOOK_CLOUDS_CONFIG = {
-  backgroundColor: 0x08060e,
+  backgroundColor: 0x1e1530,
   skyColor: 0x6838a8,
   cloudColor: 0xe0d0f4,
   cloudShadowColor: 0x1a0e28,
@@ -60,8 +60,8 @@ export function BookSection({ language, isActive, onBooking }: BookSectionProps)
         <div ref={vantaRef} className="absolute inset-0 z-0" />
 
         {/* Dark overlay to preserve readability */}
-        <div className="absolute inset-0 z-[1]"
-          style={{ background: 'linear-gradient(160deg, rgba(6,2,18,0.78) 0%, rgba(10,4,28,0.62) 50%, rgba(6,2,18,0.80) 100%)' }}
+        <div className="absolute inset-0 z-[1] m-book-overlay"
+          style={{ background: 'linear-gradient(160deg, rgba(6,2,18,0.65) 0%, rgba(10,4,28,0.50) 50%, rgba(6,2,18,0.68) 100%)' }}
         />
 
         <div className="relative z-10 w-full h-full flex flex-col items-center justify-center px-8 md:px-16 text-center pt-16 md:pt-0">
@@ -74,7 +74,7 @@ export function BookSection({ language, isActive, onBooking }: BookSectionProps)
           >
             <GlassPanel className="rounded-full px-4 py-2 flex items-center gap-2 mb-8 mx-auto w-fit">
               <Clock className="w-3.5 h-3.5 text-white/50" />
-              <span className="text-xs text-white/60 tracking-wider">{tr.duration} · {tr.growthMappingCall}</span>
+              <span className="text-xs text-white/60 max-md:text-white/85 tracking-wider">{tr.duration} · {tr.growthMappingCall}</span>
             </GlassPanel>
           </motion.div>
 
@@ -92,7 +92,7 @@ export function BookSection({ language, isActive, onBooking }: BookSectionProps)
             initial={{ opacity: 0 }}
             animate={isActive ? { opacity: 1 } : {}}
             transition={{ delay: 0.6 }}
-            className="text-white/40 text-sm mb-6 md:mb-10 max-w-sm leading-relaxed"
+            className="text-white/40 max-md:text-white/68 text-sm mb-6 md:mb-10 max-w-sm leading-relaxed"
           >
             {tr.growthMappingDesc}
           </motion.p>

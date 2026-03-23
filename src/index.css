@@ -14,7 +14,7 @@
   html, body {
     margin: 0;
     padding: 0;
-    background: #080810;
+    background: #141628;
     color: white;
     font-family: 'Inter', system-ui, sans-serif;
     overflow: hidden;
@@ -22,11 +22,9 @@
     scrollbar-color: rgba(255,255,255,0.14) transparent;
   }
 
-  /* Hide cursor only on special interactive elements — custom circle takes over */
-  @media (min-width: 768px) {
-    [data-cursor], [data-cursor] * {
-      cursor: none !important;
-    }
+  /* Hide cursor — custom circle takes over everywhere */
+  [data-cursor], [data-cursor] * {
+    cursor: none !important;
   }
 
   /* Mobile: allow normal scroll */
@@ -87,62 +85,93 @@
   ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.14); border-radius: 4px; }
   ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.26); }
 
+  /* ── Mobile brightness lift ── */
+  @media (max-width: 767px) {
+    html, body { background: #1f1d3a; }
+
+    /* Lighter section backgrounds */
+    .m-bg-about    { background: #28244e !important; }
+    .m-bg-results  { background: #1e2542 !important; }
+    .m-bg-work     { background: #1e2445 !important; }
+    .m-bg-process  { background: #231c3e !important; }
+
+    /* Reduce vanta dark overlays so color bleeds through on mobile */
+    .m-hero-overlay {
+      background: linear-gradient(160deg, rgba(4,6,14,0.22) 0%, rgba(6,10,20,0.10) 40%, rgba(4,6,14,0.26) 100%) !important;
+    }
+    .m-hero-fade {
+      background: linear-gradient(to bottom, transparent, rgba(15,20,34,0.45)) !important;
+    }
+    .m-book-overlay {
+      background: linear-gradient(160deg, rgba(6,2,18,0.44) 0%, rgba(10,4,28,0.30) 50%, rgba(6,2,18,0.48) 100%) !important;
+    }
+
+    /* Reduce edge fades so they don't swallow content */
+    .m-edge-fade { opacity: 0.4 !important; }
+
+    /* Brighter glass cards */
+    .m-card {
+      background: rgba(255,255,255,0.09) !important;
+      border-color: rgba(255,255,255,0.16) !important;
+    }
+
+  }
+  /* ─────────────────────────────────────────────────────────── */
+
   /* ── Custom cursor — all animation via rAF, zero CSS transitions ── */
-  @media (min-width: 768px) {
-    .cursor-root {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 52px;
-      height: 52px;
-      pointer-events: none;
-      z-index: 9999;
-      will-change: transform;
-      opacity: 0;
-    }
+  .cursor-root {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 52px;
+    height: 52px;
+    pointer-events: none;
+    z-index: 9999;
+    will-change: transform;
+    opacity: 0;
+  }
 
-    .cursor-dot {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 5px;
-      height: 5px;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.92);
-      transform: translate(-50%, -50%) scale(1);
-      will-change: transform, opacity;
-      z-index: 2;
-    }
+  .cursor-dot {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.92);
+    transform: translate(-50%, -50%) scale(1);
+    will-change: transform, opacity;
+    z-index: 2;
+  }
 
-    .cursor-ring {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      border: 1px solid rgba(255, 255, 255, 0.22);
-      background: rgba(255, 255, 255, 0.04);
-      transform: translate(-50%, -50%) scale(0);
-      opacity: 0;
-      will-change: transform, opacity;
-    }
+  .cursor-ring {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    background: rgba(255, 255, 255, 0.04);
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+    will-change: transform, opacity;
+  }
 
-    .cursor-text {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 7.5px;
-      font-family: 'Inter', system-ui, sans-serif;
-      letter-spacing: 0.22em;
-      text-transform: uppercase;
-      color: rgba(255, 255, 255, 0.72);
-      white-space: nowrap;
-      opacity: 0;
-      user-select: none;
-      will-change: opacity;
-    }
+  .cursor-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 7.5px;
+    font-family: 'Inter', system-ui, sans-serif;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.72);
+    white-space: nowrap;
+    opacity: 0;
+    user-select: none;
+    will-change: opacity;
   }
   /* ─────────────────────────────────────────────────────────── */
 }

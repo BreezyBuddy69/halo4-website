@@ -49,10 +49,10 @@ export function ResultsSection({ language, isActive }: ResultsSectionProps) {
 
   return (
     <SectionReveal isActive={isActive}>
-      <div className="relative w-full h-full overflow-hidden bg-[#080c1c]">
+      <div className="relative w-full h-full overflow-hidden bg-[#131828] m-bg-results">
         {/* Blue-to-purple atmospheric gradient */}
         <div className="absolute inset-0 pointer-events-none" style={{
-          background: 'radial-gradient(ellipse 90% 80% at 50% 50%, rgba(42,58,165,0.36) 0%, rgba(28,38,118,0.20) 35%, rgba(14,18,60,0.10) 65%, transparent 82%), radial-gradient(ellipse 55% 60% at 50% 50%, rgba(58,72,190,0.15) 0%, transparent 50%)',
+          background: 'radial-gradient(ellipse 90% 80% at 50% 50%, rgba(42,58,165,0.50) 0%, rgba(28,38,118,0.30) 35%, rgba(14,18,60,0.14) 65%, transparent 82%), radial-gradient(ellipse 55% 60% at 50% 50%, rgba(58,72,190,0.22) 0%, transparent 50%)',
         }} />
         {/* Purple accent glow — right side */}
         <div
@@ -74,7 +74,7 @@ export function ResultsSection({ language, isActive }: ResultsSectionProps) {
               initial={{ opacity: 0 }}
               animate={isActive ? { opacity: 1 } : {}}
               transition={{ delay: 0.2 }}
-              className="text-white/30 text-xs tracking-[0.3em] uppercase"
+              className="text-white/30 max-md:text-white/58 text-xs tracking-[0.3em] uppercase"
             >
               {tr.whyUsTitle}
             </motion.p>
@@ -90,7 +90,7 @@ export function ResultsSection({ language, isActive }: ResultsSectionProps) {
                   <div className="text-5xl md:text-8xl lg:text-9xl font-serif text-white leading-none tracking-tight">
                     {isActive && <CountUp target={s.value} suffix={s.suffix} />}
                   </div>
-                  <p className="text-white/35 text-xs md:text-sm tracking-widest uppercase mt-2">{s.label}</p>
+                  <p className="text-white/35 max-md:text-white/62 text-xs md:text-sm tracking-widest uppercase mt-2">{s.label}</p>
                 </motion.div>
               ))}
             </div>
@@ -141,7 +141,7 @@ export function ResultsSection({ language, isActive }: ResultsSectionProps) {
                     className="block group"
                   >
                     <div
-                      className="rounded-xl px-4 py-3 flex flex-col gap-2.5"
+                      className="rounded-xl px-4 py-3 flex flex-col gap-2.5 m-card"
                       style={{
                         background: 'rgba(255,255,255,0.03)',
                         border: '1px solid rgba(255,255,255,0.07)',
@@ -156,7 +156,7 @@ export function ResultsSection({ language, isActive }: ResultsSectionProps) {
                         ;(e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(255,255,255,0.07)'
                       }}
                     >
-                      <p className="text-white/50 text-xs leading-relaxed line-clamp-3">"{review.review}"</p>
+                      <p className="text-white/50 max-md:text-white/78 text-xs leading-relaxed line-clamp-3">"{review.review}"</p>
                       <div className="flex items-center justify-between gap-2">
                         <div className="flex items-center gap-2 min-w-0">
                           <div
@@ -166,8 +166,8 @@ export function ResultsSection({ language, isActive }: ResultsSectionProps) {
                             {review.name[0].toUpperCase()}
                           </div>
                           <div className="min-w-0">
-                            <p className="text-white/60 text-[11px] font-medium truncate">{review.name}</p>
-                            <p className="text-white/28 text-[10px] truncate">{review.role}</p>
+                            <p className="text-white/60 max-md:text-white/85 text-[11px] font-medium truncate">{review.name}</p>
+                            <p className="text-white/28 max-md:text-white/52 text-[10px] truncate">{review.role}</p>
                           </div>
                         </div>
                         <span className="text-white/20 text-[9px] tracking-wider whitespace-nowrap group-hover:text-white/45 transition-colors shrink-0">

@@ -49,11 +49,11 @@ export function AboutSection({ language, isActive }: AboutSectionProps) {
 
   return (
     <SectionReveal isActive={isActive}>
-      <div className="relative w-full h-full overflow-hidden bg-[#0c0a20] flex items-center">
+      <div className="relative w-full h-full overflow-hidden bg-[#17152e] m-bg-about flex items-center">
 
         {/* Rich purple radial */}
         <div className="absolute inset-0 pointer-events-none" style={{
-          background: 'radial-gradient(ellipse 75% 80% at 50% 50%, rgba(95,55,185,0.38) 0%, rgba(65,35,140,0.22) 30%, rgba(34,16,75,0.10) 58%, transparent 78%), radial-gradient(ellipse 42% 48% at 50% 50%, rgba(115,70,210,0.15) 0%, transparent 44%)',
+          background: 'radial-gradient(ellipse 75% 80% at 50% 50%, rgba(95,55,185,0.52) 0%, rgba(65,35,140,0.32) 30%, rgba(34,16,75,0.14) 58%, transparent 78%), radial-gradient(ellipse 42% 48% at 50% 50%, rgba(115,70,210,0.22) 0%, transparent 44%)',
         }} />
         {/* Pink hint — right side, pointing toward Book */}
         <div className="absolute inset-0 pointer-events-none" style={{
@@ -61,10 +61,10 @@ export function AboutSection({ language, isActive }: AboutSectionProps) {
         }} />
 
         {/* Edge fades */}
-        <div className="absolute top-0 inset-x-0 h-20 pointer-events-none z-10"
-          style={{ background: 'linear-gradient(to bottom, #0c0a20, transparent)' }} />
-        <div className="absolute bottom-0 inset-x-0 h-20 pointer-events-none z-10"
-          style={{ background: 'linear-gradient(to top, #0c0a20, transparent)' }} />
+        <div className="absolute top-0 inset-x-0 h-20 pointer-events-none z-10 m-edge-fade"
+          style={{ background: 'linear-gradient(to bottom, #17152e, transparent)' }} />
+        <div className="absolute bottom-0 inset-x-0 h-20 pointer-events-none z-10 m-edge-fade"
+          style={{ background: 'linear-gradient(to top, #17152e, transparent)' }} />
 
         {/* Content layout */}
         <div className="relative z-10 w-full flex flex-col md:flex-row items-center justify-center gap-12 md:gap-20 px-6 md:pl-[20%] md:pr-16 pt-16 pb-16">
@@ -75,7 +75,7 @@ export function AboutSection({ language, isActive }: AboutSectionProps) {
               initial={{ opacity: 0 }}
               animate={isActive ? { opacity: 1 } : {}}
               transition={{ delay: 0.2 }}
-              className="text-white/35 text-[11px] tracking-[0.35em] uppercase mb-6"
+              className="text-white/35 max-md:text-white/62 text-[11px] tracking-[0.35em] uppercase mb-6"
             >
               {c.label}
             </motion.p>
@@ -108,9 +108,9 @@ export function AboutSection({ language, isActive }: AboutSectionProps) {
                   transition={{ delay: 0.5 + i * 0.1, duration: 0.45 }}
                   className="flex items-start gap-3"
                 >
-                  <CheckCircle className="w-3.5 h-3.5 text-white/30 shrink-0 mt-0.5" />
+                  <CheckCircle className="w-3.5 h-3.5 text-white/30 max-md:text-white/55 shrink-0 mt-0.5" />
                   <p className="text-sm leading-snug">
-                    <span className="text-white/75 font-medium">{r.title}</span>
+                    <span className="text-white/75 max-md:text-white/92 font-medium">{r.title}</span>
                     <span className="text-white/38 hidden md:inline"> — {r.desc}</span>
                   </p>
                 </motion.div>

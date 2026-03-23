@@ -34,11 +34,11 @@ export function ProcessSection({ language, isActive, onBooking }: ProcessSection
 
   return (
     <SectionReveal isActive={isActive}>
-      <div className="relative w-full h-full overflow-hidden bg-[#0b0918]">
+      <div className="relative w-full h-full overflow-hidden bg-[#151224] m-bg-process">
 
         {/* Deep purple with pink edge — bridging toward Book */}
         <div className="absolute inset-0 pointer-events-none" style={{
-          background: 'radial-gradient(ellipse 70% 65% at 18% 22%, rgba(105,48,210,0.22) 0%, rgba(78,34,165,0.12) 42%, transparent 70%), radial-gradient(ellipse 40% 45% at 78% 80%, rgba(140,55,195,0.14) 0%, transparent 55%)',
+          background: 'radial-gradient(ellipse 70% 65% at 18% 22%, rgba(105,48,210,0.36) 0%, rgba(78,34,165,0.20) 42%, transparent 70%), radial-gradient(ellipse 40% 45% at 78% 80%, rgba(140,55,195,0.24) 0%, transparent 55%)',
         }} />
         {/* Subtle top-edge purple shimmer */}
         <div className="absolute top-0 inset-x-0 h-px pointer-events-none" style={{
@@ -72,7 +72,7 @@ export function ProcessSection({ language, isActive, onBooking }: ProcessSection
             initial={{ opacity: 0 }}
             animate={isActive ? { opacity: 1 } : {}}
             transition={{ delay: 0.2 }}
-            className="text-white/30 text-[11px] md:text-sm tracking-[0.35em] uppercase mb-6"
+            className="text-white/30 max-md:text-white/58 text-[11px] md:text-sm tracking-[0.35em] uppercase mb-6"
           >
             {tr.processTitle}
           </motion.p>
@@ -92,7 +92,7 @@ export function ProcessSection({ language, isActive, onBooking }: ProcessSection
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-medium tracking-wide whitespace-nowrap transition-all duration-300
                   ${activeStep === i
                     ? 'text-white'
-                    : 'border border-white/[0.08] text-white/30 hover:text-white/55 hover:border-white/20'
+                    : 'border border-white/[0.08] text-white/30 max-md:text-white/58 hover:text-white/55 hover:border-white/20'
                   }`}
                 style={activeStep === i ? { background: 'rgba(110,55,210,0.22)', border: '1px solid rgba(160,100,255,0.40)' } : {}}
               >
@@ -117,12 +117,12 @@ export function ProcessSection({ language, isActive, onBooking }: ProcessSection
                 {steps[activeStep].title}.
               </h2>
 
-              <p className="text-white/60 text-sm md:text-lg leading-relaxed max-w-lg">
+              <p className="text-white/60 max-md:text-white/82 text-sm md:text-lg leading-relaxed max-w-lg">
                 {steps[activeStep].desc}
               </p>
 
               <div className="flex items-center gap-3 mt-1">
-                <span className="text-white/25 text-sm font-mono">{activeStep + 1} / {steps.length}</span>
+                <span className="text-white/25 max-md:text-white/52 text-sm font-mono">{activeStep + 1} / {steps.length}</span>
                 <div className="flex gap-1">
                   {steps.map((_, i) => (
                     <div key={i} className={`h-0.5 rounded-full transition-all duration-300 ${i === activeStep ? 'w-6 bg-purple-400/65' : 'w-3 bg-white/15'}`} />
@@ -143,7 +143,7 @@ export function ProcessSection({ language, isActive, onBooking }: ProcessSection
               <button
                 data-cursor="hover"
                 onClick={() => setActiveStep(s => s + 1)}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-full border border-white/15 text-white/50 text-xs whitespace-nowrap
+                className="flex items-center gap-2 px-5 py-2.5 rounded-full border border-white/15 max-md:border-white/30 text-white/50 max-md:text-white/78 text-xs whitespace-nowrap
                            hover:text-white/80 hover:border-white/30 transition-all"
               >
                 {tr.nextStep} <ArrowRight className="w-3.5 h-3.5 shrink-0" />

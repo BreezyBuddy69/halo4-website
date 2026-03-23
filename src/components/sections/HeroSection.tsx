@@ -12,21 +12,30 @@ import { useChatContext } from '../../contexts/ChatContext'
 
 const CHATBOT_URL = 'https://n8n.halovisionai.cloud/webhook/halovisionchatbot997655'
 
-// Render message content with **bold** markers parsed into <strong> tags
+// Render message content with **bold** markers and \n line breaks
 function renderContent(text: string): React.ReactNode {
   const parts: React.ReactNode[] = []
-  let rem = text
   let key = 0
-  while (rem.length > 0) {
-    const start = rem.indexOf('**')
-    if (start === -1) { parts.push(rem); break }
-    if (start > 0) parts.push(rem.slice(0, start))
-    rem = rem.slice(start + 2)
-    const end = rem.indexOf('**')
-    if (end === -1) { parts.push(<strong key={key++} style={{ color: 'rgba(255,255,255,0.92)', fontWeight: 600 }}>{rem}</strong>); break }
-    parts.push(<strong key={key++} style={{ color: 'rgba(255,255,255,0.92)', fontWeight: 600 }}>{rem.slice(0, end)}</strong>)
-    rem = rem.slice(end + 2)
+
+  const flushLine = (line: string) => {
+    let rem = line
+    while (rem.length > 0) {
+      const start = rem.indexOf('**')
+      if (start === -1) { parts.push(rem); return }
+      if (start > 0) parts.push(rem.slice(0, start))
+      rem = rem.slice(start + 2)
+      const end = rem.indexOf('**')
+      if (end === -1) { parts.push(<strong key={key++} style={{ color: 'rgba(255,255,255,0.96)', fontWeight: 600 }}>{rem}</strong>); return }
+      parts.push(<strong key={key++} style={{ color: 'rgba(255,255,255,0.96)', fontWeight: 600 }}>{rem.slice(0, end)}</strong>)
+      rem = rem.slice(end + 2)
+    }
   }
+
+  const lines = text.split('\n')
+  lines.forEach((line, i) => {
+    if (i > 0) parts.push(<br key={`br${key++}`} />)
+    flushLine(line)
+  })
   return parts
 }
 
@@ -121,11 +130,11 @@ export function HeroSection({ language, isActive, onBooking, inputRef, introDone
 
   useEffect(() => {
     if (!isActive || !introDone || greetingFiredRef.current || messages.length > 0) return
-    greetingFiredRef.current = true
     const timer = setTimeout(() => {
+      greetingFiredRef.current = true
       addMessage({ role: 'assistant', content: greetingMsg, isNew: true })
     }, 800)
-    return () => clearTimeout(timer)
+    return () => clearTimeout(timer)  // leaving before 800ms resets greetingFiredRef so it retries on return
   }, [isActive, introDone]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const sendMessage = useCallback(async (text: string) => {
@@ -162,11 +171,11 @@ export function HeroSection({ language, isActive, onBooking, inputRef, introDone
   return (
     <div className="relative w-full h-full overflow-hidden">
       <div ref={vantaRef} className="absolute inset-0 z-0" />
-      <div className="absolute inset-0 z-[1] pointer-events-none"
+      <div className="absolute inset-0 z-[1] pointer-events-none m-hero-overlay"
         style={{ background: 'linear-gradient(160deg, rgba(4,6,14,0.60) 0%, rgba(6,10,20,0.40) 40%, rgba(4,6,14,0.65) 100%)' }}
       />
-      <div className="absolute bottom-0 left-0 right-0 h-56 z-[1] pointer-events-none"
-        style={{ background: 'linear-gradient(to bottom, transparent, #060a14)' }}
+      <div className="absolute bottom-0 left-0 right-0 h-56 z-[1] pointer-events-none m-hero-fade"
+        style={{ background: 'linear-gradient(to bottom, transparent, #0f1422)' }}
       />
 
       <div className="relative z-10 w-full h-full">
@@ -197,7 +206,7 @@ export function HeroSection({ language, isActive, onBooking, inputRef, introDone
                 style={{ willChange: 'transform, opacity' }}
               />
               <motion.span
-                className="text-[11px] text-white/50 tracking-[0.22em] uppercase font-medium"
+                className="text-[11px] text-white/50 max-md:text-white/75 tracking-[0.22em] uppercase font-medium"
                 animate={{ opacity: [0.5, 1, 0.5] }}
                 transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
                 style={{ willChange: 'opacity' }}
@@ -206,7 +215,7 @@ export function HeroSection({ language, isActive, onBooking, inputRef, introDone
               </motion.span>
             </motion.div>
 
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-3">
               <AnimatePresence initial={false}>
                 {messages.map(msg => (
                   <motion.div
@@ -219,7 +228,7 @@ export function HeroSection({ language, isActive, onBooking, inputRef, introDone
                     className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                   >
                     {msg.isConfirmation ? (
-                      <div className="max-w-[82%] rounded-2xl px-4 py-3 text-xs leading-relaxed backdrop-blur-md"
+                      <div className="max-w-[84%] rounded-2xl px-4 py-3 text-xs leading-relaxed backdrop-blur-md"
                         style={{
                           background: msg.content.startsWith('📬') ? 'rgba(251,191,36,0.08)' : 'rgba(52,211,153,0.09)',
                           border: msg.content.startsWith('📬') ? '1px solid rgba(251,191,36,0.22)' : '1px solid rgba(52,211,153,0.25)',
@@ -233,32 +242,53 @@ export function HeroSection({ language, isActive, onBooking, inputRef, introDone
                           return (
                             <>
                               <p className={`font-medium mb-1.5 text-[11px] tracking-wider ${msg.content.startsWith('📬') ? 'text-amber-400/80' : 'text-emerald-400/85'}`}>{title}</p>
-                              {body && <p className="text-white/65 whitespace-pre-line">{body}</p>}
+                              {body && <p className="text-white/65">{renderContent(body)}</p>}
                             </>
                           )
                         })()}
                       </div>
-                    ) : (
+                    ) : msg.role === 'user' ? (
+                      /* User bubble */
                       <div
-                        className="max-w-[80%] rounded-2xl px-4 py-2.5 text-xs leading-relaxed whitespace-pre-line"
-                        style={msg.role === 'user' ? {
-                          background: 'rgba(255,255,255,0.13)',
-                          border: '1px solid rgba(255,255,255,0.18)',
-                          boxShadow: '0 2px 16px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.15)',
-                          color: 'rgba(255,255,255,0.85)',
-                          backdropFilter: 'blur(16px)',
-                        } : {
-                          background: 'rgba(8,6,18,0.48)',
-                          border: '1px solid rgba(255,255,255,0.045)',
-                          boxShadow: '0 8px 56px rgba(0,0,0,0.18), 0 2px 20px rgba(0,0,0,0.10), inset 0 1px 0 rgba(255,255,255,0.04)',
-                          color: 'rgba(255,255,255,0.68)',
-                          backdropFilter: 'blur(18px)',
+                        className="max-w-[78%] rounded-2xl px-4 py-2.5 text-[13px] leading-relaxed"
+                        style={{
+                          background: 'rgba(255,255,255,0.14)',
+                          border: '1px solid rgba(255,255,255,0.20)',
+                          boxShadow: '0 2px 20px rgba(0,0,0,0.10), inset 0 1px 0 rgba(255,255,255,0.18)',
+                          color: 'rgba(255,255,255,0.92)',
+                          backdropFilter: 'blur(20px)',
                         }}
                       >
-                        {msg.role === 'assistant' && msg.isNew ? (
+                        {renderContent(msg.content)}
+                      </div>
+                    ) : (
+                      /* AI bubble — glass morphism */
+                      <div
+                        className="max-w-[86%] rounded-2xl px-5 py-4 text-[13px] leading-[1.70]"
+                        style={{
+                          background: 'rgba(255,255,255,0.09)',
+                          border: '1px solid rgba(255,255,255,0.16)',
+                          backdropFilter: 'blur(28px)',
+                          WebkitBackdropFilter: 'blur(28px)',
+                          color: 'rgba(255,255,255,0.90)',
+                          boxShadow: '0 8px 40px rgba(0,0,0,0.10), inset 0 1px 0 rgba(255,255,255,0.20), inset 0 -1px 0 rgba(0,0,0,0.05)',
+                        }}
+                      >
+                        {/* Halo AI label */}
+                        <div className="flex items-center gap-1.5 mb-3 pb-2.5" style={{ borderBottom: '1px solid rgba(255,255,255,0.09)' }}>
+                          <motion.div
+                            className="w-1.5 h-1.5 rounded-full bg-emerald-400"
+                            animate={{ opacity: [0.5, 1, 0.5] }}
+                            transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+                            style={{ willChange: 'opacity' }}
+                          />
+                          <span className="text-[9px] tracking-[0.22em] uppercase font-medium" style={{ color: 'rgba(255,255,255,0.42)' }}>Halo AI</span>
+                        </div>
+                        {msg.isNew ? (
                           <TypingMessage
                             text={msg.content}
                             scrollRef={scrollContainerRef}
+                            isActive={isActive}
                             onComplete={() => {
                               markDone(msg.id)
                               setTimeout(() => inputRef.current?.focus(), 150)
@@ -273,11 +303,12 @@ export function HeroSection({ language, isActive, onBooking, inputRef, introDone
                 ))}
                 {isLoading && (
                   <motion.div key="loading" initial={{ opacity: 0, y: 8, scale: 0.9 }} animate={{ opacity: 1, y: 0, scale: 1 }} className="flex justify-start">
-                    <div className="rounded-2xl px-4 py-2.5 backdrop-blur-md"
+                    <div className="rounded-2xl px-5 py-3.5"
                       style={{
-                        background: 'rgba(8,6,18,0.55)',
-                        border: '1px solid rgba(255,255,255,0.07)',
-                        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.05)',
+                        background: 'rgba(255,255,255,0.09)',
+                        border: '1px solid rgba(255,255,255,0.16)',
+                        backdropFilter: 'blur(28px)',
+                        boxShadow: '0 8px 40px rgba(0,0,0,0.10), inset 0 1px 0 rgba(255,255,255,0.20)',
                       }}>
                       <ThinkingProcess language={language} />
                     </div>
@@ -352,7 +383,7 @@ export function HeroSection({ language, isActive, onBooking, inputRef, introDone
             {tr.heroTitle1}
           </motion.h1>
           <motion.h1
-            className="text-[clamp(2.2rem,6vw,6.5rem)] font-serif text-white/50 leading-[1] tracking-tight"
+            className="text-[clamp(2.2rem,6vw,6.5rem)] font-serif text-white/50 max-md:text-white/75 leading-[1] tracking-tight"
             initial={{ opacity: 0, x: 70 }}
             animate={introDone ? { opacity: 1, x: 0 } : { opacity: 0, x: 70 }}
             transition={{ delay: 0.22, duration: 0.72, ease: [0.16, 1, 0.3, 1] }}

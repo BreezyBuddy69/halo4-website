@@ -17,7 +17,7 @@ export function useVantaHalo(containerRef: React.RefObject<HTMLDivElement | null
         const result = vanta.VANTA?.HALO?.({
           el: containerRef.current,
           THREE: window.THREE,
-          backgroundColor: 0x080810,
+          backgroundColor: 0x141628,
           baseColor: 0x1a0050,
           amplitudeFactor: 1.8,
           size: 2.5,

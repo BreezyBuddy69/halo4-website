@@ -65,11 +65,11 @@ export function WorkSection({ language, isActive, onAskAI }: WorkSectionProps) {
 
   return (
     <SectionReveal isActive={isActive}>
-      <div className="relative w-full h-full overflow-hidden bg-[#090b1e]">
+      <div className="relative w-full h-full overflow-hidden bg-[#141830] m-bg-work">
 
         {/* Blue-purple midpoint radial */}
         <div className="absolute inset-0 pointer-events-none" style={{
-          background: 'radial-gradient(ellipse 70% 75% at 50% 50%, rgba(62,50,175,0.40) 0%, rgba(42,32,130,0.24) 28%, rgba(22,14,68,0.12) 56%, transparent 78%), radial-gradient(ellipse 45% 50% at 50% 50%, rgba(82,65,200,0.17) 0%, transparent 42%)',
+          background: 'radial-gradient(ellipse 70% 75% at 50% 50%, rgba(62,50,175,0.55) 0%, rgba(42,32,130,0.34) 28%, rgba(22,14,68,0.16) 56%, transparent 78%), radial-gradient(ellipse 45% 50% at 50% 50%, rgba(82,65,200,0.24) 0%, transparent 42%)',
         }} />
 
         {/* Ambient glow — stable div, background swaps instantly, opacity fades in once */}
@@ -84,10 +84,10 @@ export function WorkSection({ language, isActive, onAskAI }: WorkSectionProps) {
         />
 
         {/* Edge fades */}
-        <div className="absolute top-0 inset-x-0 h-20 pointer-events-none z-10"
-          style={{ background: 'linear-gradient(to bottom, #090b1e, transparent)' }} />
-        <div className="absolute bottom-0 inset-x-0 h-20 pointer-events-none z-10"
-          style={{ background: 'linear-gradient(to top, #090b1e, transparent)' }} />
+        <div className="absolute top-0 inset-x-0 h-20 pointer-events-none z-10 m-edge-fade"
+          style={{ background: 'linear-gradient(to bottom, #141830, transparent)' }} />
+        <div className="absolute bottom-0 inset-x-0 h-20 pointer-events-none z-10 m-edge-fade"
+          style={{ background: 'linear-gradient(to top, #141830, transparent)' }} />
 
         {/* Left info panel — each element has a fixed position, nothing shifts */}
         <div className="absolute left-0 top-0 bottom-0 z-20 flex flex-col justify-center pl-6 md:pl-48 lg:pl-64 pr-4 w-full md:w-1/2">
@@ -97,7 +97,7 @@ export function WorkSection({ language, isActive, onAskAI }: WorkSectionProps) {
             initial={{ opacity: 0, y: 10 }}
             animate={isActive ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
             transition={{ delay: isActive ? 0.15 : 0, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-            className="text-white/45 text-[11px] tracking-[0.35em] uppercase mb-6"
+            className="text-white/45 max-md:text-white/70 text-[11px] tracking-[0.35em] uppercase mb-6"
           >
             {tr.servicesTitle}
           </motion.p>
@@ -117,7 +117,7 @@ export function WorkSection({ language, isActive, onAskAI }: WorkSectionProps) {
                 className={`px-3 py-1 rounded-full text-[10px] tracking-wide transition-all whitespace-nowrap ${
                   filter === cat
                     ? 'bg-white/12 border border-white/35 text-white'
-                    : 'border border-white/[0.08] text-white/30 hover:text-white/55 hover:border-white/20'
+                    : 'border border-white/[0.08] text-white/30 max-md:text-white/58 hover:text-white/55 hover:border-white/20'
                 }`}
               >
                 {catLabels[cat]}
@@ -138,7 +138,7 @@ export function WorkSection({ language, isActive, onAskAI }: WorkSectionProps) {
             >
               <ActiveIcon className="w-4 h-4" style={{ color: activeColors.accent }} />
             </div>
-            <span className="text-white/45 text-xs font-mono">
+            <span className="text-white/45 max-md:text-white/70 text-xs font-mono">
               {String(activeIdx + 1).padStart(2, '0')} / {String(displayNodes.length).padStart(2, '0')}
             </span>
           </motion.div>
@@ -181,7 +181,7 @@ export function WorkSection({ language, isActive, onAskAI }: WorkSectionProps) {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -4 }}
                 transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
-                className="text-white/72 text-sm leading-relaxed max-w-sm"
+                className="text-white/72 max-md:text-white/90 text-sm leading-relaxed max-w-sm"
               >
                 {activeDesc}
               </motion.p>

@@ -34,34 +34,31 @@ function detectLanguage(): Language {
   return 'en'
 }
 
-// White → dark box morphs open → content fades in
-// Phase 1: scaleY + slight scaleX (not just height — smoother)
-// Phase 2: full scaleX
-// Content always rendered at partial opacity, fades to 1 when done
+// Two-phase reveal: strip narrows in first axis, then expands to fill screen
 function IntroReveal({ children, onDone, isMobile }: { children: React.ReactNode; onDone: () => void; isMobile: boolean }) {
   const boxRef = useRef<HTMLDivElement>(null)
   const [done, setDone] = useState(false)
 
   useEffect(() => {
     const run = async () => {
-      await new Promise<void>(r => setTimeout(r, 80))
+      await new Promise<void>(r => setTimeout(r, 100))
       const el = boxRef.current
       if (!el) return
       if (isMobile) {
-        // Mobile: full width first (thin horizontal bar), then expand height
+        // Mobile: full width bar first, then expand height
         await animate(el, { scaleX: 1, scaleY: 0.04, borderRadius: '14px', opacity: 0.9 }, {
-          type: 'spring', damping: 26, stiffness: 260, mass: 0.40,
+          type: 'spring', damping: 28, stiffness: 230, mass: 0.45,
         })
         await animate(el, { scaleY: 1, borderRadius: '0px', opacity: 1 }, {
-          type: 'spring', damping: 26, stiffness: 210, mass: 0.45,
+          type: 'spring', damping: 28, stiffness: 190, mass: 0.50,
         })
       } else {
-        // Desktop: height first (narrow strip), then expand width
+        // Desktop: height strip first, then expand width
         await animate(el, { scaleY: 1, scaleX: 0.16, borderRadius: '20px', opacity: 0.82 }, {
-          type: 'spring', damping: 26, stiffness: 260, mass: 0.40,
+          type: 'spring', damping: 28, stiffness: 230, mass: 0.45,
         })
         await animate(el, { scaleX: 1, borderRadius: '0px', opacity: 1 }, {
-          type: 'spring', damping: 24, stiffness: 210, mass: 0.45,
+          type: 'spring', damping: 26, stiffness: 190, mass: 0.50,
         })
       }
       setDone(true)
@@ -72,12 +69,12 @@ function IntroReveal({ children, onDone, isMobile }: { children: React.ReactNode
 
   return (
     <>
-      {/* App content — always rendered, starts faint so it "breathes" into view */}
+      {/* App content — always rendered, starts faint so it breathes into view */}
       <motion.div
         className={done && isMobile ? 'min-h-screen' : 'fixed inset-0'}
         initial={{ opacity: 0.18 }}
         animate={{ opacity: done ? 1 : 0.18 }}
-        transition={{ duration: 0.58, ease: 'easeOut' }}
+        transition={{ duration: 0.65, ease: 'easeOut' }}
       >
         {children}
       </motion.div>
@@ -92,7 +89,7 @@ function IntroReveal({ children, onDone, isMobile }: { children: React.ReactNode
             ref={boxRef}
             className="absolute inset-0"
             initial={{ scaleX: 0.08, scaleY: 0.06, borderRadius: '60px', opacity: 0.3 }}
-            style={{ transformOrigin: 'center center', background: '#080810' }}
+            style={{ transformOrigin: 'center center', background: '#141628' }}
           />
         </div>
       )}

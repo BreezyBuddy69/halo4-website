@@ -11,7 +11,7 @@ export function Cursor() {
   return (
     <div
       ref={cursorRef}
-      className="cursor-root hidden md:block"
+      className="cursor-root block"
       aria-hidden="true"
     >
       <div ref={ringRef} className="cursor-ring" />
