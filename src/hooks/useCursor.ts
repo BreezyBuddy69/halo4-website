@@ -1,8 +1,8 @@
 import { useEffect, useRef, RefObject } from 'react'
 
-const STIFFNESS = 220
-const DAMPING   = 23
-const MASS      = 0.48
+const STIFFNESS = 260
+const DAMPING   = 36
+const MASS      = 0.42
 
 export function useCursor(
   cursorRef: RefObject<HTMLDivElement>,
@@ -119,14 +119,29 @@ export function useCursor(
     document.addEventListener('mouseleave', onLeave)
     document.addEventListener('mouseenter', onEnter)
 
-    // Delay RAF start until page is fully loaded to avoid competing
-    // with Vanta/Three.js init which would cause 5fps jank on first load
-    const startRaf = () => { rafRef.current = requestAnimationFrame(tick) }
-    if (document.readyState === 'complete') {
-      startRaf()
-    } else {
-      window.addEventListener('load', startRaf, { once: true })
+    // Wait until the browser is consistently running at ≥30fps before starting
+    // the cursor. Vanta/Three.js shader compilation blocks the main thread on
+    // first load causing 5fps — requestIdleCallback doesn't help because
+    // Vanta's own RAF loop keeps the browser permanently "busy".
+    let goodFrames = 0
+    let lastCheck = 0
+    const waitForSmooth = (now: number) => {
+      const dt = lastCheck === 0 ? 999 : (now - lastCheck) / 1000
+      lastCheck = now
+      if (dt < 0.034) { // ≥30fps
+        goodFrames++
+        if (goodFrames >= 4) {
+          // GPU warm, shaders compiled — hand off to the real cursor loop
+          lastTimeRef.current = null
+          rafRef.current = requestAnimationFrame(tick)
+          return
+        }
+      } else {
+        goodFrames = 0 // reset on any slow frame
+      }
+      rafRef.current = requestAnimationFrame(waitForSmooth)
     }
+    rafRef.current = requestAnimationFrame(waitForSmooth)
 
     return () => {
       document.removeEventListener('mousemove', onMove)
