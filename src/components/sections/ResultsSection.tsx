@@ -66,10 +66,10 @@ export function ResultsSection({ language, isActive }: ResultsSectionProps) {
           }}
         />
 
-        <div className="relative z-10 w-full h-full flex flex-col md:flex-row pl-8 md:pl-[20rem] lg:pl-[24rem] pr-8 md:pr-16 lg:pr-24 pt-20 pb-12 gap-12 md:gap-20 lg:gap-32" style={{ position: 'relative', zIndex: 10 }}>
+        <div className="relative z-10 w-full h-full flex flex-col md:flex-row pl-8 md:pl-[13rem] lg:pl-[20rem] pr-8 md:pr-10 lg:pr-20 pt-20 pb-12 gap-8 md:gap-12 lg:gap-24" style={{ position: 'relative', zIndex: 10 }}>
 
           {/* Left: stats — dominant, centered vertically */}
-          <div className="flex flex-col justify-center gap-10 flex-shrink-0 md:w-[260px] lg:w-[300px]">
+          <div className="flex flex-col justify-center gap-10 flex-shrink-0 md:w-[220px] lg:w-[300px]">
             <motion.p
               initial={{ opacity: 0 }}
               animate={isActive ? { opacity: 1 } : {}}

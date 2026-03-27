@@ -196,7 +196,7 @@ export function HeroSection({ language, isActive, onBooking, inputRef, introDone
         {/* Chat area */}
         <div
           className="absolute inset-x-0 flex flex-col items-center px-4 md:px-12 lg:px-20"
-          style={{ top: '5%', bottom: '30%' }}
+          style={{ top: '5%', bottom: 'max(30%, 290px)' }}
         >
           {/* Messages */}
           <div

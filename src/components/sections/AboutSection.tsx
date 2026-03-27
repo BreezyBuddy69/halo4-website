@@ -67,7 +67,7 @@ export function AboutSection({ language, isActive }: AboutSectionProps) {
           style={{ background: 'linear-gradient(to top, #17152e, transparent)' }} />
 
         {/* Content layout */}
-        <div className="relative z-10 w-full flex flex-col md:flex-row items-center justify-center gap-12 md:gap-20 px-6 md:pl-[20%] md:pr-16 pt-16 pb-16">
+        <div className="relative z-10 w-full flex flex-col md:flex-row items-center justify-center gap-8 md:gap-14 lg:gap-20 px-6 md:pl-[13%] lg:pl-[20%] md:pr-10 lg:pr-16 pt-16 pb-16">
 
           {/* Left: text */}
           <div className="flex-1 max-w-lg">
