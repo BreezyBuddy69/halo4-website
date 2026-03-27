@@ -175,9 +175,15 @@ export function HeroSection({ language, isActive, onBooking, inputRef, introDone
     <div className="relative w-full h-full overflow-hidden">
       {vantaEnabled
         ? <div ref={vantaRef} className="absolute inset-0 z-0" />
-        : <div className="absolute inset-0 z-0" style={{
-            background: 'linear-gradient(160deg, #1a3a6a 0%, #112d54 25%, #0e2245 55%, #122040 100%)',
-          }} />
+        : <div className="absolute inset-0 z-0" style={{ background: `
+            radial-gradient(ellipse 90% 35% at 30% 42%, rgba(92,166,202,0.42) 0%, transparent 68%),
+            radial-gradient(ellipse 60% 28% at 72% 58%, rgba(70,130,180,0.38) 0%, transparent 62%),
+            radial-gradient(ellipse 110% 45% at 55% 72%, rgba(100,155,205,0.32) 0%, transparent 58%),
+            radial-gradient(ellipse 45% 22% at 88% 28%, rgba(80,140,190,0.28) 0%, transparent 60%),
+            radial-gradient(ellipse 70% 30% at 10% 65%, rgba(60,110,160,0.30) 0%, transparent 65%),
+            radial-gradient(ellipse 100% 55% at 50% 80%, rgba(51,77,128,0.55) 0%, transparent 68%),
+            linear-gradient(180deg, #04080f 0%, #0a1828 28%, #102238 55%, #183350 80%, #1e3e5e 100%)
+          `}} />
       }
       <div className="absolute inset-0 z-[1] pointer-events-none m-hero-overlay"
         style={{ background: 'linear-gradient(160deg, rgba(4,6,14,0.60) 0%, rgba(6,10,20,0.40) 40%, rgba(4,6,14,0.65) 100%)' }}
