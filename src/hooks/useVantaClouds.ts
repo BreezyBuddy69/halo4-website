@@ -12,13 +12,15 @@ interface VantaCloudsConfig {
 export function useVantaClouds(
   containerRef: React.RefObject<HTMLDivElement | null>,
   config: VantaCloudsConfig = {},
-  isActive = true
+  isActive = true,
+  enabled = true
 ) {
   const effectRef = useRef<{ destroy: () => void } | null>(null)
   const scriptsReadyRef = useRef(false)
 
   // Load Three.js + Vanta scripts once, then set scriptsReadyRef
   useEffect(() => {
+    if (!enabled) return
     const initEffect = () => {
       if (!containerRef.current) return
       const vanta = window as { VANTA?: { CLOUDS2?: (c: Record<string, unknown>) => { destroy: () => void } } }
@@ -71,6 +73,7 @@ export function useVantaClouds(
 
   // Destroy effect when section goes inactive, recreate when it comes back
   useEffect(() => {
+    if (!enabled) return
     if (isActive) {
       if (!effectRef.current && scriptsReadyRef.current) {
         const vanta = window as { VANTA?: { CLOUDS2?: (c: Record<string, unknown>) => { destroy: () => void } } }

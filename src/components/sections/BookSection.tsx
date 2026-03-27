@@ -4,6 +4,7 @@ import { SectionReveal } from '../ui/SectionReveal'
 import { NeonButton } from '../ui/NeonButton'
 import { GlassPanel } from '../ui/GlassPanel'
 import { useVantaClouds } from '../../hooks/useVantaClouds'
+import { usePerformance } from '../../contexts/PerformanceContext'
 import { t } from '../../utils/translations'
 import type { Language } from '../../utils/translations'
 import { Clock, CheckCircle } from 'lucide-react'
@@ -28,8 +29,10 @@ interface BookSectionProps {
 
 export function BookSection({ language, isActive, onBooking }: BookSectionProps) {
   const tr = t(language)
+  const tier = usePerformance()
+  const vantaEnabled = tier === 'full'
   const vantaRef = useRef<HTMLDivElement>(null)
-  useVantaClouds(vantaRef, BOOK_CLOUDS_CONFIG, isActive)
+  useVantaClouds(vantaRef, BOOK_CLOUDS_CONFIG, isActive, vantaEnabled)
 
   const steps = [
     { num: '01', text: 'Audit' },
@@ -56,8 +59,13 @@ export function BookSection({ language, isActive, onBooking }: BookSectionProps)
   return (
     <SectionReveal isActive={isActive}>
       <div className="relative w-full h-full overflow-hidden">
-        {/* Vanta CLOUDS purple/pink background */}
-        <div ref={vantaRef} className="absolute inset-0 z-0" />
+        {/* Background — Vanta on full tier, static gradient otherwise */}
+        {vantaEnabled
+          ? <div ref={vantaRef} className="absolute inset-0 z-0" />
+          : <div className="absolute inset-0 z-0" style={{
+              background: 'linear-gradient(160deg, #3a1868 0%, #2a1050 30%, #1c0c3a 60%, #180e36 100%)',
+            }} />
+        }
 
         {/* Dark overlay to preserve readability */}
         <div className="absolute inset-0 z-[1] m-book-overlay"

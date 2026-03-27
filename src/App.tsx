@@ -16,6 +16,8 @@ import { BookingModal } from './components/booking/BookingModal'
 import { useSectionScroll } from './hooks/useSectionScroll'
 import { useMediaQuery } from './hooks/useMediaQuery'
 import { ChatProvider, addGlobalChatMessage } from './contexts/ChatContext'
+import { PerformanceProvider } from './contexts/PerformanceContext'
+import { usePerformanceTier } from './hooks/usePerformanceTier'
 import type { Language } from './utils/translations'
 
 const TOTAL_SECTIONS = 7
@@ -98,6 +100,7 @@ function IntroReveal({ children, onDone, isMobile }: { children: React.ReactNode
 }
 
 function AppInner() {
+  const tier = usePerformanceTier()
   const [currentSection, setCurrentSection] = useState(0)
   const [isBookingOpen, setIsBookingOpen] = useState(false)
   const [chatContext, setChatContext] = useState('')
@@ -176,7 +179,7 @@ function AppInner() {
 
   const appContent = (
     <>
-      <Cursor />
+      {tier !== 'minimal' && <Cursor />}
 
       <Header
         language={language}
@@ -264,9 +267,11 @@ function AppInner() {
   )
 
   return (
-    <IntroReveal onDone={() => setIntroDone(true)} isMobile={isMobile}>
-      {appContent}
-    </IntroReveal>
+    <PerformanceProvider tier={tier}>
+      <IntroReveal onDone={() => setIntroDone(true)} isMobile={isMobile}>
+        {appContent}
+      </IntroReveal>
+    </PerformanceProvider>
   )
 }
 

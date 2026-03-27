@@ -152,6 +152,7 @@ export function VideoSection({ isActive, language }: VideoSectionProps) {
         muted
         loop
         playsInline
+        preload="auto"
         webkit-playsinline="true"
       />
 

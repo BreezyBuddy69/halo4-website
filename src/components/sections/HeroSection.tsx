@@ -2,6 +2,7 @@ import { useRef, useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Send } from 'lucide-react'
 import { useVantaClouds } from '../../hooks/useVantaClouds'
+import { usePerformance } from '../../contexts/PerformanceContext'
 import { NeonButton } from '../ui/NeonButton'
 import { GlassPanel } from '../ui/GlassPanel'
 import { TypingMessage } from '../chat/TypingMessage'
@@ -102,8 +103,10 @@ function useTypewriterText(texts: string[]) {
 export function HeroSection({ language, isActive, onBooking, inputRef, introDone }: HeroSectionProps) {
   const tr = t(language)
   const greetingMsg = tr.heroGreeting
+  const tier = usePerformance()
+  const vantaEnabled = tier === 'full'
   const vantaRef = useRef<HTMLDivElement>(null)
-  useVantaClouds(vantaRef, CLOUDS_CONFIG, isActive)
+  useVantaClouds(vantaRef, CLOUDS_CONFIG, isActive, vantaEnabled)
 
   const { messages, isLoading, addMessage, markDone, setIsLoading } = useChatContext()
 
@@ -170,7 +173,12 @@ export function HeroSection({ language, isActive, onBooking, inputRef, introDone
 
   return (
     <div className="relative w-full h-full overflow-hidden">
-      <div ref={vantaRef} className="absolute inset-0 z-0" />
+      {vantaEnabled
+        ? <div ref={vantaRef} className="absolute inset-0 z-0" />
+        : <div className="absolute inset-0 z-0" style={{
+            background: 'linear-gradient(160deg, #1a3a6a 0%, #112d54 25%, #0e2245 55%, #122040 100%)',
+          }} />
+      }
       <div className="absolute inset-0 z-[1] pointer-events-none m-hero-overlay"
         style={{ background: 'linear-gradient(160deg, rgba(4,6,14,0.60) 0%, rgba(6,10,20,0.40) 40%, rgba(4,6,14,0.65) 100%)' }}
       />
