@@ -1,8 +1,8 @@
 import { useEffect, useRef, RefObject } from 'react'
 
-const STIFFNESS = 260
-const DAMPING   = 36
-const MASS      = 0.42
+const STIFFNESS = 900
+const DAMPING   = 58
+const MASS      = 0.22
 
 export function useCursor(
   cursorRef: RefObject<HTMLDivElement>,
