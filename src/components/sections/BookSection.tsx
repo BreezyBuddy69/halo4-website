@@ -9,15 +9,14 @@ import { t } from '../../utils/translations'
 import type { Language } from '../../utils/translations'
 import { Clock, CheckCircle } from 'lucide-react'
 
-// More neutral / muted purple-gray — less saturated
 const BOOK_CLOUDS_CONFIG = {
-  backgroundColor: 0x1e1530,
-  skyColor: 0x6838a8,
-  cloudColor: 0xe0d0f4,
-  cloudShadowColor: 0x1a0e28,
-  sunColor: 0x9050c8,
-  sunGlareColor: 0xb068d8,
-  sunlightColor: 0xc890e0,
+  backgroundColor: 0x120a2e,
+  skyColor: 0x9060e0,
+  cloudColor: 0xf0e8ff,
+  cloudShadowColor: 0x2a1550,
+  sunColor: 0xc080ff,
+  sunGlareColor: 0xe0a0ff,
+  sunlightColor: 0xf0c8ff,
   speed: 0.5,
 }
 
@@ -63,19 +62,18 @@ export function BookSection({ language, isActive, onBooking }: BookSectionProps)
         {vantaEnabled
           ? <div ref={vantaRef} className="absolute inset-0 z-0" />
           : <div className="absolute inset-0 z-0" style={{ background: `
-              radial-gradient(ellipse 100% 48% at 50% 88%, rgba(224,208,244,0.38) 0%, transparent 62%),
-              radial-gradient(ellipse 65% 32% at 18% 68%, rgba(190,150,235,0.28) 0%, transparent 68%),
-              radial-gradient(ellipse 55% 28% at 82% 52%, rgba(170,120,220,0.32) 0%, transparent 62%),
-              radial-gradient(ellipse 80% 38% at 40% 75%, rgba(200,170,240,0.22) 0%, transparent 60%),
-              radial-gradient(ellipse 45% 24% at 75% 30%, rgba(140,90,200,0.25) 0%, transparent 65%),
-              radial-gradient(ellipse 110% 58% at 50% 92%, rgba(104,56,168,0.65) 0%, transparent 70%),
-              linear-gradient(180deg, #070312 0%, #100820 28%, #180c30 55%, #200f3c 80%, #2a1448 100%)
+              radial-gradient(ellipse 120% 55% at 50% 20%, rgba(192,144,255,0.30) 0%, transparent 60%),
+              radial-gradient(ellipse 80% 45% at 20% 50%, rgba(160,100,240,0.28) 0%, transparent 65%),
+              radial-gradient(ellipse 70% 40% at 80% 40%, rgba(200,130,255,0.25) 0%, transparent 60%),
+              radial-gradient(ellipse 100% 48% at 50% 88%, rgba(224,190,255,0.42) 0%, transparent 62%),
+              radial-gradient(ellipse 110% 58% at 50% 95%, rgba(120,60,200,0.55) 0%, transparent 70%),
+              linear-gradient(180deg, #1a0840 0%, #1e0c48 28%, #230f52 55%, #2a145e 80%, #301968 100%)
             `}} />
         }
 
         {/* Dark overlay to preserve readability */}
         <div className="absolute inset-0 z-[1] m-book-overlay"
-          style={{ background: 'linear-gradient(160deg, rgba(6,2,18,0.65) 0%, rgba(10,4,28,0.50) 50%, rgba(6,2,18,0.68) 100%)' }}
+          style={{ background: 'linear-gradient(180deg, rgba(6,2,18,0.05) 0%, rgba(6,2,18,0.20) 35%, rgba(6,2,18,0.52) 62%, rgba(6,2,18,0.72) 100%)' }}
         />
 
         <div className="relative z-10 w-full h-full flex flex-col items-center justify-center px-8 md:px-16 text-center pt-16 md:pt-0">

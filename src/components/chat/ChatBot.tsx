@@ -8,6 +8,16 @@ import { t } from '../../utils/translations'
 import type { Language } from '../../utils/translations'
 import { useChatContext } from '../../contexts/ChatContext'
 
+function renderText(content: string) {
+  const parts = content.split(/(\*\*[^*]+\*\*)/)
+  return parts.map((part, i) => {
+    if (part.startsWith('**') && part.endsWith('**')) {
+      return <strong key={i} style={{ color: 'rgba(255,255,255,0.97)', fontWeight: 650 }}>{part.slice(2, -2)}</strong>
+    }
+    return part.split('\n').flatMap((line, j, arr) => j < arr.length - 1 ? [line, <br key={`${i}-${j}`} />] : [line])
+  })
+}
+
 const CHATBOT_URL = 'https://n8n.halovisionai.cloud/webhook/halovisionchatbot997655'
 const VALID_CATEGORIES = ['general', 'lead-generation', 'custom-solutions', 'save-time', 'examples']
 
@@ -158,7 +168,7 @@ export function ChatBot({ language, context, onContextUsed }: ChatBotProps) {
       })
       const data = await res.json()
       let raw = data.response ?? data.message ?? data.output ?? data.text ?? 'I apologize, I could not process your request.'
-      raw = raw.replace(/<[^>]*>/g, '').replace(/\*\*/g, '').replace(/#+\s/g, '').replace(/`/g, '').replace(/>/g, '')
+      raw = raw.replace(/<[^>]*>/g, '').replace(/#+\s/g, '').replace(/`/g, '').replace(/>/g, '')
       addMessage({ role: 'assistant', content: raw, isNew: true })
     } catch {
       addMessage({ role: 'assistant', content: 'Error connecting to service.' })
@@ -202,22 +212,33 @@ export function ChatBot({ language, context, onContextUsed }: ChatBotProps) {
             className="w-80 md:w-96 rounded-2xl overflow-hidden"
             style={{ maxHeight: '70vh', display: 'flex', flexDirection: 'column' }}
           >
-            <GlassPanel strong className="rounded-2xl flex flex-col h-full" style={{
+            <GlassPanel strong className="rounded-2xl flex flex-col h-full relative" style={{
               maxHeight: '70vh',
-              background: 'linear-gradient(160deg, rgba(22,14,50,0.90) 0%, rgba(10,6,24,0.97) 55%, rgba(5,3,14,0.99) 100%)',
-              border: '1px solid rgba(255,255,255,0.14)',
-              backdropFilter: 'blur(16px)',
-              WebkitBackdropFilter: 'blur(16px)',
-              boxShadow: '0 24px 64px rgba(0,0,0,0.62), 0 8px 24px rgba(0,0,0,0.38), inset 0 1.5px 0 rgba(255,255,255,0.16), inset 0 -1px 0 rgba(0,0,0,0.30)',
+              background: 'linear-gradient(160deg, rgba(28,16,60,0.96) 0%, rgba(14,8,34,0.98) 55%, rgba(7,4,18,0.99) 100%)',
+              border: '1px solid rgba(160,120,255,0.22)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+              boxShadow: '0 32px 72px rgba(0,0,0,0.72), 0 8px 28px rgba(0,0,0,0.42), 0 0 0 1px rgba(255,255,255,0.06), inset 0 1.5px 0 rgba(255,255,255,0.18), inset 0 -1px 0 rgba(0,0,0,0.30)',
             }}>
+              {/* Accent line at top */}
+              <div className="absolute top-0 left-0 right-0 h-[2px] rounded-t-2xl" style={{
+                background: 'linear-gradient(90deg, transparent 0%, rgba(139,92,246,0.7) 30%, rgba(167,139,250,0.9) 50%, rgba(139,92,246,0.7) 70%, transparent 100%)',
+              }} />
               {/* Header */}
-              <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.12]">
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-emerald-400/80 animate-pulse" />
-                  <span className="text-xs font-medium text-white/80">{tr.chatSub}</span>
+              <div className="flex items-center justify-between px-4 py-3" style={{
+                borderBottom: '1px solid rgba(255,255,255,0.10)',
+                background: 'linear-gradient(180deg, rgba(255,255,255,0.04) 0%, transparent 100%)',
+              }}>
+                <div className="flex items-center gap-2.5">
+                  <div className="relative flex items-center justify-center w-5 h-5">
+                    <div className="w-2 h-2 rounded-full bg-emerald-400 relative z-10" />
+                    <div className="absolute w-4 h-4 rounded-full bg-emerald-400/20 animate-ping" />
+                  </div>
+                  <span className="text-xs font-semibold text-white/90 tracking-wide">{tr.chatSub}</span>
                 </div>
-                <button data-cursor="hover" onClick={closeChat} className="text-white/45 hover:text-white/75 transition-colors">
-                  <X className="w-4 h-4" />
+                <button data-cursor="hover" onClick={closeChat}
+                  className="w-6 h-6 rounded-full flex items-center justify-center text-white/40 hover:text-white/80 hover:bg-white/10 transition-all">
+                  <X className="w-3.5 h-3.5" />
                 </button>
               </div>
 
@@ -249,8 +270,17 @@ export function ChatBot({ language, context, onContextUsed }: ChatBotProps) {
                       </div>
                     ) : (
                       <div
-                        className={`max-w-[85%] rounded-xl px-3 py-2 text-xs leading-relaxed
-                          ${msg.role === 'user' ? 'bg-white/14 text-white/90' : 'text-white/72'}`}
+                        className={`max-w-[85%] rounded-xl px-3 py-2.5 text-xs leading-relaxed`}
+                        style={msg.role === 'user' ? {
+                          background: 'linear-gradient(135deg, rgba(139,92,246,0.28) 0%, rgba(109,40,217,0.22) 100%)',
+                          border: '1px solid rgba(167,139,250,0.28)',
+                          color: 'rgba(255,255,255,0.93)',
+                        } : {
+                          background: 'rgba(255,255,255,0.07)',
+                          border: '1px solid rgba(255,255,255,0.09)',
+                          borderLeft: '2px solid rgba(139,92,246,0.5)',
+                          color: 'rgba(255,255,255,0.82)',
+                        }}
                       >
                         {msg.role === 'assistant' && msg.isNew && !seenMsgIdsRef.current.has(msg.id) ? (
                           <TypingMessage
@@ -259,7 +289,7 @@ export function ChatBot({ language, context, onContextUsed }: ChatBotProps) {
                             onComplete={() => markDone(msg.id)}
                           />
                         ) : (
-                          msg.content
+                          renderText(msg.content)
                         )}
                       </div>
                     )}
@@ -287,8 +317,13 @@ export function ChatBot({ language, context, onContextUsed }: ChatBotProps) {
                         setRecommendations([])
                         handleSendMessage(rec)
                       }}
-                      className="text-left text-[11px] text-white/62 hover:text-white/90 px-3 py-2 rounded-lg
-                                 border border-white/[0.12] hover:border-white/22 hover:bg-white/8 transition-all"
+                      className="text-left text-[11px] text-white/70 hover:text-white/95 px-3 py-2 rounded-lg transition-all"
+                      style={{
+                        background: 'rgba(139,92,246,0.08)',
+                        border: '1px solid rgba(139,92,246,0.25)',
+                      }}
+                      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.18)' }}
+                      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.08)' }}
                     >
                       {rec}
                     </button>
@@ -304,32 +339,40 @@ export function ChatBot({ language, context, onContextUsed }: ChatBotProps) {
               )}
 
               {/* Input */}
-              <div className="px-4 py-3 border-t border-white/[0.14] flex items-end gap-2">
-                <textarea
-                  ref={inputRef}
-                  value={input}
-                  onChange={handleInputChange}
-                  onKeyDown={e => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                      e.preventDefault()
-                      submitInput()
-                    }
-                  }}
-                  placeholder={tr.chatInputPlaceholder}
-                  rows={1}
-                  className="flex-1 bg-transparent text-white/82 text-xs placeholder-white/38 outline-none resize-none leading-relaxed"
-                  style={{ maxHeight: 80 }}
-                  data-cursor="hover"
-                />
-                <button
-                  data-cursor="hover"
-                  onClick={submitInput}
-                  disabled={!input.trim() || limitWarning || isLoading || userMsgCount >= 20}
-                  className="w-7 h-7 rounded-full bg-white/16 hover:bg-white/26 flex items-center justify-center
-                             transition-colors disabled:opacity-30 shrink-0 mb-0.5"
-                >
-                  <Send className="w-3 h-3 text-white/82" />
-                </button>
+              <div className="px-3 py-3" style={{ borderTop: '1px solid rgba(255,255,255,0.10)' }}>
+                <div className="flex items-end gap-2 rounded-xl px-3 py-2" style={{
+                  background: 'rgba(255,255,255,0.07)',
+                  border: '1px solid rgba(255,255,255,0.12)',
+                }}>
+                  <textarea
+                    ref={inputRef}
+                    value={input}
+                    onChange={handleInputChange}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault()
+                        submitInput()
+                      }
+                    }}
+                    placeholder={tr.chatInputPlaceholder}
+                    rows={1}
+                    className="flex-1 bg-transparent text-white/90 text-xs placeholder-white/35 outline-none resize-none leading-relaxed"
+                    style={{ maxHeight: 80 }}
+                    data-cursor="hover"
+                  />
+                  <button
+                    data-cursor="hover"
+                    onClick={submitInput}
+                    disabled={!input.trim() || limitWarning || isLoading || userMsgCount >= 20}
+                    className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 mb-0.5 transition-all disabled:opacity-25"
+                    style={{
+                      background: 'linear-gradient(135deg, rgba(139,92,246,0.8) 0%, rgba(109,40,217,0.9) 100%)',
+                      boxShadow: '0 2px 12px rgba(139,92,246,0.45)',
+                    }}
+                  >
+                    <Send className="w-3 h-3 text-white" />
+                  </button>
+                </div>
               </div>
             </GlassPanel>
           </motion.div>

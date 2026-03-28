@@ -270,8 +270,8 @@ export function HeroSection({ language, isActive, onBooking, inputRef, introDone
                           border: '1px solid rgba(255,255,255,0.28)',
                           boxShadow: '0 4px 32px rgba(0,0,0,0.12), 0 1px 0 rgba(255,255,255,0.06) inset, inset 0 1px 0 rgba(255,255,255,0.32)',
                           color: 'rgba(255,255,255,0.93)',
-                          backdropFilter: 'blur(48px) saturate(180%)',
-                          WebkitBackdropFilter: 'blur(48px) saturate(180%)',
+                          backdropFilter: 'blur(14px) saturate(160%)',
+                          WebkitBackdropFilter: 'blur(14px) saturate(160%)',
                         }}
                       >
                         {renderContent(msg.content)}
@@ -283,8 +283,8 @@ export function HeroSection({ language, isActive, onBooking, inputRef, introDone
                         style={{
                           background: 'linear-gradient(160deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.06) 60%, rgba(255,255,255,0.10) 100%)',
                           border: '1px solid rgba(255,255,255,0.22)',
-                          backdropFilter: 'blur(60px) saturate(200%)',
-                          WebkitBackdropFilter: 'blur(60px) saturate(200%)',
+                          backdropFilter: 'blur(18px) saturate(160%)',
+                          WebkitBackdropFilter: 'blur(18px) saturate(160%)',
                           color: 'rgba(255,255,255,0.91)',
                           boxShadow: '0 8px 48px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.36), inset 0 -1px 0 rgba(255,255,255,0.04), 0 0 0 0.5px rgba(255,255,255,0.08)',
                         }}
@@ -322,8 +322,8 @@ export function HeroSection({ language, isActive, onBooking, inputRef, introDone
                       style={{
                         background: 'linear-gradient(160deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.06) 100%)',
                         border: '1px solid rgba(255,255,255,0.22)',
-                        backdropFilter: 'blur(60px) saturate(200%)',
-                        WebkitBackdropFilter: 'blur(60px) saturate(200%)',
+                        backdropFilter: 'blur(18px) saturate(160%)',
+                        WebkitBackdropFilter: 'blur(18px) saturate(160%)',
                         boxShadow: '0 8px 48px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.36)',
                       }}>
                       <ThinkingProcess language={language} />
@@ -354,8 +354,8 @@ export function HeroSection({ language, isActive, onBooking, inputRef, introDone
                   style={{
                     background: 'linear-gradient(160deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.07) 60%, rgba(255,255,255,0.12) 100%)',
                     border: '1px solid rgba(255,255,255,0.26)',
-                    backdropFilter: 'blur(60px) saturate(200%)',
-                    WebkitBackdropFilter: 'blur(60px) saturate(200%)',
+                    backdropFilter: 'blur(20px) saturate(160%)',
+                    WebkitBackdropFilter: 'blur(20px) saturate(160%)',
                     boxShadow: '0 8px 48px rgba(0,0,0,0.14), inset 0 1px 0 rgba(255,255,255,0.40), inset 0 -1px 0 rgba(255,255,255,0.06), 0 0 0 0.5px rgba(255,255,255,0.10)',
                   }}
                 >
