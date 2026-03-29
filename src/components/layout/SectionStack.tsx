@@ -102,44 +102,25 @@ export function SectionStack({ currentSection, children, onSectionChange }: Sect
       <div className="relative w-screen h-screen overflow-hidden">
         {children.map((child, i) => {
           const isCurrent = i === currentSection
-          const isPast = i < currentSection
-          const isFuture = i > currentSection
+          const isPrev = i === prevSection && i !== currentSection
+          const isAnimating = isCurrent || isPrev
 
-          // Direction-aware y positioning:
-          // Going DOWN: future sections enter from bottom (100%), past stay behind (0%)
-          // Going UP: past sections enter from top (-100%), prev section (now future) exits to bottom (100%)
-          let yPos: string
-          if (isCurrent) {
-            yPos = '0%'
-          } else if (isFuture) {
-            yPos = (direction < 0 && i === prevSection) ? '100%' : direction < 0 ? '0%' : '100%'
-          } else {
-            // past
-            yPos = direction < 0 ? '-100%' : '0%'
-          }
-
-            // Only the entering and exiting section need spring animation + GPU layer.
-          // All other sections snap instantly to avoid 7 simultaneous compositor layers.
-          const isAnimating = isCurrent || i === prevSection
+          // Pure positional slide — no opacity. Both sections stay fully visible
+          // during the transition so there is never a black gap.
+          const targetY = i < currentSection ? '-100%' : i > currentSection ? '100%' : '0%'
 
           return (
             <motion.div
               key={i}
               className="absolute inset-0"
-              animate={{
-                y: yPos,
-                opacity: isCurrent ? 1 : 0,
-              }}
-              transition={isAnimating ? {
-                y: { type: 'spring', damping: 30, stiffness: 280, mass: 0.75 },
-                opacity: { duration: 0.35, ease: 'easeInOut' },
-              } : {
-                y: { duration: 0 },
-                opacity: { duration: 0 },
-              }}
+              animate={{ y: targetY }}
+              transition={isAnimating
+                ? { duration: 0.48, ease: [0.76, 0, 0.24, 1] }
+                : { duration: 0 }
+              }
               style={{
-                zIndex: isCurrent ? 10 + currentSection : isPast ? i + 1 : 0,
-                willChange: isAnimating ? 'transform, opacity' : 'auto',
+                zIndex: isCurrent ? 10 : isPrev ? 9 : i,
+                willChange: isAnimating ? 'transform' : 'auto',
               }}
             >
               {child}

@@ -416,22 +416,6 @@ export function HeroSection({ language, isActive, onBooking, inputRef, introDone
           </motion.h1>
         </div>
 
-        {/* Scroll indicator — center bottom */}
-        <motion.div
-          className="absolute bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 pointer-events-none hidden md:flex"
-          initial={{ opacity: 0 }}
-          animate={introDone ? { opacity: 1 } : { opacity: 0 }}
-          transition={{ delay: 1.2, duration: 0.6 }}
-        >
-          <span className="text-[8px] tracking-[0.35em] uppercase font-medium" style={{ color: 'rgba(255,255,255,0.22)' }}>Scroll</span>
-          <motion.div
-            className="w-px h-8"
-            style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,0.28), transparent)' }}
-            animate={{ scaleY: [0, 1, 0], y: [0, 6, 0] }}
-            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-          />
-        </motion.div>
-
         {/* Book CTA — bottom right (hidden on mobile) */}
         <motion.div
           className="absolute bottom-24 md:bottom-18 right-4 md:right-16 hidden md:block"
