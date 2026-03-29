@@ -15,7 +15,15 @@ export function SideNav({ currentSection, onNavigate, language }: SideNavProps) 
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null)
 
   return (
-    <nav data-cursor="hover" className="hidden md:flex fixed left-6 top-1/2 -translate-y-1/2 z-40 flex-col gap-1.5 px-2 py-3 -mx-2 -my-3">
+    <nav data-cursor="hover" className="hidden md:flex fixed left-4 top-1/2 -translate-y-1/2 z-40 flex-col gap-0.5 px-2 py-2.5 rounded-2xl"
+      style={{
+        background: 'rgba(8,5,20,0.42)',
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+        border: '1px solid rgba(255,255,255,0.06)',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.28)',
+      }}
+    >
       {labels.map((label, i) => {
         const isActive = i === currentSection
         const isHovered = hoveredIdx === i

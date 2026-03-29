@@ -89,15 +89,25 @@ export function ProcessSection({ language, isActive, onBooking }: ProcessSection
                 key={i}
                 data-cursor="hover"
                 onClick={() => setActiveStep(i)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-medium tracking-wide whitespace-nowrap transition-all duration-300
-                  ${activeStep === i
-                    ? 'text-white'
-                    : 'border border-white/[0.08] text-white/30 max-md:text-white/58 hover:text-white/55 hover:border-white/20'
-                  }`}
-                style={activeStep === i ? { background: 'rgba(110,55,210,0.22)', border: '1px solid rgba(160,100,255,0.40)' } : {}}
+                className="relative flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-medium tracking-wide whitespace-nowrap overflow-hidden"
+                style={{
+                  border: activeStep >= i ? '1px solid rgba(160,100,255,0.40)' : '1px solid rgba(255,255,255,0.08)',
+                  color: activeStep >= i ? 'rgba(255,255,255,1)' : 'rgba(255,255,255,0.30)',
+                  transition: 'color 0.3s ease, border-color 0.3s ease',
+                }}
               >
-                <span className="font-mono text-[9px] opacity-60">{step.num}</span>
-                <span>{step.title}</span>
+                {/* Liquid fill — sweeps left-to-right when step becomes active, stays for completed */}
+                {activeStep >= i && (
+                  <motion.div
+                    className="absolute inset-0 rounded-full"
+                    style={{ background: 'rgba(110,55,210,0.25)', originX: 0 }}
+                    initial={{ scaleX: 0 }}
+                    animate={{ scaleX: 1 }}
+                    transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+                  />
+                )}
+                <span className="relative z-10 font-mono text-[9px] opacity-60">{step.num}</span>
+                <span className="relative z-10">{step.title}</span>
               </button>
             ))}
           </motion.div>
@@ -121,14 +131,6 @@ export function ProcessSection({ language, isActive, onBooking }: ProcessSection
                 {steps[activeStep].desc}
               </p>
 
-              <div className="flex items-center gap-3 mt-1">
-                <span className="text-white/25 max-md:text-white/52 text-sm font-mono">{activeStep + 1} / {steps.length}</span>
-                <div className="flex gap-1">
-                  {steps.map((_, i) => (
-                    <div key={i} className={`h-0.5 rounded-full transition-all duration-300 ${i === activeStep ? 'w-6 bg-purple-400/65' : 'w-3 bg-white/15'}`} />
-                  ))}
-                </div>
-              </div>
             </motion.div>
           </AnimatePresence>
 

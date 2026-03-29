@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 import { SectionReveal } from '../ui/SectionReveal'
-import { CheckCircle, TrendingUp, Clock, Zap, Users } from 'lucide-react'
+import { CheckCircle, ImagePlus } from 'lucide-react'
 import type { Language } from '../../utils/translations'
 
 interface AboutSectionProps {
@@ -14,33 +14,33 @@ const content = {
     heading: 'Why Halo AI.',
     body: "We're a specialized AI agency — no templates, no generic tools. Every system is built from scratch for your business. We handle 100% of the technical work and hand it over ready to run.",
     reasons: [
-      { title: 'Full transparency & live dashboard', desc: 'No hidden costs. See exactly what you pay for — and watch your automation revenue in real time.' },
-      { title: 'Live in 2–4 weeks, done-for-you', desc: 'From first call to running system in 2–4 weeks. No code, no effort on your end.' },
-      { title: 'Long-term support', desc: 'Monitoring and improvements long after launch — the system keeps performing.' },
+      { title: 'Full transparency', desc: 'No hidden costs. Real-time revenue dashboard.' },
+      { title: 'Live in 2–4 weeks', desc: 'Zero code. Zero effort. Just results.' },
+      { title: 'Long-term support', desc: 'We maintain and improve your system post-launch.' },
     ],
-    photo: 'Photo coming soon',
+    photoLabel: 'Your photo here',
   },
   de: {
     label: 'Über Uns',
     heading: 'Warum Halo AI.',
     body: 'Wir sind eine spezialisierte KI-Agentur — kein Baukasten, keine Vorlagen. Jedes System wird von Grund auf für Ihr Unternehmen entwickelt. Wir übernehmen 100 % der technischen Arbeit und übergeben alles betriebsbereit.',
     reasons: [
-      { title: 'Volle Transparenz & Live-Dashboard', desc: 'Keine versteckten Kosten. Sehen Sie exakt, wofür Sie zahlen — und Ihren Automatisierungs-Umsatz in Echtzeit.' },
-      { title: 'Live in 2–4 Wochen, komplett für Sie', desc: 'Vom ersten Gespräch bis zum laufenden System in 2–4 Wochen. Kein Code, kein Aufwand Ihrerseits.' },
-      { title: 'Langfristiger Support', desc: 'Überwachung und Weiterentwicklung weit über den Launch hinaus — das System bleibt leistungsstark.' },
+      { title: 'Volle Transparenz', desc: 'Keine versteckten Kosten. Umsatz-Dashboard in Echtzeit.' },
+      { title: 'Live in 2–4 Wochen', desc: 'Kein Code. Kein Aufwand. Nur Ergebnisse.' },
+      { title: 'Langfristiger Support', desc: 'Wir betreuen das System dauerhaft nach dem Launch.' },
     ],
-    photo: 'Foto folgt in Kürze',
+    photoLabel: 'Ihr Foto hier',
   },
   fr: {
     label: 'À Propos',
     heading: 'Pourquoi Halo AI.',
     body: "Nous sommes une agence IA spécialisée — pas de modèles, pas d'outils génériques. Chaque système est construit de zéro pour votre entreprise. Nous gérons 100 % du travail technique et vous livrons tout prêt à fonctionner.",
     reasons: [
-      { title: 'Transparence totale & tableau de bord live', desc: 'Aucun coût caché. Voyez exactement ce que vous payez — et vos revenus d\'automatisation en temps réel.' },
-      { title: 'Opérationnel en 2–4 semaines, fait pour vous', desc: 'Du premier appel au système en production en 2–4 semaines. Aucun code, aucun effort de votre côté.' },
-      { title: 'Accompagnement à long terme', desc: 'Suivi et améliorations bien après le lancement — le système continue de performer.' },
+      { title: 'Transparence totale', desc: 'Aucun coût caché. Tableau de bord en temps réel.' },
+      { title: 'Opérationnel en 2–4 semaines', desc: 'Zéro code. Zéro effort. Juste des résultats.' },
+      { title: 'Accompagnement à long terme', desc: 'Nous maintenons et améliorons votre système après le lancement.' },
     ],
-    photo: 'Photo à venir',
+    photoLabel: 'Votre photo ici',
   },
 }
 
@@ -118,7 +118,7 @@ export function AboutSection({ language, isActive }: AboutSectionProps) {
             </div>
           </div>
 
-          {/* Right: Impact metrics card (hidden on mobile) */}
+          {/* Right: Photo placeholder (hidden on mobile) */}
           <motion.div
             initial={{ opacity: 0, scale: 0.94, y: 20 }}
             animate={isActive ? { opacity: 1, scale: 1, y: 0 } : {}}
@@ -126,62 +126,46 @@ export function AboutSection({ language, isActive }: AboutSectionProps) {
             className="shrink-0 hidden md:flex"
           >
             <div
-              className="relative rounded-2xl overflow-hidden flex flex-col gap-0"
+              className="relative rounded-2xl overflow-hidden flex flex-col items-center justify-center group"
               style={{
-                width: 240,
-                background: 'linear-gradient(160deg, rgba(115,70,210,0.14) 0%, rgba(75,35,155,0.10) 50%, rgba(40,14,88,0.18) 100%)',
-                border: '1px solid rgba(140,90,255,0.20)',
-                boxShadow: '0 24px 64px rgba(80,30,180,0.20), 0 0 0 0.5px rgba(160,110,255,0.12), inset 0 1px 0 rgba(200,160,255,0.14)',
+                width: 220,
+                height: 300,
+                background: 'linear-gradient(160deg, rgba(115,70,210,0.10) 0%, rgba(60,30,120,0.12) 100%)',
+                border: '1.5px dashed rgba(160,110,255,0.28)',
+                boxShadow: '0 24px 64px rgba(80,30,180,0.16), inset 0 1px 0 rgba(200,160,255,0.08)',
               }}
             >
-              {/* Top shimmer */}
-              <div className="absolute top-0 left-0 right-0 h-px pointer-events-none"
-                style={{ background: 'linear-gradient(90deg, transparent 10%, rgba(180,130,255,0.5) 45%, rgba(255,255,255,0.22) 55%, rgba(150,100,255,0.3) 75%, transparent 90%)' }}
-              />
-
-              {/* Header row */}
-              <div className="px-5 pt-5 pb-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                <div className="flex items-center gap-2 mb-1">
-                  <motion.div
-                    className="w-1.5 h-1.5 rounded-full bg-emerald-400"
-                    animate={{ opacity: [0.5, 1, 0.5] }}
-                    transition={{ duration: 2.2, repeat: Infinity }}
-                    style={{ willChange: 'opacity' }}
-                  />
-                  <span className="text-[9px] tracking-[0.25em] uppercase font-medium" style={{ color: 'rgba(255,255,255,0.35)' }}>Live Impact</span>
-                </div>
-                <p className="text-white/70 text-[11px] leading-snug">Client automations running</p>
-              </div>
-
-              {/* Metric rows */}
+              {/* Corner accents */}
               {[
-                { icon: Clock, label: 'Hours saved / week', value: '20+', color: 'rgba(130,200,255,0.9)', bg: 'rgba(100,180,255,0.08)', border: 'rgba(100,180,255,0.20)' },
-                { icon: Zap, label: 'Avg. time to launch', value: '3 wks', color: 'rgba(200,160,255,0.9)', bg: 'rgba(160,100,255,0.08)', border: 'rgba(140,90,255,0.22)' },
-                { icon: TrendingUp, label: 'Integrations supported', value: '250+', color: 'rgba(100,230,160,0.9)', bg: 'rgba(80,210,140,0.07)', border: 'rgba(80,200,140,0.20)' },
-                { icon: Users, label: 'Availability', value: '24/7', color: 'rgba(255,200,100,0.9)', bg: 'rgba(230,170,60,0.07)', border: 'rgba(220,165,60,0.22)' },
-              ].map(({ icon: Icon, label, value, color, bg, border }, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, x: 12 }}
-                  animate={isActive ? { opacity: 1, x: 0 } : {}}
-                  transition={{ delay: 0.55 + i * 0.1, duration: 0.45 }}
-                  className="flex items-center gap-3 px-5 py-3.5"
-                  style={{ borderBottom: i < 3 ? '1px solid rgba(255,255,255,0.04)' : 'none' }}
-                >
-                  <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
-                    style={{ background: bg, border: `1px solid ${border}` }}>
-                    <Icon className="w-3.5 h-3.5" style={{ color }} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-white/35 text-[9px] tracking-wide leading-none mb-0.5">{label}</p>
-                    <p className="text-white/88 text-sm font-semibold leading-none" style={{ letterSpacing: '-0.01em' }}>{value}</p>
-                  </div>
-                </motion.div>
+                'top-0 left-0 border-t-2 border-l-2 rounded-tl-2xl',
+                'top-0 right-0 border-t-2 border-r-2 rounded-tr-2xl',
+                'bottom-0 left-0 border-b-2 border-l-2 rounded-bl-2xl',
+                'bottom-0 right-0 border-b-2 border-r-2 rounded-br-2xl',
+              ].map((cls, i) => (
+                <div key={i} className={`absolute w-5 h-5 pointer-events-none ${cls}`}
+                  style={{ borderColor: 'rgba(180,130,255,0.45)' }} />
               ))}
 
-              {/* Bottom glow accent */}
-              <div className="absolute bottom-0 left-0 right-0 h-24 pointer-events-none"
-                style={{ background: 'radial-gradient(ellipse 80% 60% at 50% 100%, rgba(100,50,200,0.18) 0%, transparent 70%)' }}
+              {/* Center icon + label */}
+              <div className="flex flex-col items-center gap-3">
+                <div
+                  className="w-12 h-12 rounded-xl flex items-center justify-center"
+                  style={{
+                    background: 'rgba(160,100,255,0.10)',
+                    border: '1px solid rgba(180,130,255,0.22)',
+                  }}
+                >
+                  <ImagePlus className="w-5 h-5" style={{ color: 'rgba(200,160,255,0.55)' }} />
+                </div>
+                <p className="text-[10px] tracking-[0.22em] uppercase font-medium text-center px-4"
+                  style={{ color: 'rgba(200,160,255,0.45)' }}>
+                  {c.photoLabel}
+                </p>
+              </div>
+
+              {/* Subtle inner glow */}
+              <div className="absolute inset-0 pointer-events-none"
+                style={{ background: 'radial-gradient(ellipse 70% 55% at 50% 40%, rgba(140,90,255,0.07) 0%, transparent 70%)' }}
               />
             </div>
           </motion.div>
