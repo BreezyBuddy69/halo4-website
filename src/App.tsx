@@ -179,8 +179,6 @@ function AppInner() {
 
   const appContent = (
     <>
-      {tier !== 'minimal' && <Cursor />}
-
       <Header
         language={language}
         onLanguageChange={setLanguage}
@@ -268,6 +266,7 @@ function AppInner() {
 
   return (
     <PerformanceProvider tier={tier}>
+      {tier !== 'minimal' && <Cursor />}
       <IntroReveal onDone={() => setIntroDone(true)} isMobile={isMobile}>
         {appContent}
       </IntroReveal>
