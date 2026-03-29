@@ -126,58 +126,82 @@ export function ResultsSection({ language, isActive }: ResultsSectionProps) {
             </motion.h2>
 
             <div className="flex flex-col gap-2.5">
-              {tr.testimonials.map((review, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={isActive ? { opacity: 1, y: 0 } : {}}
-                  transition={{ delay: 0.4 + i * 0.08, duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-                >
-                  <a
-                    href={testimonialLinks[i % testimonialLinks.length]}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    data-cursor="hover"
-                    className="block group"
+              {tr.testimonials.map((review, i) => {
+                const accentPalette = [
+                  { border: 'rgba(120,140,255,0.28)', glow: 'rgba(100,120,255,0.06)', avatar: 'linear-gradient(135deg, rgba(100,120,255,0.30) 0%, rgba(80,100,220,0.18) 100%)', avatarBorder: 'rgba(120,140,255,0.30)', starColor: 'rgba(180,195,255,0.90)' },
+                  { border: 'rgba(190,110,255,0.26)', glow: 'rgba(170,90,255,0.06)', avatar: 'linear-gradient(135deg, rgba(180,100,255,0.28) 0%, rgba(140,70,220,0.16) 100%)', avatarBorder: 'rgba(190,110,255,0.28)', starColor: 'rgba(210,160,255,0.90)' },
+                  { border: 'rgba(52,211,153,0.24)', glow: 'rgba(52,211,153,0.05)', avatar: 'linear-gradient(135deg, rgba(52,211,153,0.24) 0%, rgba(32,180,130,0.14) 100%)', avatarBorder: 'rgba(52,211,153,0.26)', starColor: 'rgba(100,230,170,0.90)' },
+                  { border: 'rgba(255,210,80,0.24)', glow: 'rgba(220,185,40,0.05)', avatar: 'linear-gradient(135deg, rgba(255,200,70,0.24) 0%, rgba(220,160,40,0.14) 100%)', avatarBorder: 'rgba(255,200,70,0.26)', starColor: 'rgba(255,220,100,0.90)' },
+                  { border: 'rgba(255,140,70,0.26)', glow: 'rgba(255,120,50,0.05)', avatar: 'linear-gradient(135deg, rgba(255,140,60,0.26) 0%, rgba(220,100,40,0.14) 100%)', avatarBorder: 'rgba(255,140,60,0.28)', starColor: 'rgba(255,175,110,0.90)' },
+                ]
+                const accent = accentPalette[i % accentPalette.length]
+                return (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={isActive ? { opacity: 1, y: 0 } : {}}
+                    transition={{ delay: 0.4 + i * 0.08, duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
                   >
-                    <div
-                      className="rounded-xl px-4 py-3 flex flex-col gap-2.5 m-card"
-                      style={{
-                        background: 'rgba(255,255,255,0.03)',
-                        border: '1px solid rgba(255,255,255,0.07)',
-                        transition: 'background 0.25s, border-color 0.25s',
-                      }}
-                      onMouseEnter={e => {
-                        (e.currentTarget as HTMLDivElement).style.background = 'rgba(255,255,255,0.055)'
-                        ;(e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(255,255,255,0.14)'
-                      }}
-                      onMouseLeave={e => {
-                        (e.currentTarget as HTMLDivElement).style.background = 'rgba(255,255,255,0.03)'
-                        ;(e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(255,255,255,0.07)'
-                      }}
+                    <a
+                      href={testimonialLinks[i % testimonialLinks.length]}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      data-cursor="hover"
+                      className="block group"
                     >
-                      <p className="text-white/50 max-md:text-white/78 text-xs leading-relaxed line-clamp-3">"{review.review}"</p>
-                      <div className="flex items-center justify-between gap-2">
-                        <div className="flex items-center gap-2 min-w-0">
-                          <div
-                            className="w-6 h-6 rounded-full flex items-center justify-center shrink-0 text-[9px] text-white/55 font-medium"
-                            style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.10)' }}
-                          >
-                            {review.name[0].toUpperCase()}
-                          </div>
-                          <div className="min-w-0">
-                            <p className="text-white/60 max-md:text-white/85 text-[11px] font-medium truncate">{review.name}</p>
-                            <p className="text-white/28 max-md:text-white/52 text-[10px] truncate">{review.role}</p>
-                          </div>
+                      <div
+                        className="rounded-xl px-4 py-3 flex flex-col gap-2.5 m-card relative overflow-hidden"
+                        style={{
+                          background: `linear-gradient(135deg, ${accent.glow.replace('0.06', '0.09')} 0%, rgba(255,255,255,0.02) 100%)`,
+                          border: `1px solid ${accent.border}`,
+                          boxShadow: `0 4px 24px ${accent.glow}, inset 0 1px 0 rgba(255,255,255,0.05)`,
+                          transition: 'background 0.25s, border-color 0.25s, box-shadow 0.25s',
+                        }}
+                        onMouseEnter={e => {
+                          const el = e.currentTarget as HTMLDivElement
+                          el.style.background = `linear-gradient(135deg, ${accent.glow.replace('0.06', '0.15')} 0%, rgba(255,255,255,0.04) 100%)`
+                          el.style.borderColor = accent.border.replace('0.28', '0.45').replace('0.26', '0.42').replace('0.24', '0.40')
+                        }}
+                        onMouseLeave={e => {
+                          const el = e.currentTarget as HTMLDivElement
+                          el.style.background = `linear-gradient(135deg, ${accent.glow.replace('0.06', '0.09')} 0%, rgba(255,255,255,0.02) 100%)`
+                          el.style.borderColor = accent.border
+                        }}
+                      >
+                        {/* Star rating */}
+                        <div className="flex items-center gap-0.5">
+                          {[...Array(5)].map((_, s) => (
+                            <svg key={s} width="9" height="9" viewBox="0 0 10 10" fill="none">
+                              <path d="M5 1l1.12 2.27 2.5.36-1.81 1.76.43 2.49L5 6.77 2.76 7.88l.43-2.49L1.38 3.63l2.5-.36L5 1z"
+                                fill={accent.starColor} />
+                            </svg>
+                          ))}
                         </div>
-                        <span className="text-white/20 text-[9px] tracking-wider whitespace-nowrap group-hover:text-white/45 transition-colors shrink-0">
-                          ↗
-                        </span>
+
+                        <p className="text-white/58 max-md:text-white/82 text-xs leading-relaxed line-clamp-3">"{review.review}"</p>
+
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <div
+                              className="w-6 h-6 rounded-full flex items-center justify-center shrink-0 text-[9px] text-white/80 font-semibold"
+                              style={{ background: accent.avatar, border: `1px solid ${accent.avatarBorder}` }}
+                            >
+                              {review.name[0].toUpperCase()}
+                            </div>
+                            <div className="min-w-0">
+                              <p className="text-white/65 max-md:text-white/88 text-[11px] font-medium truncate">{review.name}</p>
+                              <p className="text-white/30 max-md:text-white/55 text-[10px] truncate">{review.role}</p>
+                            </div>
+                          </div>
+                          <span className="text-white/18 text-[9px] tracking-wider whitespace-nowrap group-hover:text-white/48 transition-colors shrink-0">
+                            ↗
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                  </a>
-                </motion.div>
-              ))}
+                    </a>
+                  </motion.div>
+                )
+              })}
             </div>
           </div>
         </div>

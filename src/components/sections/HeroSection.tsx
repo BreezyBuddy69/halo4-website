@@ -155,7 +155,7 @@ export function HeroSection({ language, isActive, onBooking, inputRef, introDone
       })
       const data = await res.json()
       let raw = data.response ?? data.message ?? data.output ?? data.text ?? '...'
-      raw = raw.replace(/<[^>]*>/g, '').replace(/\*\*/g, '').replace(/#+\s/g, '').replace(/`/g, '')
+      raw = raw.replace(/<[^>]*>/g, '').replace(/#+\s/g, '').replace(/`/g, '')
       addMessage({ role: 'assistant', content: raw, isNew: true })
     } catch {
       addMessage({ role: 'assistant', content: 'Connection error.' })
@@ -379,8 +379,16 @@ export function HeroSection({ language, isActive, onBooking, inputRef, introDone
                     data-cursor="hover"
                   />
                   <button data-cursor="hover" onClick={handleSubmit} disabled={!input.trim() || isLoading || userMsgCount >= 20}
-                    className="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors shrink-0 mb-0.5 disabled:opacity-30">
-                    <Send className="w-3.5 h-3.5 text-white/70" />
+                    className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 mb-0.5 disabled:opacity-30 transition-all"
+                    style={{
+                      background: 'linear-gradient(135deg, rgba(139,92,246,0.65) 0%, rgba(109,40,217,0.55) 100%)',
+                      border: '1px solid rgba(167,139,250,0.35)',
+                      boxShadow: '0 0 14px rgba(139,92,246,0.30), inset 0 1px 0 rgba(255,255,255,0.12)',
+                    }}
+                    onMouseEnter={e => { if (!e.currentTarget.disabled) e.currentTarget.style.boxShadow = '0 0 22px rgba(139,92,246,0.50), inset 0 1px 0 rgba(255,255,255,0.18)' }}
+                    onMouseLeave={e => { e.currentTarget.style.boxShadow = '0 0 14px rgba(139,92,246,0.30), inset 0 1px 0 rgba(255,255,255,0.12)' }}
+                  >
+                    <Send className="w-3.5 h-3.5 text-white/90" />
                   </button>
                 </GlassPanel>
               </motion.div>
@@ -407,6 +415,22 @@ export function HeroSection({ language, isActive, onBooking, inputRef, introDone
             {tr.heroTitle2}
           </motion.h1>
         </div>
+
+        {/* Scroll indicator — center bottom */}
+        <motion.div
+          className="absolute bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 pointer-events-none hidden md:flex"
+          initial={{ opacity: 0 }}
+          animate={introDone ? { opacity: 1 } : { opacity: 0 }}
+          transition={{ delay: 1.2, duration: 0.6 }}
+        >
+          <span className="text-[8px] tracking-[0.35em] uppercase font-medium" style={{ color: 'rgba(255,255,255,0.22)' }}>Scroll</span>
+          <motion.div
+            className="w-px h-8"
+            style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,0.28), transparent)' }}
+            animate={{ scaleY: [0, 1, 0], y: [0, 6, 0] }}
+            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+          />
+        </motion.div>
 
         {/* Book CTA — bottom right (hidden on mobile) */}
         <motion.div

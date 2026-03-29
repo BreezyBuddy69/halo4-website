@@ -84,10 +84,24 @@ export function BookSection({ language, isActive, onBooking }: BookSectionProps)
             animate={isActive ? { opacity: 1, y: 0 } : {}}
             transition={{ delay: 0.3 }}
           >
-            <GlassPanel className="rounded-full px-4 py-2 flex items-center gap-2 mb-8 mx-auto w-fit">
-              <Clock className="w-3.5 h-3.5 text-white/50" />
-              <span className="text-xs text-white/60 max-md:text-white/85 tracking-wider">{tr.duration} · {tr.growthMappingCall}</span>
-            </GlassPanel>
+            <div
+              className="rounded-full px-4 py-2 flex items-center gap-2 mb-8 mx-auto w-fit"
+              style={{
+                background: 'linear-gradient(135deg, rgba(160,100,255,0.14) 0%, rgba(120,60,220,0.10) 100%)',
+                border: '1px solid rgba(180,120,255,0.28)',
+                boxShadow: '0 0 20px rgba(140,80,255,0.14), inset 0 1px 0 rgba(200,160,255,0.12)',
+                backdropFilter: 'blur(12px)',
+              }}
+            >
+              <motion.div
+                className="w-1.5 h-1.5 rounded-full bg-purple-400"
+                animate={{ opacity: [0.5, 1, 0.5], scale: [1, 1.3, 1] }}
+                transition={{ duration: 2, repeat: Infinity }}
+                style={{ willChange: 'opacity, transform' }}
+              />
+              <Clock className="w-3.5 h-3.5" style={{ color: 'rgba(200,160,255,0.65)' }} />
+              <span className="text-xs tracking-wider" style={{ color: 'rgba(220,185,255,0.72)' }}>{tr.duration} · {tr.growthMappingCall}</span>
+            </div>
           </motion.div>
 
           {/* Headline */}
@@ -108,6 +122,35 @@ export function BookSection({ language, isActive, onBooking }: BookSectionProps)
           >
             {tr.growthMappingDesc}
           </motion.p>
+
+          {/* Social proof */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={isActive ? { opacity: 1 } : {}}
+            transition={{ delay: 0.65 }}
+            className="flex items-center gap-3 mb-6 justify-center"
+          >
+            {/* Avatar stack */}
+            <div className="flex -space-x-2">
+              {['A','M','T','J'].map((initial, i) => {
+                const gradients = [
+                  'linear-gradient(135deg, rgba(100,120,255,0.6), rgba(80,100,220,0.4))',
+                  'linear-gradient(135deg, rgba(190,110,255,0.6), rgba(150,70,220,0.4))',
+                  'linear-gradient(135deg, rgba(52,211,153,0.6), rgba(32,180,130,0.4))',
+                  'linear-gradient(135deg, rgba(255,200,70,0.6), rgba(220,160,40,0.4))',
+                ]
+                return (
+                  <div key={i} className="w-6 h-6 rounded-full flex items-center justify-center text-[8px] font-semibold text-white/80"
+                    style={{ background: gradients[i], border: '1.5px solid rgba(255,255,255,0.15)', zIndex: 4 - i }}>
+                    {initial}
+                  </div>
+                )
+              })}
+            </div>
+            <p className="text-white/35 text-[11px] tracking-wide">
+              <span className="text-white/58 font-medium">12+</span> businesses already automating
+            </p>
+          </motion.div>
 
           {/* CTA */}
           <motion.div
