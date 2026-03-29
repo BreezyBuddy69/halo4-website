@@ -15,73 +15,93 @@ export function SideNav({ currentSection, onNavigate, language }: SideNavProps) 
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null)
 
   return (
-    <nav className="hidden md:flex fixed left-4 top-1/2 -translate-y-1/2 z-40 flex-col gap-1.5">
+    <nav className="hidden md:flex fixed left-5 top-1/2 -translate-y-1/2 z-40 flex-col gap-2">
       {labels.map((label, i) => {
         const isActive = i === currentSection
         const isHovered = hoveredIdx === i
-        const lit = isActive || isHovered
 
         return (
           <motion.button
             key={i}
             data-cursor="hover"
             onClick={() => onNavigate(i)}
-            onHoverStart={() => setHoveredIdx(i)}
+            onHoverStart={() => { setHoveredIdx(i); onNavigate(i) }}
             onHoverEnd={() => setHoveredIdx(null)}
-            whileTap={{ scale: 0.96 }}
-            className="relative flex items-center gap-2 rounded-full text-left overflow-hidden"
+            animate={{
+              scale: isHovered ? 1.06 : isActive ? 1.02 : 1,
+              x: isHovered ? 3 : 0,
+            }}
+            transition={{ type: 'spring', stiffness: 380, damping: 28, mass: 0.6 }}
+            className="relative flex items-center gap-2.5 rounded-full text-left overflow-hidden"
             style={{
-              paddingLeft: 10,
-              paddingRight: 14,
-              paddingTop: 6,
-              paddingBottom: 6,
+              paddingLeft: 12,
+              paddingRight: 18,
+              paddingTop: 8,
+              paddingBottom: 8,
               background: isActive
-                ? 'linear-gradient(135deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.07) 100%)'
+                ? 'linear-gradient(135deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.08) 60%, rgba(255,255,255,0.12) 100%)'
                 : isHovered
-                ? 'linear-gradient(135deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.04) 100%)'
-                : 'linear-gradient(135deg, rgba(0,0,0,0.28) 0%, rgba(0,0,0,0.18) 100%)',
-              backdropFilter: 'blur(18px) saturate(160%)',
-              WebkitBackdropFilter: 'blur(18px) saturate(160%)',
+                ? 'linear-gradient(135deg, rgba(255,255,255,0.13) 0%, rgba(255,255,255,0.05) 60%, rgba(255,255,255,0.09) 100%)'
+                : 'linear-gradient(135deg, rgba(0,0,0,0.30) 0%, rgba(0,0,0,0.18) 100%)',
+              backdropFilter: 'blur(20px) saturate(180%)',
+              WebkitBackdropFilter: 'blur(20px) saturate(180%)',
               border: isActive
-                ? '1px solid rgba(255,255,255,0.28)'
-                : '1px solid rgba(255,255,255,0.09)',
+                ? '1px solid rgba(255,255,255,0.32)'
+                : isHovered
+                ? '1px solid rgba(255,255,255,0.20)'
+                : '1px solid rgba(255,255,255,0.08)',
               boxShadow: isActive
-                ? '0 4px 20px rgba(0,0,0,0.32), inset 0 1px 0 rgba(255,255,255,0.26)'
-                : '0 2px 8px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.06)',
-              color: isActive ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.38)',
-              transition: 'background 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease, color 0.22s ease',
+                ? '0 6px 28px rgba(0,0,0,0.35), 0 1px 0 rgba(255,255,255,0.18) inset, 0 -1px 0 rgba(0,0,0,0.12) inset'
+                : isHovered
+                ? '0 4px 20px rgba(0,0,0,0.28), 0 1px 0 rgba(255,255,255,0.14) inset'
+                : '0 2px 10px rgba(0,0,0,0.20), 0 1px 0 rgba(255,255,255,0.06) inset',
+              color: isActive
+                ? 'rgba(255,255,255,0.96)'
+                : isHovered
+                ? 'rgba(255,255,255,0.75)'
+                : 'rgba(255,255,255,0.35)',
+              transition: 'background 0.28s ease, border-color 0.28s ease, box-shadow 0.28s ease, color 0.28s ease',
             }}
           >
-            {/* Top gloss */}
-            <span className="absolute top-0 left-4 right-4 h-px pointer-events-none"
+            {/* Gloss line top */}
+            <span
+              className="absolute top-0 left-5 right-5 h-px pointer-events-none"
               style={{
-                background: lit
-                  ? 'linear-gradient(90deg, transparent, rgba(255,255,255,0.45), transparent)'
+                background: isActive || isHovered
+                  ? 'linear-gradient(90deg, transparent, rgba(255,255,255,0.50), transparent)'
                   : 'linear-gradient(90deg, transparent, rgba(255,255,255,0.10), transparent)',
-                transition: 'opacity 0.22s ease',
+                transition: 'opacity 0.28s ease',
               }}
             />
 
-            {/* Dot — always on left, animates between grey and white */}
+            {/* Dot */}
             <motion.span
-              layoutId={isActive ? 'sidenav-active-dot' : undefined}
               className="shrink-0 rounded-full relative z-10"
-              style={{
-                width: isActive ? 6 : 5,
-                height: isActive ? 6 : 5,
-                background: isActive
+              animate={{
+                width: isActive ? 7 : 5,
+                height: isActive ? 7 : 5,
+                backgroundColor: isActive
                   ? 'rgba(255,255,255,1)'
                   : isHovered
-                  ? 'rgba(255,255,255,0.55)'
-                  : 'rgba(255,255,255,0.22)',
-                boxShadow: isActive ? '0 0 6px rgba(255,255,255,0.6)' : 'none',
-                transition: 'background 0.22s ease, box-shadow 0.22s ease, width 0.22s ease, height 0.22s ease',
+                  ? 'rgba(255,255,255,0.60)'
+                  : 'rgba(255,255,255,0.20)',
+                boxShadow: isActive
+                  ? '0 0 8px 2px rgba(255,255,255,0.45)'
+                  : isHovered
+                  ? '0 0 5px 1px rgba(255,255,255,0.20)'
+                  : '0 0 0px rgba(255,255,255,0)',
               }}
+              transition={{ type: 'spring', stiffness: 400, damping: 26 }}
             />
 
-            <span className="text-[10px] font-medium tracking-[0.16em] whitespace-nowrap relative z-10">
+            {/* Label */}
+            <motion.span
+              className="relative z-10 whitespace-nowrap font-medium tracking-[0.15em]"
+              animate={{ fontSize: isActive ? '11px' : '10px' }}
+              transition={{ type: 'spring', stiffness: 400, damping: 28 }}
+            >
               {label}
-            </span>
+            </motion.span>
           </motion.button>
         )
       })}
