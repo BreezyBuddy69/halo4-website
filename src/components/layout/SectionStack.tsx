@@ -109,6 +109,7 @@ export function SectionStack({ currentSection, children, onSectionChange }: Sect
               style={{
                 zIndex: isCurrent ? 10 : isPrev ? 9 : i,
                 willChange: 'opacity',
+                pointerEvents: isCurrent ? 'auto' : 'none',
               }}
             >
               {child}
