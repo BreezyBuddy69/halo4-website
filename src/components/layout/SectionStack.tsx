@@ -37,7 +37,6 @@ export function SectionStack({ currentSection, children, onSectionChange }: Sect
   const isMobile = useMediaQuery('(max-width: 767px)')
   const [showHint, setShowHint] = useState(false)
   const [prevSection, setPrevSection] = useState(currentSection)
-  const [direction, setDirection] = useState(0) // 1=down, -1=up
   const isLastSection = currentSection === children.length - 1
 
   // Mobile: sync currentSection with native scroll via IntersectionObserver
@@ -64,10 +63,7 @@ export function SectionStack({ currentSection, children, onSectionChange }: Sect
   }, [isMobile, children.length]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (currentSection !== prevSection) {
-      setDirection(currentSection > prevSection ? 1 : -1)
-      setPrevSection(currentSection)
-    }
+    if (currentSection !== prevSection) setPrevSection(currentSection)
   }, [currentSection]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
@@ -103,24 +99,16 @@ export function SectionStack({ currentSection, children, onSectionChange }: Sect
         {children.map((child, i) => {
           const isCurrent = i === currentSection
           const isPrev = i === prevSection && i !== currentSection
-          const isAnimating = isCurrent || isPrev
-
-          // Pure positional slide — no opacity. Both sections stay fully visible
-          // during the transition so there is never a black gap.
-          const targetY = i < currentSection ? '-100%' : i > currentSection ? '100%' : '0%'
 
           return (
             <motion.div
               key={i}
               className="absolute inset-0"
-              animate={{ y: targetY }}
-              transition={isAnimating
-                ? { duration: 0.48, ease: [0.76, 0, 0.24, 1] }
-                : { duration: 0 }
-              }
+              animate={{ opacity: isCurrent ? 1 : 0 }}
+              transition={{ duration: 0.55, ease: 'easeInOut' }}
               style={{
                 zIndex: isCurrent ? 10 : isPrev ? 9 : i,
-                willChange: isAnimating ? 'transform' : 'auto',
+                willChange: 'opacity',
               }}
             >
               {child}
