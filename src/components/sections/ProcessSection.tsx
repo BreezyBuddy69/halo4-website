@@ -16,11 +16,17 @@ export function ProcessSection({ language, isActive, onBooking }: ProcessSection
   const tr = t(language)
   const [activeStep, setActiveStep] = useState(0)
 
+  const stepTitles = {
+    en: ['Discovery', 'Plan', 'Build', 'Launch'],
+    de: ['Gespräch', 'Plan', 'Umsetzung', 'Live'],
+    fr: ['Appel', 'Plan', 'Construction', 'Live'],
+  }
+  const titles = stepTitles[language]
   const steps = [
-    { num: '01', title: 'Audit', desc: tr.planStep1.replace('1. Audit: ', '').replace('1. Analyse: ', '') },
-    { num: '02', title: 'Strategy', desc: tr.planStep2.replace('2. Strategy: ', '').replace('2. Planung: ', '').replace('2. Planification: ', '') },
-    { num: '03', title: 'Build', desc: tr.planStep3.replace('3. Build: ', '').replace('3. Entwicklung: ', '').replace('3. Développement: ', '') },
-    { num: '04', title: 'Go Live', desc: tr.planStep4.replace('4. Go Live: ', '').replace('4. Start: ', '').replace('4. Lancement: ', '') },
+    { num: '01', title: titles[0], desc: tr.planStep1.replace(/^1\.[^:]+:\s*/, '') },
+    { num: '02', title: titles[1], desc: tr.planStep2.replace(/^2\.[^:]+:\s*/, '') },
+    { num: '03', title: titles[2], desc: tr.planStep3.replace(/^3\.[^:]+:\s*/, '') },
+    { num: '04', title: titles[3], desc: tr.planStep4.replace(/^4\.[^:]+:\s*/, '') },
   ]
 
   // Auto-advance every 5 seconds when active

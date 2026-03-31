@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import { SectionReveal } from '../ui/SectionReveal'
+import { AnimatedBg } from '../ui/AnimatedBg'
 import { CheckCircle, ImagePlus } from 'lucide-react'
 import type { Language } from '../../utils/translations'
 
@@ -59,6 +60,9 @@ export function AboutSection({ language, isActive }: AboutSectionProps) {
         <div className="absolute inset-0 pointer-events-none" style={{
           background: 'radial-gradient(ellipse 45% 55% at 90% 40%, rgba(140,60,180,0.12) 0%, transparent 58%)',
         }} />
+
+        {/* ── Animation C: Aurora Sweep ── */}
+        <AnimatedBg variant="aurora" isActive={isActive} />
 
         {/* Edge fades */}
         <div className="absolute top-0 inset-x-0 h-20 pointer-events-none z-10 m-edge-fade"

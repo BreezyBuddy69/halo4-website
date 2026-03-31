@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react'
 import { SectionReveal } from '../ui/SectionReveal'
+import { AnimatedBg } from '../ui/AnimatedBg'
 import { t, getNodeContent } from '../../utils/translations'
 import { SERVICE_NODES } from '../../utils/serviceData'
 import type { FilterGroup } from '../../utils/serviceData'
@@ -71,6 +72,9 @@ export function WorkSection({ language, isActive, onAskAI }: WorkSectionProps) {
         <div className="absolute inset-0 pointer-events-none" style={{
           background: 'radial-gradient(ellipse 70% 75% at 50% 50%, rgba(62,50,175,0.55) 0%, rgba(42,32,130,0.34) 28%, rgba(22,14,68,0.16) 56%, transparent 78%), radial-gradient(ellipse 45% 50% at 50% 50%, rgba(82,65,200,0.24) 0%, transparent 42%)',
         }} />
+
+        {/* ── Animation B: Rising Particles ── */}
+        <AnimatedBg variant="particles" isActive={isActive} />
 
         {/* Ambient glow — stable div, background swaps instantly, opacity fades in once */}
         <motion.div

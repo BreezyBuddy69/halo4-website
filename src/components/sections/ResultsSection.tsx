@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import { SectionReveal } from '../ui/SectionReveal'
+import { AnimatedBg } from '../ui/AnimatedBg'
 import { t } from '../../utils/translations'
 import type { Language } from '../../utils/translations'
 
@@ -42,9 +43,9 @@ export function ResultsSection({ language, isActive }: ResultsSectionProps) {
   ]
 
   const stats = [
-    { value: 20, suffix: '+', label: 'hrs saved / week' },
-    { value: 24, suffix: '/7', label: 'availability' },
-    { value: 250, suffix: '+', label: 'integrations' },
+    { value: 20, suffix: '+', label: tr.statHrs },
+    { value: 24, suffix: '/7', label: tr.statAvailability },
+    { value: 250, suffix: '+', label: tr.statIntegrations },
   ]
 
   return (
@@ -65,6 +66,9 @@ export function ResultsSection({ language, isActive }: ResultsSectionProps) {
             right: '-10%',
           }}
         />
+
+        {/* ── Animation: Drift Lines ── */}
+        <AnimatedBg variant="driftlines" isActive={isActive} />
 
         <div className="relative z-10 w-full h-full flex flex-col md:flex-row pl-8 md:pl-[13rem] lg:pl-[20rem] pr-8 md:pr-10 lg:pr-20 pt-20 pb-12 gap-8 md:gap-12 lg:gap-24" style={{ position: 'relative', zIndex: 10 }}>
 

@@ -33,12 +33,12 @@ export function BookSection({ language, isActive, onBooking }: BookSectionProps)
   const vantaRef = useRef<HTMLDivElement>(null)
   useVantaClouds(vantaRef, BOOK_CLOUDS_CONFIG, isActive, vantaEnabled)
 
-  const steps = [
-    { num: '01', text: 'Audit' },
-    { num: '02', text: 'Strategy' },
-    { num: '03', text: 'Build' },
-    { num: '04', text: 'Launch' },
-  ]
+  const stepLabels = {
+    en: ['Discovery', 'Plan', 'Build', 'Launch'],
+    de: ['Gespräch', 'Plan', 'Umsetzung', 'Live'],
+    fr: ['Appel', 'Plan', 'Construction', 'Live'],
+  }
+  const steps = stepLabels[language].map((text, i) => ({ num: `0${i + 1}`, text }))
 
   const [activeStep, setActiveStep] = useState(-1)
 
@@ -76,16 +76,18 @@ export function BookSection({ language, isActive, onBooking }: BookSectionProps)
           style={{ background: 'linear-gradient(180deg, rgba(6,2,18,0.05) 0%, rgba(6,2,18,0.20) 35%, rgba(6,2,18,0.52) 62%, rgba(6,2,18,0.72) 100%)' }}
         />
 
-        <div className="relative z-10 w-full h-full flex flex-col items-center justify-center px-8 md:px-16 text-center pt-16 md:pt-0">
+        {/* ── Two-column layout on desktop, stacked on mobile ── */}
+        <div className="relative z-10 w-full h-full flex flex-col md:flex-row items-center justify-center pl-8 md:pl-[13rem] lg:pl-[18rem] pr-8 md:pr-16 lg:pr-24 pt-20 md:pt-0 gap-12 md:gap-16 lg:gap-24">
 
-          {/* Duration badge */}
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={isActive ? { opacity: 1, y: 0 } : {}}
-            transition={{ delay: 0.3 }}
-          >
-            <div
-              className="rounded-full px-4 py-2 flex items-center gap-2 mb-8 mx-auto w-fit"
+          {/* ── Left: headline + CTA ── */}
+          <div className="flex flex-col items-start max-w-lg w-full">
+
+            {/* Duration badge */}
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={isActive ? { opacity: 1, y: 0 } : {}}
+              transition={{ delay: 0.25 }}
+              className="rounded-full px-4 py-2 flex items-center gap-2 mb-7 w-fit"
               style={{
                 background: 'linear-gradient(135deg, rgba(160,100,255,0.14) 0%, rgba(120,60,220,0.10) 100%)',
                 border: '1px solid rgba(180,120,255,0.28)',
@@ -101,136 +103,137 @@ export function BookSection({ language, isActive, onBooking }: BookSectionProps)
               />
               <Clock className="w-3.5 h-3.5" style={{ color: 'rgba(200,160,255,0.65)' }} />
               <span className="text-xs tracking-wider" style={{ color: 'rgba(220,185,255,0.72)' }}>{tr.duration} · {tr.growthMappingCall}</span>
-            </div>
-          </motion.div>
+            </motion.div>
 
-          {/* Headline */}
-          <motion.h2
-            initial={{ opacity: 0, y: 30 }}
-            animate={isActive ? { opacity: 1, y: 0 } : {}}
-            transition={{ delay: 0.4, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-            className="text-4xl md:text-7xl lg:text-8xl font-serif text-white leading-none mb-4"
-          >
-            {tr.workWithUs}
-          </motion.h2>
+            {/* Headline */}
+            <motion.h2
+              initial={{ opacity: 0, y: 24 }}
+              animate={isActive ? { opacity: 1, y: 0 } : {}}
+              transition={{ delay: 0.35, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+              className="text-4xl md:text-6xl lg:text-7xl font-serif text-white leading-[1.05] mb-5"
+            >
+              {tr.workWithUs}
+            </motion.h2>
 
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={isActive ? { opacity: 1 } : {}}
-            transition={{ delay: 0.6 }}
-            className="text-white/40 max-md:text-white/68 text-sm mb-6 md:mb-10 max-w-sm leading-relaxed"
-          >
-            {tr.growthMappingDesc}
-          </motion.p>
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={isActive ? { opacity: 1 } : {}}
+              transition={{ delay: 0.5 }}
+              className="text-white/45 text-sm leading-relaxed mb-8 max-w-xs"
+            >
+              {tr.growthMappingDesc}
+            </motion.p>
 
-          {/* Social proof */}
+            {/* CTA */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.93 }}
+              animate={isActive ? { opacity: 1, scale: 1 } : {}}
+              transition={{ delay: 0.6, type: 'spring', damping: 15 }}
+              className="mb-8"
+            >
+              <NeonButton onClick={onBooking} size="lg">
+                {tr.bookCall}
+              </NeonButton>
+            </motion.div>
+
+            {/* Social proof */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={isActive ? { opacity: 1 } : {}}
+              transition={{ delay: 0.7 }}
+              className="flex items-center gap-3"
+            >
+              <div className="flex -space-x-2">
+                {['A','M','T','J'].map((initial, i) => {
+                  const gradients = [
+                    'linear-gradient(135deg, rgba(100,120,255,0.6), rgba(80,100,220,0.4))',
+                    'linear-gradient(135deg, rgba(190,110,255,0.6), rgba(150,70,220,0.4))',
+                    'linear-gradient(135deg, rgba(52,211,153,0.6), rgba(32,180,130,0.4))',
+                    'linear-gradient(135deg, rgba(255,200,70,0.6), rgba(220,160,40,0.4))',
+                  ]
+                  return (
+                    <div key={i} className="w-6 h-6 rounded-full flex items-center justify-center text-[8px] font-semibold text-white/80"
+                      style={{ background: gradients[i], border: '1.5px solid rgba(255,255,255,0.15)', zIndex: 4 - i }}>
+                      {initial}
+                    </div>
+                  )
+                })}
+              </div>
+              <p className="text-white/35 text-[11px] tracking-wide">
+                <span className="text-white/58 font-medium">12+</span> {language === 'de' ? 'Unternehmen automatisieren bereits' : language === 'fr' ? 'entreprises déjà automatisées' : 'businesses already automating'}
+              </p>
+            </motion.div>
+          </div>
+
+          {/* ── Divider ── */}
+          <div className="hidden md:block w-px self-stretch shrink-0" style={{ background: 'linear-gradient(to bottom, transparent, rgba(255,255,255,0.10) 20%, rgba(255,255,255,0.10) 80%, transparent)' }} />
+
+          {/* ── Right: animated steps card ── */}
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={isActive ? { opacity: 1 } : {}}
-            transition={{ delay: 0.65 }}
-            className="flex items-center gap-3 mb-6 justify-center"
+            initial={{ opacity: 0, x: 30 }}
+            animate={isActive ? { opacity: 1, x: 0 } : {}}
+            transition={{ delay: 0.45, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+            className="hidden md:flex flex-col gap-3 w-full max-w-[320px]"
           >
-            {/* Avatar stack */}
-            <div className="flex -space-x-2">
-              {['A','M','T','J'].map((initial, i) => {
-                const gradients = [
-                  'linear-gradient(135deg, rgba(100,120,255,0.6), rgba(80,100,220,0.4))',
-                  'linear-gradient(135deg, rgba(190,110,255,0.6), rgba(150,70,220,0.4))',
-                  'linear-gradient(135deg, rgba(52,211,153,0.6), rgba(32,180,130,0.4))',
-                  'linear-gradient(135deg, rgba(255,200,70,0.6), rgba(220,160,40,0.4))',
-                ]
-                return (
-                  <div key={i} className="w-6 h-6 rounded-full flex items-center justify-center text-[8px] font-semibold text-white/80"
-                    style={{ background: gradients[i], border: '1.5px solid rgba(255,255,255,0.15)', zIndex: 4 - i }}>
-                    {initial}
-                  </div>
-                )
-              })}
-            </div>
-            <p className="text-white/35 text-[11px] tracking-wide">
-              <span className="text-white/58 font-medium">12+</span> businesses already automating
-            </p>
-          </motion.div>
+            <p className="text-white/30 text-xs tracking-[0.22em] uppercase mb-2">{tr.workWithUsDesc}</p>
 
-          {/* CTA */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={isActive ? { opacity: 1, scale: 1 } : {}}
-            transition={{ delay: 0.7, type: 'spring', damping: 15 }}
-          >
-            <NeonButton onClick={onBooking} size="lg">
-              {tr.bookCall}
-            </NeonButton>
-          </motion.div>
-
-          {/* Steps row — hidden on mobile */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={isActive ? { opacity: 1, y: 0 } : {}}
-            transition={{ delay: 0.9 }}
-            className="hidden md:flex items-center mt-10"
-          >
             {steps.map((step, i) => {
               const lit = activeStep >= i
               return (
-                <div key={i} className="flex items-center">
-                  {/* Step pill */}
-                  <motion.div
-                    className="flex items-center gap-2 px-3 py-1.5 rounded-full"
-                    animate={lit ? { scale: [1, 1.18, 1] } : { scale: 1 }}
-                    transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-                    style={{
-                      background: lit ? 'rgba(52,211,153,0.10)' : 'transparent',
-                      border: lit ? '1px solid rgba(52,211,153,0.22)' : '1px solid transparent',
-                      boxShadow: lit ? '0 0 14px rgba(52,211,153,0.12)' : 'none',
-                      transition: 'background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease',
-                    }}
+                <motion.div
+                  key={i}
+                  className="flex items-start gap-4 rounded-xl px-4 py-3.5"
+                  animate={{
+                    background: lit ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.02)',
+                    borderColor: lit ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.05)',
+                  }}
+                  transition={{ duration: 0.5 }}
+                  style={{ border: '1px solid rgba(255,255,255,0.05)' }}
+                >
+                  {/* Number */}
+                  <motion.span
+                    className="text-xs font-mono shrink-0 mt-0.5"
+                    animate={{ color: lit ? 'rgba(200,160,255,0.90)' : 'rgba(255,255,255,0.20)' }}
+                    transition={{ duration: 0.4 }}
                   >
-                    <motion.div
-                      animate={{ color: lit ? 'rgba(52,211,153,1)' : 'rgba(255,255,255,0.25)' }}
-                      transition={{ duration: 0.4 }}
-                      style={{ willChange: 'color' }}
-                    >
-                      <CheckCircle style={{ width: 13, height: 13 }} />
-                    </motion.div>
-                    <motion.span
-                      className="text-xs tracking-wider"
-                      animate={{ color: lit ? 'rgba(52,211,153,0.90)' : 'rgba(255,255,255,0.35)' }}
-                      transition={{ duration: 0.4 }}
-                    >
-                      {step.text}
-                    </motion.span>
-                  </motion.div>
+                    {step.num}
+                  </motion.span>
 
-                  {/* Connector line */}
-                  {i < steps.length - 1 && (
-                    <div className="relative mx-2" style={{ width: 40, height: 1, background: 'rgba(255,255,255,0.10)' }}>
-                      <motion.div
-                        className="absolute inset-0"
-                        style={{
-                          background: 'linear-gradient(90deg, #10b981, #34d399)',
-                          transformOrigin: 'left',
-                          boxShadow: '0 0 6px rgba(52,211,153,0.5)',
-                        }}
-                        initial={{ scaleX: 0 }}
-                        animate={{ scaleX: activeStep > i ? 1 : 0 }}
-                        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                      />
-                    </div>
-                  )}
-                </div>
+                  <div className="flex flex-col gap-1 min-w-0">
+                    {/* Step title */}
+                    <motion.div className="flex items-center gap-2">
+                      <motion.span
+                        className="text-sm font-medium"
+                        animate={{ color: lit ? 'rgba(255,255,255,0.90)' : 'rgba(255,255,255,0.30)' }}
+                        transition={{ duration: 0.4 }}
+                      >
+                        {step.text}
+                      </motion.span>
+                      {lit && (
+                        <motion.div
+                          initial={{ opacity: 0, scale: 0 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+                        >
+                          <CheckCircle style={{ width: 12, height: 12, color: 'rgba(52,211,153,0.85)' }} />
+                        </motion.div>
+                      )}
+                    </motion.div>
+                  </div>
+                </motion.div>
               )
             })}
+
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={isActive ? { opacity: 1 } : {}}
+              transition={{ delay: 1.2 }}
+              className="text-white/20 text-[10px] tracking-wider mt-2"
+            >
+              {tr.agencyNote}
+            </motion.p>
           </motion.div>
 
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={isActive ? { opacity: 1 } : {}}
-            transition={{ delay: 1.1 }}
-            className="text-white/20 text-[10px] tracking-wider mt-6 hidden md:block"
-          >
-            {tr.agencyNote}
-          </motion.p>
         </div>
 
       </div>
