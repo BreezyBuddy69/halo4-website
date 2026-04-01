@@ -67,8 +67,10 @@ export function ThinkingProcess({ language }: ThinkingProcessProps) {
   return (
     <div className="flex items-center gap-2 py-1">
       <Icon className="w-3 h-3 text-white/40 shrink-0" />
-      <span className="text-white/40 text-xs italic min-h-[1em]">{displayed}</span>
-      <span className="w-0.5 h-3 bg-white/30 animate-pulse" />
+      <span className="inline-flex items-center min-h-[1em]">
+        <span className="text-white/40 text-xs italic">{displayed}</span>
+        <span className="inline-block w-0.5 h-3 bg-white/30 animate-pulse ml-[2px]" />
+      </span>
     </div>
   )
 }
