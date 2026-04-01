@@ -10,7 +10,34 @@ interface VantaCloudsConfig {
 }
 
 type VantaEffect = { destroy: () => void }
-type VantaWindow = { THREE?: unknown; VANTA?: { CLOUDS2?: (c: Record<string, unknown>) => VantaEffect } }
+type VantaWin = { THREE?: unknown; VANTA?: { CLOUDS2?: (c: Record<string, unknown>) => VantaEffect } }
+
+const BASE = {
+  mouseControls: true,
+  touchControls: true,
+  gyroControls: false,
+  minHeight: 200,
+  minWidth: 200,
+  scale: 1.0,
+  backgroundColor: 0x0,
+  skyColor: 0x5ca6ca,
+  cloudColor: 0x334d80,
+  lightColor: 0xffffff,
+  speed: 1,
+  texturePath: '/gallery/noise.png',
+}
+
+// Load a script once (idempotent)
+function loadScript(src: string): Promise<void> {
+  return new Promise(resolve => {
+    if (document.querySelector(`script[src="${src}"]`)) { resolve(); return }
+    const s = document.createElement('script')
+    s.src = src
+    s.onload = () => resolve()
+    s.onerror = () => resolve() // resolve anyway so chain continues
+    document.head.appendChild(s)
+  })
+}
 
 export function useVantaClouds(
   containerRef: React.RefObject<HTMLDivElement | null>,
@@ -23,58 +50,37 @@ export function useVantaClouds(
   useEffect(() => {
     if (!enabled) return
 
-    const BASE_CONFIG = {
-      mouseControls: true,
-      touchControls: true,
-      gyroControls: false,
-      minHeight: 200,
-      minWidth: 200,
-      scale: 1.0,
-      backgroundColor: 0x0,
-      skyColor: 0x5ca6ca,
-      cloudColor: 0x334d80,
-      lightColor: 0xffffff,
-      speed: 1,
-      texturePath: '/gallery/noise.png',
-      ...config,
-    }
+    let cancelled = false
 
-    const initEffect = () => {
-      if (!containerRef.current || effectRef.current) return
-      const w = window as VantaWindow
-      if (!w.VANTA?.CLOUDS2) return
+    // Delay init so it doesn't block the first render / intro animation
+    const timer = setTimeout(async () => {
+      if (cancelled || effectRef.current) return
+
+      const w = window as VantaWin
+
+      // Load Three.js if not present
+      if (!w.THREE) await loadScript('/three.r121.min.js')
+      if (cancelled) return
+
+      // Load Vanta CLOUDS2 if not present
+      if (!w.VANTA?.CLOUDS2) await loadScript('/vanta.clouds2.min.js')
+      if (cancelled) return
+
+      if (!containerRef.current) return
+      const clouds2 = (window as VantaWin).VANTA?.CLOUDS2
+      if (!clouds2) return
+
       try {
-        effectRef.current = w.VANTA.CLOUDS2({ el: containerRef.current, ...BASE_CONFIG })
-      } catch { /* unavailable */ }
+        effectRef.current = clouds2({ el: containerRef.current, ...BASE, ...config })
+      } catch { /* WebGL unavailable */ }
+    }, 1400) // wait for intro animation to finish before touching the GPU
+
+    return () => {
+      cancelled = true
+      clearTimeout(timer)
+      effectRef.current?.destroy()
+      effectRef.current = null
     }
-
-    const w = window as VantaWindow
-
-    if (w.VANTA?.CLOUDS2) {
-      // Both scripts already loaded (preloaded via index.html)
-      initEffect()
-      return () => { effectRef.current?.destroy(); effectRef.current = null }
-    }
-
-    // Fallback: dynamic load if preload missed
-    const loadVanta = () => {
-      if ((window as VantaWindow).VANTA?.CLOUDS2) { initEffect(); return }
-      const s = document.createElement('script')
-      s.src = '/vanta.clouds2.min.js'
-      s.onload = initEffect
-      document.head.appendChild(s)
-    }
-
-    if (w.THREE) {
-      loadVanta()
-    } else {
-      const s = document.createElement('script')
-      s.src = '/three.r121.min.js'
-      s.onload = loadVanta
-      document.head.appendChild(s)
-    }
-
-    return () => { effectRef.current?.destroy(); effectRef.current = null }
   }, [containerRef]) // eslint-disable-line react-hooks/exhaustive-deps
-  // Note: isActive intentionally ignored — effect stays alive to avoid shader recompile stutter on revisit
+  // isActive intentionally unused — effect stays alive to avoid shader-recompile stutter on revisit
 }
