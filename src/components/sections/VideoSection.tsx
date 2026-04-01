@@ -43,14 +43,6 @@ export function VideoSection({ isActive, language }: VideoSectionProps) {
     }
   }, [isActive])
 
-  // ── Global cursor hide/show ─────────────────────────────────────
-  useEffect(() => {
-    if (isActive) {
-      document.dispatchEvent(new Event('cursor:hide'))
-    } else {
-      document.dispatchEvent(new Event('cursor:show'))
-    }
-  }, [isActive])
 
   // ── Spring cursor — pure rAF, zero React re-renders ────────────
   useEffect(() => {
@@ -80,9 +72,6 @@ export function VideoSection({ isActive, language }: VideoSectionProps) {
           current.y = e.clientY
           vel.x = 0
           vel.y = 0
-          document.dispatchEvent(new Event('cursor:hide'))
-        } else {
-          document.dispatchEvent(new Event('cursor:show'))
         }
       }
     }
@@ -142,7 +131,7 @@ export function VideoSection({ isActive, language }: VideoSectionProps) {
 
   return (
     <div
-      className="relative w-full h-full overflow-hidden bg-black cursor-none"
+      className="relative w-full h-full overflow-hidden bg-black"
       onClick={handleClick}
     >
       <video
