@@ -13,10 +13,10 @@ const labels: Record<Language, { play: string; mute: string }> = {
   fr: { play: "Lire\nL'Intro", mute: 'Couper\nLe Son' },
 }
 
-// Spring constants — same as global cursor
-const STIFFNESS = 180
-const DAMPING   = 22
-const MASS      = 0.6
+// Spring constants — tight enough to feel responsive, loose enough to look smooth
+const STIFFNESS = 480
+const DAMPING   = 30
+const MASS      = 0.35
 
 const NAVBAR_HEIGHT = 64
 const SIDENAV_WIDTH = 190

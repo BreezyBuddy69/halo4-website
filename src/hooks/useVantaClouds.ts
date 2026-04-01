@@ -9,97 +9,72 @@ interface VantaCloudsConfig {
   texturePath?: string
 }
 
+type VantaEffect = { destroy: () => void }
+type VantaWindow = { THREE?: unknown; VANTA?: { CLOUDS2?: (c: Record<string, unknown>) => VantaEffect } }
+
 export function useVantaClouds(
   containerRef: React.RefObject<HTMLDivElement | null>,
   config: VantaCloudsConfig = {},
-  isActive = true,
+  _isActive = true,
   enabled = true
 ) {
-  const effectRef = useRef<{ destroy: () => void } | null>(null)
-  const scriptsReadyRef = useRef(false)
+  const effectRef = useRef<VantaEffect | null>(null)
 
-  // Load Three.js + Vanta scripts once, then set scriptsReadyRef
   useEffect(() => {
     if (!enabled) return
+
+    const BASE_CONFIG = {
+      mouseControls: true,
+      touchControls: true,
+      gyroControls: false,
+      minHeight: 200,
+      minWidth: 200,
+      scale: 1.0,
+      backgroundColor: 0x0,
+      skyColor: 0x5ca6ca,
+      cloudColor: 0x334d80,
+      lightColor: 0xffffff,
+      speed: 1,
+      texturePath: '/gallery/noise.png',
+      ...config,
+    }
+
     const initEffect = () => {
-      if (!containerRef.current) return
-      const vanta = window as { VANTA?: { CLOUDS2?: (c: Record<string, unknown>) => { destroy: () => void } } }
-      if (!vanta.VANTA?.CLOUDS2) return
+      if (!containerRef.current || effectRef.current) return
+      const w = window as VantaWindow
+      if (!w.VANTA?.CLOUDS2) return
       try {
-        effectRef.current?.destroy()
-        effectRef.current = vanta.VANTA.CLOUDS2({
-          el: containerRef.current,
-          mouseControls: true,
-          touchControls: true,
-          gyroControls: false,
-          minHeight: 200,
-          minWidth: 200,
-          scale: 1.0,
-          backgroundColor: 0x0,
-          skyColor: 0x5ca6ca,
-          cloudColor: 0x334d80,
-          lightColor: 0xffffff,
-          speed: 1,
-          texturePath: '/gallery/noise.png',
-          ...config,
-        })
-        scriptsReadyRef.current = true
+        effectRef.current = w.VANTA.CLOUDS2({ el: containerRef.current, ...BASE_CONFIG })
       } catch { /* unavailable */ }
     }
 
-    const loadClouds = () => {
-      const vanta = window as { VANTA?: { CLOUDS2?: unknown } }
-      if (vanta.VANTA?.CLOUDS2) { initEffect(); return }
+    const w = window as VantaWindow
+
+    if (w.VANTA?.CLOUDS2) {
+      // Both scripts already loaded (preloaded via index.html)
+      initEffect()
+      return () => { effectRef.current?.destroy(); effectRef.current = null }
+    }
+
+    // Fallback: dynamic load if preload missed
+    const loadVanta = () => {
+      if ((window as VantaWindow).VANTA?.CLOUDS2) { initEffect(); return }
       const s = document.createElement('script')
       s.src = '/vanta.clouds2.min.js'
       s.onload = initEffect
       document.head.appendChild(s)
     }
 
-    if ((window as { THREE?: unknown }).THREE) {
-      loadClouds()
+    if (w.THREE) {
+      loadVanta()
     } else {
       const s = document.createElement('script')
       s.src = '/three.r121.min.js'
-      s.onload = loadClouds
+      s.onload = loadVanta
       document.head.appendChild(s)
     }
 
-    return () => {
-      effectRef.current?.destroy()
-      effectRef.current = null
-    }
+    return () => { effectRef.current?.destroy(); effectRef.current = null }
   }, [containerRef]) // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Destroy effect when section goes inactive, recreate when it comes back
-  useEffect(() => {
-    if (!enabled) return
-    if (isActive) {
-      if (!effectRef.current && scriptsReadyRef.current) {
-        const vanta = window as { VANTA?: { CLOUDS2?: (c: Record<string, unknown>) => { destroy: () => void } } }
-        if (!containerRef.current || !vanta.VANTA?.CLOUDS2) return
-        try {
-          effectRef.current = vanta.VANTA.CLOUDS2({
-            el: containerRef.current,
-            mouseControls: true,
-            touchControls: true,
-            gyroControls: false,
-            minHeight: 200,
-            minWidth: 200,
-            scale: 1.0,
-            backgroundColor: 0x0,
-            skyColor: 0x5ca6ca,
-            cloudColor: 0x334d80,
-            lightColor: 0xffffff,
-            speed: 1,
-            texturePath: '/gallery/noise.png',
-            ...config,
-          })
-        } catch { /* unavailable */ }
-      }
-    } else {
-      effectRef.current?.destroy()
-      effectRef.current = null
-    }
-  }, [isActive]) // eslint-disable-line react-hooks/exhaustive-deps
+  // Note: isActive intentionally ignored — effect stays alive to avoid shader recompile stutter on revisit
 }
