@@ -51,44 +51,49 @@ function IntroReveal({ children, onDone, isMobile, title1, title2 }: {
 
   useEffect(() => {
     const run = async () => {
-      await new Promise<void>(r => setTimeout(r, 80))
+      await new Promise<void>(r => setTimeout(r, 60))
       const t1  = t1Ref.current
       const t2  = t2Ref.current
       const box = boxRef.current
       if (!t1 || !t2 || !box) return
 
-      // Phase 1: titles enter from opposite sides with spring overshoot
+      // Phase 1: slide in from far outside — keyframe syntax sets explicit start value
       await Promise.all([
-        animate(t1, { opacity: 1, x: 0 }, { type: 'spring', damping: 13, stiffness: 160, mass: 0.9 }),
-        animate(t2, { opacity: 1, x: 0 }, { type: 'spring', damping: 13, stiffness: 160, mass: 0.9, delay: 0.10 }),
+        animate(t1, { x: ['-100vw', 0], opacity: [0, 1] }, {
+          type: 'spring', damping: 18, stiffness: 140, mass: 1.1,
+        }),
+        animate(t2, { x: ['100vw', 0], opacity: [0, 1] }, {
+          type: 'spring', damping: 18, stiffness: 140, mass: 1.1, delay: 0.12,
+        }),
       ])
 
-      // Hold at center briefly
-      await new Promise<void>(r => setTimeout(r, 300))
+      // Brief hold
+      await new Promise<void>(r => setTimeout(r, 260))
 
-      // Phase 2: cross to opposite sides
+      // Phase 2: shoot across to opposite sides (fast, punchy)
       await Promise.all([
-        animate(t1, { x: '55vw'  }, { duration: 0.38, ease: [0.4, 0, 0.6, 1] }),
-        animate(t2, { x: '-50vw' }, { duration: 0.38, ease: [0.4, 0, 0.6, 1] }),
+        animate(t1, { x: '70vw'  }, { duration: 0.30, ease: [0.55, 0, 1, 0.45] }),
+        animate(t2, { x: '-65vw' }, { duration: 0.30, ease: [0.55, 0, 1, 0.45] }),
       ])
 
-      // Phase 3: spring back to center while dark box expands on top
-      animate(t1, { x: 0 }, { type: 'spring', damping: 16, stiffness: 240, mass: 0.8 })
-      animate(t2, { x: 0 }, { type: 'spring', damping: 16, stiffness: 240, mass: 0.8 })
+      // Phase 3: spring back to 0 simultaneously with dark box expanding
+      animate(t1, { x: 0 }, { type: 'spring', damping: 20, stiffness: 260, mass: 0.75 })
+      animate(t2, { x: 0 }, { type: 'spring', damping: 20, stiffness: 260, mass: 0.75, delay: 0.04 })
 
+      // Box expands on top of returning titles
       if (isMobile) {
-        await animate(box, { scaleX: 1, scaleY: 0.04, borderRadius: '14px', opacity: 0.9 }, {
-          type: 'spring', damping: 28, stiffness: 230, mass: 0.45,
+        await animate(box, { scaleX: 1, scaleY: 0.035, borderRadius: '12px', opacity: 1 }, {
+          type: 'spring', damping: 30, stiffness: 260, mass: 0.4,
         })
-        await animate(box, { scaleY: 1, borderRadius: '0px', opacity: 1 }, {
-          type: 'spring', damping: 28, stiffness: 190, mass: 0.50,
+        await animate(box, { scaleY: 1, borderRadius: '0px' }, {
+          type: 'spring', damping: 26, stiffness: 200, mass: 0.5,
         })
       } else {
-        await animate(box, { scaleY: 1, scaleX: 0.16, borderRadius: '20px', opacity: 0.82 }, {
-          type: 'spring', damping: 28, stiffness: 230, mass: 0.45,
+        await animate(box, { scaleY: 1, scaleX: 0.14, borderRadius: '18px', opacity: 1 }, {
+          type: 'spring', damping: 30, stiffness: 260, mass: 0.4,
         })
-        await animate(box, { scaleX: 1, borderRadius: '0px', opacity: 1 }, {
-          type: 'spring', damping: 26, stiffness: 190, mass: 0.50,
+        await animate(box, { scaleX: 1, borderRadius: '0px' }, {
+          type: 'spring', damping: 24, stiffness: 200, mass: 0.5,
         })
       }
 
@@ -121,14 +126,14 @@ function IntroReveal({ children, onDone, isMobile, title1, title2 }: {
             <h1
               ref={t1Ref}
               className="text-[clamp(2.2rem,6vw,6.5rem)] font-serif leading-[1] tracking-tight mb-2 md:mb-0.5"
-              style={{ color: '#141628', opacity: 0, transform: 'translateX(-110vw)', willChange: 'transform, opacity' }}
+              style={{ color: '#141628', opacity: 0, willChange: 'transform, opacity' }}
             >
               {title1}
             </h1>
             <h1
               ref={t2Ref}
               className="text-[clamp(2.2rem,6vw,6.5rem)] font-serif leading-[1] tracking-tight"
-              style={{ color: 'rgba(20,22,40,0.45)', opacity: 0, transform: 'translateX(110vw)', willChange: 'transform, opacity' }}
+              style={{ color: 'rgba(20,22,40,0.45)', opacity: 0, willChange: 'transform, opacity' }}
             >
               {title2}
             </h1>
