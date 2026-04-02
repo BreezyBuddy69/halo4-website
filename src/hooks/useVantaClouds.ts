@@ -52,17 +52,16 @@ export function useVantaClouds(
 
     let cancelled = false
 
-    // Delay init so it doesn't block the first render / intro animation
-    const timer = setTimeout(async () => {
+    // Load scripts and init immediately — the intro animation runs for ~2.5s,
+    // giving Three.js plenty of time to compile shaders before the overlay lifts.
+    const run = async () => {
       if (cancelled || effectRef.current) return
 
       const w = window as VantaWin
 
-      // Load Three.js if not present
       if (!w.THREE) await loadScript('/three.r121.min.js')
       if (cancelled) return
 
-      // Load Vanta CLOUDS2 if not present
       if (!w.VANTA?.CLOUDS2) await loadScript('/vanta.clouds2.min.js')
       if (cancelled) return
 
@@ -73,11 +72,12 @@ export function useVantaClouds(
       try {
         effectRef.current = clouds2({ el: containerRef.current, ...BASE, ...config })
       } catch { /* WebGL unavailable */ }
-    }, 1400) // wait for intro animation to finish before touching the GPU
+    }
+
+    run()
 
     return () => {
       cancelled = true
-      clearTimeout(timer)
       effectRef.current?.destroy()
       effectRef.current = null
     }

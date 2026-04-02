@@ -402,7 +402,7 @@ export function HeroSection({ language, isActive, onBooking, inputRef, introDone
             className="text-[clamp(2.2rem,6vw,6.5rem)] font-serif text-white leading-[1] tracking-tight mb-2 md:mb-0.5"
             initial={{ opacity: 0, x: -70 }}
             animate={introDone ? { opacity: 1, x: 0 } : { opacity: 0, x: -70 }}
-            transition={{ delay: 0.08, duration: 0.72, ease: [0.16, 1, 0.3, 1] }}
+            transition={introDone ? { duration: 0.01 } : { delay: 0.08, duration: 0.72, ease: [0.16, 1, 0.3, 1] }}
           >
             {tr.heroTitle1}
           </motion.h1>
@@ -410,7 +410,7 @@ export function HeroSection({ language, isActive, onBooking, inputRef, introDone
             className="text-[clamp(2.2rem,6vw,6.5rem)] font-serif text-white/50 max-md:text-white/75 leading-[1] tracking-tight"
             initial={{ opacity: 0, x: 70 }}
             animate={introDone ? { opacity: 1, x: 0 } : { opacity: 0, x: 70 }}
-            transition={{ delay: 0.22, duration: 0.72, ease: [0.16, 1, 0.3, 1] }}
+            transition={introDone ? { duration: 0.01 } : { delay: 0.22, duration: 0.72, ease: [0.16, 1, 0.3, 1] }}
           >
             {tr.heroTitle2}
           </motion.h1>

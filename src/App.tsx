@@ -1,6 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
 import { motion, animate } from 'framer-motion'
-import { Cursor } from './components/ui/Cursor'
 import { Header } from './components/layout/Header'
 import { SideNav } from './components/layout/SideNav'
 import { SectionStack } from './components/layout/SectionStack'
@@ -18,6 +17,7 @@ import { useMediaQuery } from './hooks/useMediaQuery'
 import { ChatProvider, addGlobalChatMessage } from './contexts/ChatContext'
 import { PerformanceProvider } from './contexts/PerformanceContext'
 import { usePerformanceTier } from './hooks/usePerformanceTier'
+import { t } from './utils/translations'
 import type { Language } from './utils/translations'
 
 const TOTAL_SECTIONS = 7
@@ -36,33 +36,62 @@ function detectLanguage(): Language {
   return 'en'
 }
 
-// Two-phase reveal: strip narrows in first axis, then expands to fill screen
-function IntroReveal({ children, onDone, isMobile }: { children: React.ReactNode; onDone: () => void; isMobile: boolean }) {
+// Cinematic intro: titles slide in from sides, cross, spring back — dark box expands to reveal hero
+function IntroReveal({ children, onDone, isMobile, title1, title2 }: {
+  children: React.ReactNode
+  onDone: () => void
+  isMobile: boolean
+  title1: string
+  title2: string
+}) {
   const boxRef = useRef<HTMLDivElement>(null)
+  const t1Ref  = useRef<HTMLHeadingElement>(null)
+  const t2Ref  = useRef<HTMLHeadingElement>(null)
   const [done, setDone] = useState(false)
 
   useEffect(() => {
     const run = async () => {
-      await new Promise<void>(r => setTimeout(r, 100))
-      const el = boxRef.current
-      if (!el) return
+      await new Promise<void>(r => setTimeout(r, 80))
+      const t1  = t1Ref.current
+      const t2  = t2Ref.current
+      const box = boxRef.current
+      if (!t1 || !t2 || !box) return
+
+      // Phase 1: titles enter from opposite sides with spring overshoot
+      await Promise.all([
+        animate(t1, { opacity: 1, x: 0 }, { type: 'spring', damping: 13, stiffness: 160, mass: 0.9 }),
+        animate(t2, { opacity: 1, x: 0 }, { type: 'spring', damping: 13, stiffness: 160, mass: 0.9, delay: 0.10 }),
+      ])
+
+      // Hold at center briefly
+      await new Promise<void>(r => setTimeout(r, 300))
+
+      // Phase 2: cross to opposite sides
+      await Promise.all([
+        animate(t1, { x: '55vw'  }, { duration: 0.38, ease: [0.4, 0, 0.6, 1] }),
+        animate(t2, { x: '-50vw' }, { duration: 0.38, ease: [0.4, 0, 0.6, 1] }),
+      ])
+
+      // Phase 3: spring back to center while dark box expands on top
+      animate(t1, { x: 0 }, { type: 'spring', damping: 16, stiffness: 240, mass: 0.8 })
+      animate(t2, { x: 0 }, { type: 'spring', damping: 16, stiffness: 240, mass: 0.8 })
+
       if (isMobile) {
-        // Mobile: full width bar first, then expand height
-        await animate(el, { scaleX: 1, scaleY: 0.04, borderRadius: '14px', opacity: 0.9 }, {
+        await animate(box, { scaleX: 1, scaleY: 0.04, borderRadius: '14px', opacity: 0.9 }, {
           type: 'spring', damping: 28, stiffness: 230, mass: 0.45,
         })
-        await animate(el, { scaleY: 1, borderRadius: '0px', opacity: 1 }, {
+        await animate(box, { scaleY: 1, borderRadius: '0px', opacity: 1 }, {
           type: 'spring', damping: 28, stiffness: 190, mass: 0.50,
         })
       } else {
-        // Desktop: height strip first, then expand width
-        await animate(el, { scaleY: 1, scaleX: 0.16, borderRadius: '20px', opacity: 0.82 }, {
+        await animate(box, { scaleY: 1, scaleX: 0.16, borderRadius: '20px', opacity: 0.82 }, {
           type: 'spring', damping: 28, stiffness: 230, mass: 0.45,
         })
-        await animate(el, { scaleX: 1, borderRadius: '0px', opacity: 1 }, {
+        await animate(box, { scaleX: 1, borderRadius: '0px', opacity: 1 }, {
           type: 'spring', damping: 26, stiffness: 190, mass: 0.50,
         })
       }
+
       setDone(true)
       onDone()
     }
@@ -71,7 +100,7 @@ function IntroReveal({ children, onDone, isMobile }: { children: React.ReactNode
 
   return (
     <>
-      {/* App content — always rendered, starts faint so it breathes into view */}
+      {/* App content — always rendered, breathes into view after overlay lifts */}
       <motion.div
         className={done && isMobile ? 'min-h-screen' : 'fixed inset-0'}
         initial={{ opacity: 0.18 }}
@@ -81,17 +110,36 @@ function IntroReveal({ children, onDone, isMobile }: { children: React.ReactNode
         {children}
       </motion.div>
 
-      {/* Intro overlay — only during animation */}
+      {/* Intro overlay */}
       {!done && (
-        <div className="fixed inset-0 z-[200] pointer-events-none">
+        <div className="fixed inset-0 z-[200] pointer-events-none overflow-hidden">
           {/* White background */}
           <div className="absolute inset-0 bg-white" />
-          {/* Dark expanding box */}
+
+          {/* Titles — positioned identical to HeroSection, dark on white */}
+          <div className="absolute bottom-20 md:bottom-[4.5rem] inset-x-0 flex flex-col items-start md:pl-36 lg:pl-40 px-5 md:px-0">
+            <h1
+              ref={t1Ref}
+              className="text-[clamp(2.2rem,6vw,6.5rem)] font-serif leading-[1] tracking-tight mb-2 md:mb-0.5"
+              style={{ color: '#141628', opacity: 0, transform: 'translateX(-110vw)', willChange: 'transform, opacity' }}
+            >
+              {title1}
+            </h1>
+            <h1
+              ref={t2Ref}
+              className="text-[clamp(2.2rem,6vw,6.5rem)] font-serif leading-[1] tracking-tight"
+              style={{ color: 'rgba(20,22,40,0.45)', opacity: 0, transform: 'translateX(110vw)', willChange: 'transform, opacity' }}
+            >
+              {title2}
+            </h1>
+          </div>
+
+          {/* Dark expanding box — sits above titles */}
           <motion.div
             ref={boxRef}
             className="absolute inset-0"
             initial={{ scaleX: 0.08, scaleY: 0.06, borderRadius: '60px', opacity: 0.3 }}
-            style={{ transformOrigin: 'center center', background: '#141628' }}
+            style={{ transformOrigin: 'center center', background: '#141628', zIndex: 10 }}
           />
         </div>
       )}
@@ -264,9 +312,11 @@ function AppInner() {
     </>
   )
 
+  const tr = t(language)
+
   return (
     <PerformanceProvider tier={tier}>
-      <IntroReveal onDone={() => setIntroDone(true)} isMobile={isMobile}>
+      <IntroReveal onDone={() => setIntroDone(true)} isMobile={isMobile} title1={tr.heroTitle1} title2={tr.heroTitle2}>
         {appContent}
       </IntroReveal>
     </PerformanceProvider>
