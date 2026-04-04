@@ -26,7 +26,7 @@ const BASE = {
   gyroControls: false,
   minHeight: 200,
   minWidth: 200,
-  scale: 1.0,
+  scale: 1.5,        // slightly lower res = much better perf, still looks great
   backgroundColor: 0x0,
   skyColor: 0x5ca6ca,
   cloudColor: 0x334d80,
@@ -35,13 +35,11 @@ const BASE = {
   texturePath: '/gallery/noise.png',
 }
 
-// Load a script once, safely handling the case where the tag exists but script is still running
 function loadScript(src: string): Promise<void> {
   return new Promise(resolve => {
-    const existing = document.querySelector(`script[src="${src}"]`)
+    const existing = document.querySelector(`script[src="${src}"]`) as HTMLScriptElement | null
     if (existing) {
-      // Script tag exists — wait for it if still loading
-      if ((existing as HTMLScriptElement).dataset.loaded) { resolve(); return }
+      if (existing.dataset.loaded) { resolve(); return }
       existing.addEventListener('load', () => resolve())
       existing.addEventListener('error', () => resolve())
       return
@@ -54,8 +52,7 @@ function loadScript(src: string): Promise<void> {
   })
 }
 
-// Wait for a Vanta effect to be available on window.VANTA, with retry
-async function waitForVantaEffect(name: string, maxWaitMs = 2000): Promise<((c: Record<string, unknown>) => VantaEffect) | null> {
+async function waitForVantaEffect(name: string, maxWaitMs = 3000): Promise<((c: Record<string, unknown>) => VantaEffect) | null> {
   const w = window as VantaWin
   const start = Date.now()
   while (Date.now() - start < maxWaitMs) {
@@ -69,13 +66,20 @@ async function waitForVantaEffect(name: string, maxWaitMs = 2000): Promise<((c: 
 export function useVantaClouds(
   containerRef: React.RefObject<HTMLDivElement | null>,
   config: VantaCloudsConfig = {},
-  _isActive = true,
+  isActive = true,
   enabled = true
 ) {
   const effectRef = useRef<VantaEffect | null>(null)
 
   useEffect(() => {
     if (!enabled) return
+
+    // Destroy when section goes inactive — only one shader runs at a time
+    if (!isActive) {
+      effectRef.current?.destroy()
+      effectRef.current = null
+      return
+    }
 
     let cancelled = false
 
@@ -88,16 +92,13 @@ export function useVantaClouds(
 
       const w = window as VantaWin
 
-      // THREE — preloaded via HTML, but load dynamically as fallback
       if (!w.THREE) await loadScript('/three.r121.min.js')
       if (cancelled) return
 
-      // Vanta effect script — preloaded via HTML, but load dynamically as fallback
       const alreadyAvailable = typeof w.VANTA?.[effectName] === 'function'
       if (!alreadyAvailable) await loadScript(scriptSrc)
       if (cancelled) return
 
-      // Wait for window.VANTA[effectName] to be set (handles async script execution)
       const vantaFn = await waitForVantaEffect(effectName)
       if (cancelled || !vantaFn || !containerRef.current) return
 
@@ -113,5 +114,5 @@ export function useVantaClouds(
       effectRef.current?.destroy()
       effectRef.current = null
     }
-  }, [containerRef]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isActive, enabled]) // eslint-disable-line react-hooks/exhaustive-deps
 }
