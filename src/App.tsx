@@ -113,56 +113,64 @@ function IntroReveal({ children, onDone, isMobile, title1, title2 }: {
 
   return (
     <>
-      {/* Black page backdrop — only visible until box fully covers */}
-      {!done && (
-        <div className="fixed inset-0 z-[190]" style={{ background: '#000', pointerEvents: 'none' }} />
-      )}
-
-      {/* Phase 1: the box — scales from center to full-screen */}
-      {!done && (
+      {/* App content always lives in the same fixed container — never remounts */}
+      <div className={isMobile ? 'min-h-screen' : 'fixed inset-0'} style={{ zIndex: done ? 0 : 190 }}>
         <motion.div
-          className="fixed inset-0 z-[195] overflow-hidden"
-          initial={{ scale: 0.18, borderRadius: '28px' }}
-          animate={{ scale: 1, borderRadius: '0px' }}
-          transition={{ type: 'spring', damping: 28, stiffness: 180, mass: 1 }}
-          onAnimationComplete={() => setBoxOpen(true)}
-          style={{ originX: '50%', originY: '50%', willChange: 'transform' }}
+          className="w-full h-full"
+          initial={{ opacity: 0.12 }}
+          animate={{ opacity: done || revealing ? 1 : 0.12 }}
+          transition={{ duration: 0.95, ease: 'easeOut' }}
         >
-          {/* Subtle glow border that fades as box expands */}
-          <motion.div
-            className="absolute inset-0 pointer-events-none"
-            initial={{ opacity: 1 }}
-            animate={{ opacity: 0 }}
-            transition={{ duration: 0.7, delay: 0.3 }}
-            style={{
-              borderRadius: 'inherit',
-              boxShadow: '0 0 0 1.5px rgba(255,255,255,0.18), 0 0 40px rgba(255,255,255,0.08), inset 0 0 40px rgba(255,255,255,0.04)',
-            }}
-          />
+          {children}
+        </motion.div>
+      </div>
 
-          {/* App content — slightly dimmed during box phase, clears when reveal starts */}
+      {/* Intro overlay — sits on top, removed when done */}
+      {!done && (
+        <>
+          {/* Black backdrop behind the expanding box */}
+          <div className="fixed inset-0 z-[192] pointer-events-none" style={{ background: '#000' }} />
+
+          {/* The box: scales from small to full-screen */}
           <motion.div
-            className="w-full h-full"
-            initial={{ opacity: 0.12 }}
-            animate={{ opacity: revealing ? 1 : 0.12 }}
-            transition={{ duration: 0.95, ease: 'easeOut' }}
+            className="fixed z-[195] pointer-events-none overflow-hidden"
+            style={{
+              top: '50%', left: '50%',
+              width: '100vw', height: '100vh',
+              x: '-50%', y: '-50%',
+              willChange: 'transform, borderRadius',
+            }}
+            initial={{ scale: 0.18, borderRadius: '28px' }}
+            animate={{ scale: 1, borderRadius: '0px' }}
+            transition={{ type: 'spring', damping: 28, stiffness: 180, mass: 1 }}
+            onAnimationComplete={() => setBoxOpen(true)}
           >
-            {children}
+            {/* Glow border fades as box expands */}
+            <motion.div
+              className="absolute inset-0"
+              initial={{ opacity: 1 }}
+              animate={{ opacity: 0 }}
+              transition={{ duration: 0.7, delay: 0.3 }}
+              style={{
+                borderRadius: 'inherit',
+                boxShadow: '0 0 0 1.5px rgba(255,255,255,0.22), 0 0 50px rgba(255,255,255,0.10), inset 0 0 50px rgba(255,255,255,0.05)',
+                pointerEvents: 'none',
+              }}
+            />
           </motion.div>
 
           {/* Backdrop blur — fades once revealing */}
           <motion.div
-            className="absolute inset-0 pointer-events-none"
-            initial={{ opacity: 1 }}
+            className="fixed inset-0 z-[196] pointer-events-none"
             animate={{ opacity: revealing ? 0 : 1 }}
             transition={{ duration: 0.95, ease: 'easeOut' }}
             style={{ backdropFilter: 'blur(22px)', WebkitBackdropFilter: 'blur(22px)' }}
           />
 
-          {/* Titles — centered, white, difference-blend */}
+          {/* Titles — appear after box is open */}
           {boxOpen && (
             <div
-              className="absolute inset-0 flex flex-col items-center justify-center gap-1 md:gap-2 pointer-events-none"
+              className="fixed inset-0 z-[197] flex flex-col items-center justify-center gap-1 md:gap-2 pointer-events-none"
               style={{ mixBlendMode: 'difference' }}
             >
               <h1
@@ -181,14 +189,7 @@ function IntroReveal({ children, onDone, isMobile, title1, title2 }: {
               </h1>
             </div>
           )}
-        </motion.div>
-      )}
-
-      {/* After done: app content takes over normally */}
-      {done && (
-        <div className={isMobile ? 'min-h-screen' : 'fixed inset-0'}>
-          {children}
-        </div>
+        </>
       )}
     </>
   )

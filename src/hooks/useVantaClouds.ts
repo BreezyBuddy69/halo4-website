@@ -17,10 +17,7 @@ interface VantaCloudsConfig {
 type VantaEffect = { destroy: () => void }
 type VantaWin = {
   THREE?: unknown
-  VANTA?: {
-    CLOUDS?: (c: Record<string, unknown>) => VantaEffect
-    CLOUDS2?: (c: Record<string, unknown>) => VantaEffect
-  }
+  VANTA?: Record<string, ((c: Record<string, unknown>) => VantaEffect) | unknown>
 }
 
 const BASE = {
@@ -38,16 +35,35 @@ const BASE = {
   texturePath: '/gallery/noise.png',
 }
 
-// Load a script once (idempotent)
+// Load a script once, safely handling the case where the tag exists but script is still running
 function loadScript(src: string): Promise<void> {
   return new Promise(resolve => {
-    if (document.querySelector(`script[src="${src}"]`)) { resolve(); return }
+    const existing = document.querySelector(`script[src="${src}"]`)
+    if (existing) {
+      // Script tag exists — wait for it if still loading
+      if ((existing as HTMLScriptElement).dataset.loaded) { resolve(); return }
+      existing.addEventListener('load', () => resolve())
+      existing.addEventListener('error', () => resolve())
+      return
+    }
     const s = document.createElement('script')
     s.src = src
-    s.onload = () => resolve()
-    s.onerror = () => resolve() // resolve anyway so chain continues
+    s.onload = () => { s.dataset.loaded = '1'; resolve() }
+    s.onerror = () => { s.dataset.loaded = '1'; resolve() }
     document.head.appendChild(s)
   })
+}
+
+// Wait for a Vanta effect to be available on window.VANTA, with retry
+async function waitForVantaEffect(name: string, maxWaitMs = 2000): Promise<((c: Record<string, unknown>) => VantaEffect) | null> {
+  const w = window as VantaWin
+  const start = Date.now()
+  while (Date.now() - start < maxWaitMs) {
+    const effect = w.VANTA?.[name]
+    if (typeof effect === 'function') return effect as (c: Record<string, unknown>) => VantaEffect
+    await new Promise(r => setTimeout(r, 30))
+  }
+  return null
 }
 
 export function useVantaClouds(
@@ -64,36 +80,30 @@ export function useVantaClouds(
     let cancelled = false
 
     const { variant = 'clouds2', ...restConfig } = config
+    const effectName = variant === 'clouds' ? 'CLOUDS' : 'CLOUDS2'
+    const scriptSrc = variant === 'clouds' ? '/vanta.clouds.min.js' : '/vanta.clouds2.min.js'
 
-    // Load scripts and init immediately — the intro animation runs for ~2.5s,
-    // giving Three.js plenty of time to compile shaders before the overlay lifts.
     const run = async () => {
       if (cancelled || effectRef.current) return
 
       const w = window as VantaWin
 
+      // THREE — preloaded via HTML, but load dynamically as fallback
       if (!w.THREE) await loadScript('/three.r121.min.js')
       if (cancelled) return
 
-      if (variant === 'clouds') {
-        if (!w.VANTA?.CLOUDS) await loadScript('/vanta.clouds.min.js')
-        if (cancelled) return
-        if (!containerRef.current) return
-        const clouds = (window as VantaWin).VANTA?.CLOUDS
-        if (!clouds) return
-        try {
-          effectRef.current = clouds({ el: containerRef.current, ...BASE, ...restConfig })
-        } catch { /* WebGL unavailable */ }
-      } else {
-        if (!w.VANTA?.CLOUDS2) await loadScript('/vanta.clouds2.min.js')
-        if (cancelled) return
-        if (!containerRef.current) return
-        const clouds2 = (window as VantaWin).VANTA?.CLOUDS2
-        if (!clouds2) return
-        try {
-          effectRef.current = clouds2({ el: containerRef.current, ...BASE, ...restConfig })
-        } catch { /* WebGL unavailable */ }
-      }
+      // Vanta effect script — preloaded via HTML, but load dynamically as fallback
+      const alreadyAvailable = typeof w.VANTA?.[effectName] === 'function'
+      if (!alreadyAvailable) await loadScript(scriptSrc)
+      if (cancelled) return
+
+      // Wait for window.VANTA[effectName] to be set (handles async script execution)
+      const vantaFn = await waitForVantaEffect(effectName)
+      if (cancelled || !vantaFn || !containerRef.current) return
+
+      try {
+        effectRef.current = vantaFn({ el: containerRef.current, ...BASE, ...restConfig })
+      } catch { /* WebGL unavailable */ }
     }
 
     run()
@@ -104,5 +114,4 @@ export function useVantaClouds(
       effectRef.current = null
     }
   }, [containerRef]) // eslint-disable-line react-hooks/exhaustive-deps
-  // isActive intentionally unused — effect stays alive to avoid shader-recompile stutter on revisit
 }
