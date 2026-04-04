@@ -36,7 +36,9 @@ function detectLanguage(): Language {
   return 'en'
 }
 
-// Cinematic intro: titles slide in from sides, cross, spring back — dark box expands to reveal hero
+// Premium 2-phase intro:
+// Phase 1 — a box scales from small to full-screen (box expand)
+// Phase 2 — titles split/cross/spring, then blur lifts
 function IntroReveal({ children, onDone, isMobile, title1, title2 }: {
   children: React.ReactNode
   onDone: () => void
@@ -44,108 +46,148 @@ function IntroReveal({ children, onDone, isMobile, title1, title2 }: {
   title1: string
   title2: string
 }) {
-  const boxRef = useRef<HTMLDivElement>(null)
-  const t1Ref  = useRef<HTMLHeadingElement>(null)
-  const t2Ref  = useRef<HTMLHeadingElement>(null)
+  const t1Ref = useRef<HTMLHeadingElement>(null)
+  const t2Ref = useRef<HTMLHeadingElement>(null)
   const [done, setDone] = useState(false)
+  const [revealing, setRevealing] = useState(false)
+  const [boxOpen, setBoxOpen] = useState(false)
 
+  // Phase 2: title choreography — starts after box is mostly open
   useEffect(() => {
+    if (!boxOpen) return
+
     const run = async () => {
       await new Promise<void>(r => setTimeout(r, 60))
-      const t1  = t1Ref.current
-      const t2  = t2Ref.current
-      const box = boxRef.current
-      if (!t1 || !t2 || !box) return
+      const t1 = t1Ref.current
+      const t2 = t2Ref.current
+      if (!t1 || !t2) return
 
-      // Phase 1: slide in from far outside — keyframe syntax sets explicit start value
+      const travel = window.innerWidth * (isMobile ? 0.34 : 0.42)
+
+      // Fade in centered titles
       await Promise.all([
-        animate(t1, { x: ['-100vw', 0], opacity: [0, 1] }, {
-          type: 'spring', damping: 18, stiffness: 140, mass: 1.1,
-        }),
-        animate(t2, { x: ['100vw', 0], opacity: [0, 1] }, {
-          type: 'spring', damping: 18, stiffness: 140, mass: 1.1, delay: 0.12,
-        }),
+        animate(t1, { opacity: 1 }, { duration: 0.28 }),
+        animate(t2, { opacity: 1 }, { duration: 0.28, delay: 0.1 }),
+      ])
+      await new Promise<void>(r => setTimeout(r, 80))
+
+      // Split — t1 left, t2 right
+      await Promise.all([
+        animate(t1, { x: -travel }, { duration: 0.32, ease: [0.4, 0, 0.2, 1] }),
+        animate(t2, { x: travel },  { duration: 0.32, ease: [0.4, 0, 0.2, 1] }),
+      ])
+      await new Promise<void>(r => setTimeout(r, 75))
+
+      // Cross — t1 right, t2 left
+      await Promise.all([
+        animate(t1, { x: travel * 0.88 },  { duration: 0.36, ease: [0.4, 0, 0.6, 1] }),
+        animate(t2, { x: -travel * 0.88 }, { duration: 0.36, ease: [0.4, 0, 0.6, 1] }),
+      ])
+      await new Promise<void>(r => setTimeout(r, 65))
+
+      // Split again, smaller
+      await Promise.all([
+        animate(t1, { x: -travel * 0.40 }, { duration: 0.26, ease: [0.4, 0, 0.2, 1] }),
+        animate(t2, { x: travel * 0.40 },  { duration: 0.26, ease: [0.4, 0, 0.2, 1] }),
       ])
 
-      // Brief hold
-      await new Promise<void>(r => setTimeout(r, 260))
+      // Spring back to center + start unblurring
+      animate(t1, { x: 0 }, { type: 'spring', damping: 22, stiffness: 300, mass: 0.7 })
+      animate(t2, { x: 0 }, { type: 'spring', damping: 22, stiffness: 300, mass: 0.7, delay: 0.05 })
+      setRevealing(true)
 
-      // Phase 2: shoot across to opposite sides (fast, punchy)
+      await new Promise<void>(r => setTimeout(r, 660))
+
+      // Titles drift down and fade out
+      const toY = window.innerHeight * 0.21
       await Promise.all([
-        animate(t1, { x: '70vw'  }, { duration: 0.30, ease: [0.55, 0, 1, 0.45] }),
-        animate(t2, { x: '-65vw' }, { duration: 0.30, ease: [0.55, 0, 1, 0.45] }),
+        animate(t1, { y: toY, opacity: 0 }, { duration: 0.46, ease: [0.4, 0, 1, 1] }),
+        animate(t2, { y: toY, opacity: 0 }, { duration: 0.46, ease: [0.4, 0, 1, 1], delay: 0.06 }),
       ])
-
-      // Phase 3: spring back to 0 simultaneously with dark box expanding
-      animate(t1, { x: 0 }, { type: 'spring', damping: 20, stiffness: 260, mass: 0.75 })
-      animate(t2, { x: 0 }, { type: 'spring', damping: 20, stiffness: 260, mass: 0.75, delay: 0.04 })
-
-      // Box expands on top of returning titles
-      if (isMobile) {
-        await animate(box, { scaleX: 1, scaleY: 0.035, borderRadius: '12px', opacity: 1 }, {
-          type: 'spring', damping: 30, stiffness: 260, mass: 0.4,
-        })
-        await animate(box, { scaleY: 1, borderRadius: '0px' }, {
-          type: 'spring', damping: 26, stiffness: 200, mass: 0.5,
-        })
-      } else {
-        await animate(box, { scaleY: 1, scaleX: 0.14, borderRadius: '18px', opacity: 1 }, {
-          type: 'spring', damping: 30, stiffness: 260, mass: 0.4,
-        })
-        await animate(box, { scaleX: 1, borderRadius: '0px' }, {
-          type: 'spring', damping: 24, stiffness: 200, mass: 0.5,
-        })
-      }
 
       setDone(true)
       onDone()
     }
     run()
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [boxOpen]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <>
-      {/* App content — always rendered, breathes into view after overlay lifts */}
-      <motion.div
-        className={done && isMobile ? 'min-h-screen' : 'fixed inset-0'}
-        initial={{ opacity: 0.18 }}
-        animate={{ opacity: done ? 1 : 0.18 }}
-        transition={{ duration: 0.65, ease: 'easeOut' }}
-      >
-        {children}
-      </motion.div>
-
-      {/* Intro overlay */}
+      {/* Black page backdrop — only visible until box fully covers */}
       {!done && (
-        <div className="fixed inset-0 z-[200] pointer-events-none overflow-hidden">
-          {/* White background */}
-          <div className="absolute inset-0 bg-white" />
+        <div className="fixed inset-0 z-[190]" style={{ background: '#000', pointerEvents: 'none' }} />
+      )}
 
-          {/* Titles — positioned identical to HeroSection, dark on white */}
-          <div className="absolute bottom-20 md:bottom-[4.5rem] inset-x-0 flex flex-col items-start md:pl-36 lg:pl-40 px-5 md:px-0">
-            <h1
-              ref={t1Ref}
-              className="text-[clamp(2.2rem,6vw,6.5rem)] font-serif leading-[1] tracking-tight mb-2 md:mb-0.5"
-              style={{ color: '#141628', opacity: 0, willChange: 'transform, opacity' }}
-            >
-              {title1}
-            </h1>
-            <h1
-              ref={t2Ref}
-              className="text-[clamp(2.2rem,6vw,6.5rem)] font-serif leading-[1] tracking-tight"
-              style={{ color: 'rgba(20,22,40,0.45)', opacity: 0, willChange: 'transform, opacity' }}
-            >
-              {title2}
-            </h1>
-          </div>
-
-          {/* Dark expanding box — sits above titles */}
+      {/* Phase 1: the box — scales from center to full-screen */}
+      {!done && (
+        <motion.div
+          className="fixed inset-0 z-[195] overflow-hidden"
+          initial={{ scale: 0.18, borderRadius: '28px' }}
+          animate={{ scale: 1, borderRadius: '0px' }}
+          transition={{ type: 'spring', damping: 28, stiffness: 180, mass: 1 }}
+          onAnimationComplete={() => setBoxOpen(true)}
+          style={{ originX: '50%', originY: '50%', willChange: 'transform' }}
+        >
+          {/* Subtle glow border that fades as box expands */}
           <motion.div
-            ref={boxRef}
-            className="absolute inset-0"
-            initial={{ scaleX: 0.08, scaleY: 0.06, borderRadius: '60px', opacity: 0.3 }}
-            style={{ transformOrigin: 'center center', background: '#141628', zIndex: 10 }}
+            className="absolute inset-0 pointer-events-none"
+            initial={{ opacity: 1 }}
+            animate={{ opacity: 0 }}
+            transition={{ duration: 0.7, delay: 0.3 }}
+            style={{
+              borderRadius: 'inherit',
+              boxShadow: '0 0 0 1.5px rgba(255,255,255,0.18), 0 0 40px rgba(255,255,255,0.08), inset 0 0 40px rgba(255,255,255,0.04)',
+            }}
           />
+
+          {/* App content — slightly dimmed during box phase, clears when reveal starts */}
+          <motion.div
+            className="w-full h-full"
+            initial={{ opacity: 0.12 }}
+            animate={{ opacity: revealing ? 1 : 0.12 }}
+            transition={{ duration: 0.95, ease: 'easeOut' }}
+          >
+            {children}
+          </motion.div>
+
+          {/* Backdrop blur — fades once revealing */}
+          <motion.div
+            className="absolute inset-0 pointer-events-none"
+            initial={{ opacity: 1 }}
+            animate={{ opacity: revealing ? 0 : 1 }}
+            transition={{ duration: 0.95, ease: 'easeOut' }}
+            style={{ backdropFilter: 'blur(22px)', WebkitBackdropFilter: 'blur(22px)' }}
+          />
+
+          {/* Titles — centered, white, difference-blend */}
+          {boxOpen && (
+            <div
+              className="absolute inset-0 flex flex-col items-center justify-center gap-1 md:gap-2 pointer-events-none"
+              style={{ mixBlendMode: 'difference' }}
+            >
+              <h1
+                ref={t1Ref}
+                className="text-[clamp(2.2rem,6vw,6.5rem)] font-serif leading-[1] tracking-tight text-white"
+                style={{ opacity: 0, willChange: 'transform, opacity' }}
+              >
+                {title1}
+              </h1>
+              <h1
+                ref={t2Ref}
+                className="text-[clamp(2.2rem,6vw,6.5rem)] font-serif leading-[1] tracking-tight"
+                style={{ color: 'rgba(255,255,255,0.82)', opacity: 0, willChange: 'transform, opacity' }}
+              >
+                {title2}
+              </h1>
+            </div>
+          )}
+        </motion.div>
+      )}
+
+      {/* After done: app content takes over normally */}
+      {done && (
+        <div className={isMobile ? 'min-h-screen' : 'fixed inset-0'}>
+          {children}
         </div>
       )}
     </>
@@ -186,7 +228,6 @@ function AppInner() {
 
   const handleBookingConfirmed = useCallback(() => {
     const timeStr = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false })
-    // Add to mail inbox as "sent" (not yet confirmed)
     const mailMsg: MailMessage = {
       id: Date.now().toString(),
       text: 'Your booking request has been sent. We\'re confirming your strategy session — you\'ll receive a confirmation message shortly.',
@@ -194,7 +235,6 @@ function AppInner() {
       read: false,
     }
     setMailMessages(prev => [mailMsg, ...prev])
-    // Add to shared AI chat as "booking sent" notification
     addGlobalChatMessage({
       role: 'assistant',
       content: '📬 Booking Sent\n\nYour booking request has been received. We\'re confirming your strategy session — you\'ll get a notification here once it\'s confirmed.',
@@ -204,14 +244,12 @@ function AppInner() {
   }, [])
 
   const handleAIConfirmation = useCallback((aiMessage: string) => {
-    // Add to AI chat
     addGlobalChatMessage({
       role: 'assistant',
       content: '✅ Booking Confirmed\n\n' + aiMessage,
       isNew: true,
       isConfirmation: true,
     })
-    // Also push into inbox as the real confirmation message
     const timeStr = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false })
     setMailMessages(prev => [{
       id: Date.now().toString(),

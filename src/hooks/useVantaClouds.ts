@@ -1,16 +1,27 @@
 import { useEffect, useRef } from 'react'
 
 interface VantaCloudsConfig {
+  variant?: 'clouds' | 'clouds2'
   backgroundColor?: number
   skyColor?: number
   cloudColor?: number
+  cloudShadowColor?: number
   lightColor?: number
+  sunColor?: number
+  sunGlareColor?: number
+  sunlightColor?: number
   speed?: number
   texturePath?: string
 }
 
 type VantaEffect = { destroy: () => void }
-type VantaWin = { THREE?: unknown; VANTA?: { CLOUDS2?: (c: Record<string, unknown>) => VantaEffect } }
+type VantaWin = {
+  THREE?: unknown
+  VANTA?: {
+    CLOUDS?: (c: Record<string, unknown>) => VantaEffect
+    CLOUDS2?: (c: Record<string, unknown>) => VantaEffect
+  }
+}
 
 const BASE = {
   mouseControls: true,
@@ -52,6 +63,8 @@ export function useVantaClouds(
 
     let cancelled = false
 
+    const { variant = 'clouds2', ...restConfig } = config
+
     // Load scripts and init immediately — the intro animation runs for ~2.5s,
     // giving Three.js plenty of time to compile shaders before the overlay lifts.
     const run = async () => {
@@ -62,16 +75,25 @@ export function useVantaClouds(
       if (!w.THREE) await loadScript('/three.r121.min.js')
       if (cancelled) return
 
-      if (!w.VANTA?.CLOUDS2) await loadScript('/vanta.clouds2.min.js')
-      if (cancelled) return
-
-      if (!containerRef.current) return
-      const clouds2 = (window as VantaWin).VANTA?.CLOUDS2
-      if (!clouds2) return
-
-      try {
-        effectRef.current = clouds2({ el: containerRef.current, ...BASE, ...config })
-      } catch { /* WebGL unavailable */ }
+      if (variant === 'clouds') {
+        if (!w.VANTA?.CLOUDS) await loadScript('/vanta.clouds.min.js')
+        if (cancelled) return
+        if (!containerRef.current) return
+        const clouds = (window as VantaWin).VANTA?.CLOUDS
+        if (!clouds) return
+        try {
+          effectRef.current = clouds({ el: containerRef.current, ...BASE, ...restConfig })
+        } catch { /* WebGL unavailable */ }
+      } else {
+        if (!w.VANTA?.CLOUDS2) await loadScript('/vanta.clouds2.min.js')
+        if (cancelled) return
+        if (!containerRef.current) return
+        const clouds2 = (window as VantaWin).VANTA?.CLOUDS2
+        if (!clouds2) return
+        try {
+          effectRef.current = clouds2({ el: containerRef.current, ...BASE, ...restConfig })
+        } catch { /* WebGL unavailable */ }
+      }
     }
 
     run()

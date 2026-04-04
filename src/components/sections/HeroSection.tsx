@@ -51,10 +51,14 @@ interface HeroSectionProps {
 }
 
 const CLOUDS_CONFIG = {
-  backgroundColor: 0x050e1a,
-  skyColor: 0x72c8e8,
-  cloudColor: 0x3d6498,
-  lightColor: 0xffffff,
+  variant: 'clouds' as const,
+  backgroundColor: 0xffffff,
+  skyColor: 0x68b8d7,
+  cloudColor: 0xadc1de,
+  cloudShadowColor: 0x183550,
+  sunColor: 0xff9919,
+  sunGlareColor: 0xff6633,
+  sunlightColor: 0xff9933,
   speed: 1,
 }
 
@@ -176,19 +180,18 @@ export function HeroSection({ language, isActive, onBooking, inputRef, introDone
       {vantaEnabled
         ? <div ref={vantaRef} className="absolute inset-0 z-0" />
         : <div className="absolute inset-0 z-0" style={{ background: `
-            radial-gradient(ellipse 120% 50% at 50% 18%, rgba(114,200,232,0.28) 0%, transparent 58%),
-            radial-gradient(ellipse 80% 40% at 25% 48%, rgba(92,166,202,0.32) 0%, transparent 62%),
-            radial-gradient(ellipse 70% 38% at 78% 38%, rgba(100,180,220,0.26) 0%, transparent 58%),
-            radial-gradient(ellipse 100% 48% at 50% 85%, rgba(61,100,152,0.50) 0%, transparent 65%),
-            radial-gradient(ellipse 110% 55% at 50% 95%, rgba(30,60,100,0.65) 0%, transparent 70%),
-            linear-gradient(180deg, #071422 0%, #0c1e32 28%, #102438 55%, #162e48 80%, #1a3655 100%)
+            radial-gradient(ellipse 100% 55% at 60% 15%, rgba(255,185,80,0.55) 0%, transparent 55%),
+            radial-gradient(ellipse 80% 40% at 30% 35%, rgba(173,193,222,0.55) 0%, transparent 60%),
+            radial-gradient(ellipse 70% 38% at 80% 40%, rgba(104,184,215,0.40) 0%, transparent 58%),
+            radial-gradient(ellipse 120% 50% at 50% 70%, rgba(173,193,222,0.45) 0%, transparent 65%),
+            linear-gradient(180deg, #d4ecf7 0%, #b8dff0 35%, #adc1de 70%, #8ba8c4 100%)
           `}} />
       }
       <div className="absolute inset-0 z-[1] pointer-events-none m-hero-overlay"
-        style={{ background: 'linear-gradient(180deg, rgba(4,6,14,0.05) 0%, rgba(4,6,14,0.20) 35%, rgba(4,6,14,0.52) 62%, rgba(4,6,14,0.72) 100%)' }}
+        style={{ background: 'linear-gradient(180deg, rgba(0,10,30,0.02) 0%, rgba(0,10,30,0.10) 35%, rgba(0,10,30,0.38) 62%, rgba(0,10,30,0.60) 100%)' }}
       />
       <div className="absolute bottom-0 left-0 right-0 h-56 z-[1] pointer-events-none m-hero-fade"
-        style={{ background: 'linear-gradient(to bottom, transparent, #0f1422)' }}
+        style={{ background: 'linear-gradient(to bottom, transparent, #0a1628)' }}
       />
 
       <div className="relative z-10 w-full h-full">

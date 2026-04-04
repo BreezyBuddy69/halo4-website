@@ -10,14 +10,15 @@ import type { Language } from '../../utils/translations'
 import { Clock, CheckCircle } from 'lucide-react'
 
 const BOOK_CLOUDS_CONFIG = {
-  backgroundColor: 0x120a2e,
-  skyColor: 0x9060e0,
-  cloudColor: 0xf0e8ff,
-  cloudShadowColor: 0x2a1550,
-  sunColor: 0xc080ff,
-  sunGlareColor: 0xe0a0ff,
-  sunlightColor: 0xf0c8ff,
-  speed: 0.5,
+  variant: 'clouds' as const,
+  backgroundColor: 0x0d0510,
+  skyColor: 0xff6b35,
+  cloudColor: 0xff9f45,
+  cloudShadowColor: 0x1a0a20,
+  sunColor: 0xffd700,
+  sunGlareColor: 0xff4500,
+  sunlightColor: 0xffa500,
+  speed: 0.6,
 }
 
 interface BookSectionProps {
@@ -62,12 +63,11 @@ export function BookSection({ language, isActive, onBooking }: BookSectionProps)
         {vantaEnabled
           ? <div ref={vantaRef} className="absolute inset-0 z-0" />
           : <div className="absolute inset-0 z-0" style={{ background: `
-              radial-gradient(ellipse 120% 55% at 50% 20%, rgba(192,144,255,0.30) 0%, transparent 60%),
-              radial-gradient(ellipse 80% 45% at 20% 50%, rgba(160,100,240,0.28) 0%, transparent 65%),
-              radial-gradient(ellipse 70% 40% at 80% 40%, rgba(200,130,255,0.25) 0%, transparent 60%),
-              radial-gradient(ellipse 100% 48% at 50% 88%, rgba(224,190,255,0.42) 0%, transparent 62%),
-              radial-gradient(ellipse 110% 58% at 50% 95%, rgba(120,60,200,0.55) 0%, transparent 70%),
-              linear-gradient(180deg, #1a0840 0%, #1e0c48 28%, #230f52 55%, #2a145e 80%, #301968 100%)
+              radial-gradient(ellipse 100% 50% at 55% 12%, rgba(255,200,80,0.70) 0%, transparent 50%),
+              radial-gradient(ellipse 80% 40% at 25% 40%, rgba(255,107,53,0.45) 0%, transparent 60%),
+              radial-gradient(ellipse 70% 38% at 80% 35%, rgba(255,159,69,0.38) 0%, transparent 58%),
+              radial-gradient(ellipse 120% 55% at 50% 80%, rgba(180,60,20,0.50) 0%, transparent 65%),
+              linear-gradient(180deg, #1a0508 0%, #2d0d0a 28%, #3d1508 55%, #1a0a20 80%, #0d0510 100%)
             `}} />
         }
 
