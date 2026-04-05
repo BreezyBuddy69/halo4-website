@@ -7,12 +7,13 @@ const ICONS = [Database, Brain, Zap, Search, Cpu, Wand2, Terminal, Sparkles]
 
 interface ThinkingProcessProps {
   language: Language
+  isFirst?: boolean
 }
 
-export function ThinkingProcess({ language }: ThinkingProcessProps) {
+export function ThinkingProcess({ language, isFirst }: ThinkingProcessProps) {
   const tr = t(language)
   const lines = tr.thinkingLines
-  const [lineIdx, setLineIdx] = useState(() => Math.floor(Math.random() * lines.length))
+  const [lineIdx, setLineIdx] = useState(() => isFirst ? 0 : Math.floor(Math.random() * lines.length))
   const [displayed, setDisplayed] = useState('')
   const [phase, setPhase] = useState<'typing' | 'pause' | 'deleting'>('typing')
   const [iconIdx, setIconIdx] = useState(0)

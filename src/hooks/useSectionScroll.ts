@@ -14,8 +14,8 @@ export function useSectionScroll({
   currentSection,
   onNavigate,
   isMobile,
-  debounceMs = 620,
-  wheelThreshold = 55,
+  debounceMs = 900,
+  wheelThreshold = 25,
 }: Options) {
   const accRef = useRef(0)
   const isTransitioningRef = useRef(false)

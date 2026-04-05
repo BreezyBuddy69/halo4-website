@@ -71,9 +71,13 @@
   .chat-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
   .chat-scroll { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.15) transparent; }
 
-  /* Hero chat — hide scrollbar entirely */
-  .chat-scroll-hero::-webkit-scrollbar { width: 0; height: 0; }
-  .chat-scroll-hero { scrollbar-width: none; }
+  /* Hero chat — white cloud-style sidebar */
+  .chat-scroll-hero::-webkit-scrollbar { width: 3px; }
+  .chat-scroll-hero::-webkit-scrollbar-track { background: rgba(255,255,255,0.06); border-radius: 99px; }
+  .chat-scroll-hero::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.38); border-radius: 99px; }
+  .chat-scroll-hero::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.65); }
+  .chat-scroll-hero::-webkit-scrollbar-button { display: none; height: 0; width: 0; }
+  .chat-scroll-hero { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.38) transparent; }
 
   /* Global custom scrollbars */
   ::-webkit-scrollbar { width: 4px; height: 4px; }
@@ -170,4 +174,14 @@
     will-change: opacity;
   }
   /* ─────────────────────────────────────────────────────────── */
+}
+
+@keyframes waveBar {
+  from { transform: scaleY(0.35); opacity: 0.40; }
+  to   { transform: scaleY(1.0);  opacity: 0.90; }
+}
+
+/* waveform bars need bottom-aligned transform origin */
+.hero-waveform > div {
+  transform-origin: center bottom;
 }

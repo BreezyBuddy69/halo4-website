@@ -75,13 +75,13 @@ export function TypingMessage({ text, scrollRef, onComplete, isActive = true }: 
         setCharCount(indexRef.current)
         if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight
         if (indexRef.current < cleanText.length) {
-          timerRef.current = setTimeout(tick, 9)
+          timerRef.current = setTimeout(tick, 24)
         } else {
           doneRef.current = true
           onComplete()
         }
       }
-      timerRef.current = setTimeout(tick, 9)
+      timerRef.current = setTimeout(tick, 24)
     }
     return () => clearTimeout(timerRef.current)
   }, [isActive]) // eslint-disable-line react-hooks/exhaustive-deps
@@ -98,16 +98,27 @@ export function TypingMessage({ text, scrollRef, onComplete, isActive = true }: 
       setCharCount(indexRef.current)
       if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight
       if (indexRef.current < cleanText.length) {
-        timerRef.current = setTimeout(tick, 9)
+        timerRef.current = setTimeout(tick, 24)
       } else {
         doneRef.current = true
         onComplete()
       }
     }
 
-    timerRef.current = setTimeout(tick, 9)
+    timerRef.current = setTimeout(tick, 24)
     return () => clearTimeout(timerRef.current)
   }, [text]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  return <span>{renderPartial(segments, charCount)}</span>
+  // Grid trick: ghost span (full text, invisible) pre-sizes the bubble to its final dimensions.
+  // Typed span overlays it so the bubble never shifts/grows during animation.
+  return (
+    <span style={{ display: 'grid' }}>
+      <span style={{ visibility: 'hidden', gridArea: '1/1' }} aria-hidden>
+        {renderPartial(segments, cleanText.length)}
+      </span>
+      <span style={{ gridArea: '1/1' }}>
+        {renderPartial(segments, charCount)}
+      </span>
+    </span>
+  )
 }

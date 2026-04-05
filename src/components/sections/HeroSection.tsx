@@ -178,7 +178,13 @@ export function HeroSection({ language, isActive, onBooking, inputRef, introDone
   return (
     <div className="relative w-full h-full overflow-hidden">
       {vantaEnabled
-        ? <div ref={vantaRef} className="absolute inset-0 z-0" />
+        ? <div ref={vantaRef} className="absolute inset-0 z-0" style={{ background: `
+            radial-gradient(ellipse 100% 55% at 60% 15%, rgba(255,185,80,0.55) 0%, transparent 55%),
+            radial-gradient(ellipse 80% 40% at 30% 35%, rgba(173,193,222,0.55) 0%, transparent 60%),
+            radial-gradient(ellipse 70% 38% at 80% 40%, rgba(104,184,215,0.40) 0%, transparent 58%),
+            radial-gradient(ellipse 120% 50% at 50% 70%, rgba(173,193,222,0.45) 0%, transparent 65%),
+            linear-gradient(180deg, #d4ecf7 0%, #b8dff0 35%, #adc1de 70%, #8ba8c4 100%)
+          `}} />
         : <div className="absolute inset-0 z-0" style={{ background: `
             radial-gradient(ellipse 100% 55% at 60% 15%, rgba(255,185,80,0.55) 0%, transparent 55%),
             radial-gradient(ellipse 80% 40% at 30% 35%, rgba(173,193,222,0.55) 0%, transparent 60%),
@@ -188,7 +194,11 @@ export function HeroSection({ language, isActive, onBooking, inputRef, introDone
           `}} />
       }
       <div className="absolute inset-0 z-[1] pointer-events-none m-hero-overlay"
-        style={{ background: 'linear-gradient(180deg, rgba(0,10,30,0.02) 0%, rgba(0,10,30,0.10) 35%, rgba(0,10,30,0.38) 62%, rgba(0,10,30,0.60) 100%)' }}
+        style={{ background: 'linear-gradient(180deg, rgba(0,10,30,0.18) 0%, rgba(0,10,30,0.28) 35%, rgba(0,10,30,0.52) 62%, rgba(0,10,30,0.72) 100%)' }}
+      />
+      {/* Vignette — dark edges, bright center */}
+      <div className="absolute inset-0 z-[2] pointer-events-none"
+        style={{ background: 'radial-gradient(ellipse 70% 65% at 50% 45%, transparent 0%, rgba(0,8,22,0.38) 55%, rgba(0,8,22,0.68) 100%)' }}
       />
       <div className="absolute bottom-0 left-0 right-0 h-56 z-[1] pointer-events-none m-hero-fade"
         style={{ background: 'linear-gradient(to bottom, transparent, #0a1628)' }}
@@ -203,12 +213,13 @@ export function HeroSection({ language, isActive, onBooking, inputRef, introDone
           {/* Messages */}
           <div
             ref={scrollContainerRef}
-            className="w-full max-w-md flex-1 min-h-0 overflow-y-auto chat-scroll-hero flex flex-col justify-end pb-2"
+            className="w-full max-w-md flex-1 min-h-0 overflow-y-auto overflow-x-hidden chat-scroll-hero flex flex-col pb-4 px-4"
             style={{
               maskImage: 'linear-gradient(to bottom, transparent 0%, black 18%)',
               WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 18%)',
             }}
           >
+            <div className="flex-1" />
             <motion.div
               className="flex items-center justify-center gap-2 mb-12 shrink-0"
               initial={{ opacity: 0, x: -24 }}
@@ -222,7 +233,7 @@ export function HeroSection({ language, isActive, onBooking, inputRef, introDone
                 style={{ willChange: 'transform, opacity' }}
               />
               <motion.span
-                className="text-[11px] text-white/50 max-md:text-white/75 tracking-[0.22em] uppercase font-medium"
+                className="text-[11px] text-white/80 tracking-[0.22em] uppercase font-medium"
                 animate={{ opacity: [0.5, 1, 0.5] }}
                 transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
                 style={{ willChange: 'opacity' }}
@@ -266,12 +277,12 @@ export function HeroSection({ language, isActive, onBooking, inputRef, introDone
                     ) : msg.role === 'user' ? (
                       /* User bubble — Liquid Glass */
                       <div
-                        className="max-w-[78%] rounded-[18px] px-4 py-2.5 text-[13px] leading-relaxed"
+                        className="max-w-[78%] rounded-[18px] px-4 py-2.5 text-[13px] leading-relaxed break-words"
                         style={{
-                          background: 'linear-gradient(145deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.10) 100%)',
-                          border: '1px solid rgba(255,255,255,0.28)',
-                          boxShadow: '0 4px 32px rgba(0,0,0,0.12), 0 1px 0 rgba(255,255,255,0.06) inset, inset 0 1px 0 rgba(255,255,255,0.32)',
-                          color: 'rgba(255,255,255,0.93)',
+                          background: 'linear-gradient(145deg, rgba(6,18,50,0.80) 0%, rgba(6,18,50,0.68) 100%)',
+                          border: '1px solid rgba(255,255,255,0.20)',
+                          boxShadow: 'none',
+                          color: 'rgba(255,255,255,0.97)',
                           backdropFilter: 'blur(14px) saturate(160%)',
                           WebkitBackdropFilter: 'blur(14px) saturate(160%)',
                         }}
@@ -283,24 +294,15 @@ export function HeroSection({ language, isActive, onBooking, inputRef, introDone
                       <div
                         className="max-w-[86%] rounded-[20px] px-5 py-4 text-[13px] leading-[1.70]"
                         style={{
-                          background: 'linear-gradient(160deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.06) 60%, rgba(255,255,255,0.10) 100%)',
-                          border: '1px solid rgba(255,255,255,0.22)',
-                          backdropFilter: 'blur(18px) saturate(160%)',
-                          WebkitBackdropFilter: 'blur(18px) saturate(160%)',
-                          color: 'rgba(255,255,255,0.91)',
-                          boxShadow: '0 8px 48px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.36), inset 0 -1px 0 rgba(255,255,255,0.04), 0 0 0 0.5px rgba(255,255,255,0.08)',
+                          background: 'linear-gradient(160deg, rgba(4,12,32,0.72) 0%, rgba(4,12,32,0.62) 60%, rgba(4,12,32,0.68) 100%)',
+                          border: '1px solid rgba(255,255,255,0.16)',
+                          backdropFilter: 'blur(24px) saturate(180%)',
+                          WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+                          color: 'rgba(255,255,255,0.96)',
+                          boxShadow: 'none',
                         }}
                       >
                         {/* Halo AI label */}
-                        <div className="flex items-center gap-1.5 mb-3 pb-2.5" style={{ borderBottom: '1px solid rgba(255,255,255,0.09)' }}>
-                          <motion.div
-                            className="w-1.5 h-1.5 rounded-full bg-emerald-400"
-                            animate={{ opacity: [0.5, 1, 0.5] }}
-                            transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
-                            style={{ willChange: 'opacity' }}
-                          />
-                          <span className="text-[9px] tracking-[0.22em] uppercase font-medium" style={{ color: 'rgba(255,255,255,0.42)' }}>Halo AI</span>
-                        </div>
                         {msg.isNew ? (
                           <TypingMessage
                             text={msg.content}
@@ -322,13 +324,13 @@ export function HeroSection({ language, isActive, onBooking, inputRef, introDone
                   <motion.div key="loading" initial={{ opacity: 0, y: 8, scale: 0.9 }} animate={{ opacity: 1, y: 0, scale: 1 }} className="flex justify-start">
                     <div className="rounded-[20px] px-5 py-3.5"
                       style={{
-                        background: 'linear-gradient(160deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.06) 100%)',
-                        border: '1px solid rgba(255,255,255,0.22)',
+                        background: 'linear-gradient(160deg, rgba(4,12,32,0.72) 0%, rgba(4,12,32,0.62) 100%)',
+                        border: '1px solid rgba(255,255,255,0.16)',
                         backdropFilter: 'blur(18px) saturate(160%)',
                         WebkitBackdropFilter: 'blur(18px) saturate(160%)',
-                        boxShadow: '0 8px 48px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.36)',
+                        boxShadow: 'none',
                       }}>
-                      <ThinkingProcess language={language} />
+                      <ThinkingProcess language={language} isFirst={userMsgCount === 1} />
                     </div>
                   </motion.div>
                 )}
@@ -336,97 +338,95 @@ export function HeroSection({ language, isActive, onBooking, inputRef, introDone
             </div>
           </div>
 
-          {/* Input */}
-          <AnimatePresence>
-            {inputVisible && (
-              <motion.div
-                className="w-full max-w-md mt-3 shrink-0"
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 8 }}
-                transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+          {/* Input — always in layout so messages don't shift when it appears */}
+          <div style={{ width: '100%', maxWidth: 448, marginTop: 12, flexShrink: 0 }}>
+            <motion.div
+              className="w-full"
+              animate={{ opacity: inputVisible ? 1 : 0, pointerEvents: inputVisible ? 'auto' : 'none' } as never}
+              transition={{ duration: 1.1, ease: 'easeOut' }}
+            >
+              {(charWarning || userMsgCount >= 18) && (
+                <p className="text-[10px] text-amber-400/70 mb-1.5 text-right pr-1">
+                  {userMsgCount >= 20 ? 'Message limit reached' : charWarning ? `Max ${userMsgCount === 0 ? 3000 : 750} characters` : `${20 - userMsgCount} messages left`}
+                </p>
+              )}
+              <GlassPanel
+                className="flex items-end gap-3 rounded-[20px] px-4 py-3"
+                style={{
+                  background: 'linear-gradient(160deg, rgba(4,12,32,0.78) 0%, rgba(4,12,32,0.68) 60%, rgba(4,12,32,0.74) 100%)',
+                  border: '1px solid rgba(255,255,255,0.18)',
+                  backdropFilter: 'blur(20px) saturate(160%)',
+                  WebkitBackdropFilter: 'blur(20px) saturate(160%)',
+                  boxShadow: 'none',
+                }}
               >
-                {(charWarning || userMsgCount >= 18) && (
-                  <p className="text-[10px] text-amber-400/70 mb-1.5 text-right pr-1">
-                    {userMsgCount >= 20 ? 'Message limit reached' : charWarning ? `Max ${userMsgCount === 0 ? 3000 : 750} characters` : `${20 - userMsgCount} messages left`}
-                  </p>
-                )}
-                <GlassPanel
-                  className="flex items-end gap-3 rounded-[20px] px-4 py-3"
-                  style={{
-                    background: 'linear-gradient(160deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.07) 60%, rgba(255,255,255,0.12) 100%)',
-                    border: '1px solid rgba(255,255,255,0.26)',
-                    backdropFilter: 'blur(20px) saturate(160%)',
-                    WebkitBackdropFilter: 'blur(20px) saturate(160%)',
-                    boxShadow: '0 8px 48px rgba(0,0,0,0.14), inset 0 1px 0 rgba(255,255,255,0.40), inset 0 -1px 0 rgba(255,255,255,0.06), 0 0 0 0.5px rgba(255,255,255,0.10)',
+                <textarea
+                  ref={inputRef}
+                  value={input}
+                  rows={1}
+                  onChange={e => {
+                    const maxChars = userMsgCount === 0 ? 3000 : 750
+                    const val = e.target.value.slice(0, maxChars)
+                    setInput(val)
+                    setCharWarning(val.length > maxChars * 0.88)
+                    e.target.style.height = 'auto'
+                    e.target.style.height = Math.min(e.target.scrollHeight, 80) + 'px'
                   }}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSubmit() }
+                  }}
+                  placeholder={typewriterPlaceholder}
+                  className="flex-1 bg-transparent text-white text-sm placeholder-white/30 outline-none resize-none leading-relaxed"
+                  style={{ maxHeight: 80 }}
+                  data-cursor="hover"
+                />
+                <button data-cursor="hover" onClick={handleSubmit} disabled={!input.trim() || isLoading || userMsgCount >= 20}
+                  className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 mb-0.5 disabled:opacity-30 transition-all"
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(139,92,246,0.65) 0%, rgba(109,40,217,0.55) 100%)',
+                    border: '1px solid rgba(167,139,250,0.35)',
+                    boxShadow: '0 0 14px rgba(139,92,246,0.30), inset 0 1px 0 rgba(255,255,255,0.12)',
+                  }}
+                  onMouseEnter={e => { if (!e.currentTarget.disabled) e.currentTarget.style.boxShadow = '0 0 22px rgba(139,92,246,0.50), inset 0 1px 0 rgba(255,255,255,0.18)' }}
+                  onMouseLeave={e => { e.currentTarget.style.boxShadow = '0 0 14px rgba(139,92,246,0.30), inset 0 1px 0 rgba(255,255,255,0.12)' }}
                 >
-                  <textarea
-                    ref={inputRef}
-                    value={input}
-                    rows={1}
-                    onChange={e => {
-                      const maxChars = userMsgCount === 0 ? 3000 : 750
-                      const val = e.target.value.slice(0, maxChars)
-                      setInput(val)
-                      setCharWarning(val.length > maxChars * 0.88)
-                      e.target.style.height = 'auto'
-                      e.target.style.height = Math.min(e.target.scrollHeight, 80) + 'px'
-                    }}
-                    onKeyDown={e => {
-                      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSubmit() }
-                    }}
-                    placeholder={typewriterPlaceholder}
-                    className="flex-1 bg-transparent text-white text-sm placeholder-white/30 outline-none resize-none leading-relaxed"
-                    style={{ maxHeight: 80 }}
-                    data-cursor="hover"
-                  />
-                  <button data-cursor="hover" onClick={handleSubmit} disabled={!input.trim() || isLoading || userMsgCount >= 20}
-                    className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 mb-0.5 disabled:opacity-30 transition-all"
-                    style={{
-                      background: 'linear-gradient(135deg, rgba(139,92,246,0.65) 0%, rgba(109,40,217,0.55) 100%)',
-                      border: '1px solid rgba(167,139,250,0.35)',
-                      boxShadow: '0 0 14px rgba(139,92,246,0.30), inset 0 1px 0 rgba(255,255,255,0.12)',
-                    }}
-                    onMouseEnter={e => { if (!e.currentTarget.disabled) e.currentTarget.style.boxShadow = '0 0 22px rgba(139,92,246,0.50), inset 0 1px 0 rgba(255,255,255,0.18)' }}
-                    onMouseLeave={e => { e.currentTarget.style.boxShadow = '0 0 14px rgba(139,92,246,0.30), inset 0 1px 0 rgba(255,255,255,0.12)' }}
-                  >
-                    <Send className="w-3.5 h-3.5 text-white/90" />
-                  </button>
-                </GlassPanel>
-              </motion.div>
-            )}
-          </AnimatePresence>
+                  <Send className="w-3.5 h-3.5 text-white/90" />
+                </button>
+              </GlassPanel>
+            </motion.div>
+          </div>
         </div>
 
-        {/* Headline — slides in from sides */}
+        {/* Headline — overlay handles the intro animation; just snap visible when done */}
         <div className="absolute bottom-20 md:bottom-18 inset-x-0 flex flex-col items-start md:pl-36 lg:pl-40 px-5 md:px-0 overflow-hidden">
-          <motion.h1
+          <h1
             className="text-[clamp(2.2rem,6vw,6.5rem)] font-serif text-white leading-[1] tracking-tight mb-2 md:mb-0.5"
-            initial={{ opacity: 0, x: -70 }}
-            animate={introDone ? { opacity: 1, x: 0 } : { opacity: 0, x: -70 }}
-            transition={introDone ? { duration: 0.01 } : { delay: 0.08, duration: 0.72, ease: [0.16, 1, 0.3, 1] }}
+            style={{
+              opacity: introDone ? 1 : 0,
+              textShadow: '0 0 38px rgba(255,130,50,0.55), 0 0 80px rgba(255,90,20,0.28)',
+            }}
           >
             {tr.heroTitle1}
-          </motion.h1>
-          <motion.h1
-            className="text-[clamp(2.2rem,6vw,6.5rem)] font-serif text-white/50 max-md:text-white/75 leading-[1] tracking-tight"
-            initial={{ opacity: 0, x: 70 }}
-            animate={introDone ? { opacity: 1, x: 0 } : { opacity: 0, x: 70 }}
-            transition={introDone ? { duration: 0.01 } : { delay: 0.22, duration: 0.72, ease: [0.16, 1, 0.3, 1] }}
+          </h1>
+          <h1
+            className="text-[clamp(2.2rem,6vw,6.5rem)] font-serif text-white/70 leading-[1] tracking-tight"
+            style={{
+              opacity: introDone ? 1 : 0,
+              textShadow: '0 0 38px rgba(255,130,50,0.40), 0 0 80px rgba(255,90,20,0.20)',
+            }}
           >
             {tr.heroTitle2}
-          </motion.h1>
+          </h1>
         </div>
 
-        {/* Book CTA — bottom right (hidden on mobile) */}
+        {/* Book CTA — bottom right, appears after AI greeting finishes (hidden on mobile) */}
         <motion.div
           className="absolute bottom-24 md:bottom-18 right-4 md:right-16 hidden md:block"
-          initial={{ opacity: 0, x: 40 }}
-          animate={introDone ? { opacity: 1, x: 0 } : { opacity: 0, x: 40 }}
-          transition={{ delay: 0.35, duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
+          initial={{ opacity: 0 }}
+          animate={inputVisible ? { opacity: 1 } : { opacity: 0 }}
+          transition={{ delay: 1.0, duration: 1.1, ease: 'easeOut' }}
         >
-          <NeonButton onClick={onBooking} size="md">
+          <NeonButton onClick={onBooking} size="md" variant="orange">
             {tr.startJourney}
           </NeonButton>
         </motion.div>

@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Send, MessageCircle } from 'lucide-react'
-import { GlassPanel } from '../ui/GlassPanel'
 import { ThinkingProcess } from './ThinkingProcess'
 import { TypingMessage } from './TypingMessage'
 import { t } from '../../utils/translations'
@@ -194,38 +193,90 @@ export function ChatBot({ language, context, onContextUsed }: ChatBotProps) {
     }
   }
 
+  // Morph: button expands into chat panel
+  const CLOSED_W = 56
+  const CLOSED_H = 56
+  const OPEN_W = 384
+  const OPEN_H = Math.min(Math.round(window.innerHeight * 0.60), 540)
+
   return (
-    <div ref={chatRef} className="fixed z-[100] flex flex-col items-end gap-3"
-      style={{ bottom: '3.5rem', right: '1.5rem' }}
+    <div ref={chatRef} className="fixed z-[100]"
+      style={{ bottom: '1.5rem', right: '1.5rem', width: 0, height: 0 }}
       onMouseEnter={handleContainerMouseEnter}
       onMouseLeave={handleContainerMouseLeave}
     >
+      <motion.div
+        data-cursor="hover"
+        onClick={!isOpen ? openChat : undefined}
+        onMouseEnter={handleButtonMouseEnter}
+        animate={{
+          width: isOpen ? OPEN_W : CLOSED_W,
+          height: isOpen ? OPEN_H : CLOSED_H,
+          borderRadius: isOpen ? 20 : 9999,
+        }}
+        transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+        className="absolute bottom-0 right-0 overflow-hidden flex flex-col"
+        style={{
+          background: isOpen
+            ? 'linear-gradient(160deg, rgba(28,16,60,0.96) 0%, rgba(14,8,34,0.98) 55%, rgba(7,4,18,0.99) 100%)'
+            : `linear-gradient(148deg, rgba(255,255,255,${0.38 + buttonBrightness * 0.14}) 0%, rgba(220,200,255,${0.30 + buttonBrightness * 0.16}) 45%, rgba(180,150,255,${0.22 + buttonBrightness * 0.12}) 100%)`,
+          border: isOpen
+            ? '1px solid rgba(160,120,255,0.22)'
+            : `1px solid rgba(255,255,255,${0.52 + buttonBrightness * 0.18})`,
+          boxShadow: isOpen
+            ? '0 32px 72px rgba(0,0,0,0.72), 0 8px 28px rgba(0,0,0,0.42), 0 0 0 1px rgba(255,255,255,0.06), inset 0 1.5px 0 rgba(255,255,255,0.18), inset 0 -1px 0 rgba(0,0,0,0.30)'
+            : `0 8px ${36 + buttonBrightness * 28}px rgba(180,140,255,${0.55 + buttonBrightness * 0.35}), 0 2px 14px rgba(0,0,0,0.28), inset 0 1.5px 0 rgba(255,255,255,${0.72 + buttonBrightness * 0.18}), inset 0 -1px 0 rgba(0,0,0,0.10)`,
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          cursor: isOpen ? 'default' : 'pointer',
+        }}
+      >
+        {/* Liquid glass highlight — visible when closed */}
+        <AnimatePresence>
+          {!isOpen && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="absolute top-0 left-0 right-0 h-1/2 rounded-t-full pointer-events-none"
+              style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,0.55), rgba(255,255,255,0.08))' }}
+            />
+          )}
+        </AnimatePresence>
 
-      {/* Chat panel */}
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 10 }}
-            animate={animateOpen ? { opacity: 1, scale: 1, y: 0 } : { opacity: 0, scale: 0.95, y: 10 }}
-            exit={{ opacity: 0, scale: 0.95, y: 10 }}
-            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className="w-80 md:w-96 rounded-2xl overflow-hidden"
-            style={{ maxHeight: '70vh', display: 'flex', flexDirection: 'column' }}
-          >
-            <GlassPanel strong className="rounded-2xl flex flex-col h-full relative" style={{
-              maxHeight: '70vh',
-              background: 'linear-gradient(160deg, rgba(28,16,60,0.96) 0%, rgba(14,8,34,0.98) 55%, rgba(7,4,18,0.99) 100%)',
-              border: '1px solid rgba(160,120,255,0.22)',
-              backdropFilter: 'blur(20px)',
-              WebkitBackdropFilter: 'blur(20px)',
-              boxShadow: '0 32px 72px rgba(0,0,0,0.72), 0 8px 28px rgba(0,0,0,0.42), 0 0 0 1px rgba(255,255,255,0.06), inset 0 1.5px 0 rgba(255,255,255,0.18), inset 0 -1px 0 rgba(0,0,0,0.30)',
-            }}>
+        {/* Button icon — visible when closed */}
+        <AnimatePresence>
+          {!isOpen && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.7 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.7 }}
+              transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+              className="absolute inset-0 flex items-center justify-center z-10"
+            >
+              <MessageCircle className="w-5 h-5 text-white/92 drop-shadow-sm" />
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Chat content — visible when open */}
+        <AnimatePresence>
+          {isOpen && animateOpen && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2, delay: 0.15 }}
+              className="flex flex-col h-full w-full"
+            >
               {/* Accent line at top */}
-              <div className="absolute top-0 left-0 right-0 h-[2px] rounded-t-2xl" style={{
+              <div className="absolute top-0 left-0 right-0 h-[2px] rounded-t-2xl pointer-events-none" style={{
                 background: 'linear-gradient(90deg, transparent 0%, rgba(139,92,246,0.7) 30%, rgba(167,139,250,0.9) 50%, rgba(139,92,246,0.7) 70%, transparent 100%)',
               }} />
+
               {/* Header */}
-              <div className="flex items-center justify-between px-4 py-3" style={{
+              <div className="flex items-center justify-between px-4 py-3 shrink-0" style={{
                 borderBottom: '1px solid rgba(255,255,255,0.10)',
                 background: 'linear-gradient(180deg, rgba(255,255,255,0.04) 0%, transparent 100%)',
               }}>
@@ -270,7 +321,7 @@ export function ChatBot({ language, context, onContextUsed }: ChatBotProps) {
                       </div>
                     ) : (
                       <div
-                        className={`max-w-[85%] rounded-xl px-3 py-2.5 text-xs leading-relaxed`}
+                        className="max-w-[85%] rounded-xl px-3 py-2.5 text-xs leading-relaxed"
                         style={msg.role === 'user' ? {
                           background: 'linear-gradient(135deg, rgba(139,92,246,0.28) 0%, rgba(109,40,217,0.22) 100%)',
                           border: '1px solid rgba(167,139,250,0.28)',
@@ -307,7 +358,7 @@ export function ChatBot({ language, context, onContextUsed }: ChatBotProps) {
 
               {/* Recommendations */}
               {recommendations.length > 0 && (
-                <div className="px-4 pb-2 flex flex-col gap-1.5">
+                <div className="px-4 pb-2 flex flex-col gap-1.5 shrink-0">
                   <p className="text-white/38 text-[10px] tracking-wider">{tr.suggestions}</p>
                   {recommendations.map((rec, i) => (
                     <button
@@ -333,13 +384,13 @@ export function ChatBot({ language, context, onContextUsed }: ChatBotProps) {
 
               {/* Limit warning */}
               {(limitWarning || userMsgCount >= 18) && (
-                <p className="px-4 text-[10px] text-amber-400/70 pb-1">
+                <p className="px-4 text-[10px] text-amber-400/70 pb-1 shrink-0">
                   {userMsgCount >= 20 ? 'Message limit reached' : limitWarning ? `Max ${userMsgCount === 0 ? 3000 : 750} characters` : `${20 - userMsgCount} messages left`}
                 </p>
               )}
 
               {/* Input */}
-              <div className="px-3 py-3" style={{ borderTop: '1px solid rgba(255,255,255,0.10)' }}>
+              <div className="px-3 py-3 shrink-0" style={{ borderTop: '1px solid rgba(255,255,255,0.10)' }}>
                 <div className="flex items-end gap-2 rounded-xl px-3 py-2" style={{
                   background: 'rgba(255,255,255,0.07)',
                   border: '1px solid rgba(255,255,255,0.12)',
@@ -374,32 +425,10 @@ export function ChatBot({ language, context, onContextUsed }: ChatBotProps) {
                   </button>
                 </div>
               </div>
-            </GlassPanel>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Toggle button — liquid glass */}
-      <motion.button
-        data-cursor="hover"
-        whileHover={{ scale: 1.07 }}
-        whileTap={{ scale: 0.93 }}
-        onClick={() => isOpen ? closeChat() : openChat()}
-        onMouseEnter={handleButtonMouseEnter}
-        className="relative w-14 h-14 rounded-full flex items-center justify-center overflow-hidden"
-        style={{
-          background: `linear-gradient(148deg, rgba(255,255,255,${0.18 + buttonBrightness * 0.10}) 0%, rgba(168,130,255,${0.16 + buttonBrightness * 0.14}) 45%, rgba(110,80,230,${0.10 + buttonBrightness * 0.10}) 100%)`,
-          border: `1px solid rgba(255,255,255,${0.28 + buttonBrightness * 0.14})`,
-          boxShadow: `0 8px ${28 + buttonBrightness * 22}px rgba(139,92,246,${0.42 + buttonBrightness * 0.32}), 0 2px 10px rgba(0,0,0,0.38), inset 0 1.5px 0 rgba(255,255,255,${0.38 + buttonBrightness * 0.14}), inset 0 -1px 0 rgba(0,0,0,0.18)`,
-          backdropFilter: 'blur(12px)',
-        }}
-      >
-        {/* Inner top-reflection — liquid glass highlight */}
-        <div className="absolute top-0 left-0 right-0 h-1/2 rounded-t-full pointer-events-none"
-          style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,0.18), transparent)' }}
-        />
-        <MessageCircle className="w-5 h-5 text-white/92 relative z-10 drop-shadow-sm" />
-      </motion.button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
     </div>
   )
 }

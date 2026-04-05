@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion'
 import { SectionReveal } from '../ui/SectionReveal'
 import { AnimatedBg } from '../ui/AnimatedBg'
-import { CheckCircle, ImagePlus } from 'lucide-react'
+import { CheckCircle } from 'lucide-react'
 import type { Language } from '../../utils/translations'
 
 interface AboutSectionProps {
@@ -130,46 +130,31 @@ export function AboutSection({ language, isActive }: AboutSectionProps) {
             className="shrink-0 hidden md:flex"
           >
             <div
-              className="relative rounded-2xl overflow-hidden flex flex-col items-center justify-center group"
+              className="relative rounded-2xl overflow-hidden"
               style={{
                 width: 220,
                 height: 300,
-                background: 'linear-gradient(160deg, rgba(115,70,210,0.10) 0%, rgba(60,30,120,0.12) 100%)',
-                border: '1.5px dashed rgba(160,110,255,0.28)',
-                boxShadow: '0 24px 64px rgba(80,30,180,0.16), inset 0 1px 0 rgba(200,160,255,0.08)',
+                boxShadow: '0 24px 64px rgba(80,30,180,0.28), inset 0 1px 0 rgba(200,160,255,0.08)',
+                border: '1px solid rgba(180,130,255,0.18)',
               }}
             >
-              {/* Corner accents */}
-              {[
-                'top-0 left-0 border-t-2 border-l-2 rounded-tl-2xl',
-                'top-0 right-0 border-t-2 border-r-2 rounded-tr-2xl',
-                'bottom-0 left-0 border-b-2 border-l-2 rounded-bl-2xl',
-                'bottom-0 right-0 border-b-2 border-r-2 rounded-br-2xl',
-              ].map((cls, i) => (
-                <div key={i} className={`absolute w-5 h-5 pointer-events-none ${cls}`}
-                  style={{ borderColor: 'rgba(180,130,255,0.45)' }} />
-              ))}
+              {/* Photo — zoomed in ~20% via scale */}
+              <img
+                src="/gallery/WhatsApp Image 2026-04-04 at 18.13.03.jpeg"
+                alt="Team"
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  objectPosition: 'center 35%',
+                  transform: 'scale(1.2)',
+                  transformOrigin: 'center 35%',
+                }}
+              />
 
-              {/* Center icon + label */}
-              <div className="flex flex-col items-center gap-3">
-                <div
-                  className="w-12 h-12 rounded-xl flex items-center justify-center"
-                  style={{
-                    background: 'rgba(160,100,255,0.10)',
-                    border: '1px solid rgba(180,130,255,0.22)',
-                  }}
-                >
-                  <ImagePlus className="w-5 h-5" style={{ color: 'rgba(200,160,255,0.55)' }} />
-                </div>
-                <p className="text-[10px] tracking-[0.22em] uppercase font-medium text-center px-4"
-                  style={{ color: 'rgba(200,160,255,0.45)' }}>
-                  {c.photoLabel}
-                </p>
-              </div>
-
-              {/* Subtle inner glow */}
+              {/* Subtle purple tint overlay */}
               <div className="absolute inset-0 pointer-events-none"
-                style={{ background: 'radial-gradient(ellipse 70% 55% at 50% 40%, rgba(140,90,255,0.07) 0%, transparent 70%)' }}
+                style={{ background: 'linear-gradient(to top, rgba(80,30,180,0.35) 0%, transparent 55%)' }}
               />
             </div>
           </motion.div>

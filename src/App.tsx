@@ -1,5 +1,13 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
-import { motion, animate } from 'framer-motion'
+import { motion, animate, AnimatePresence } from 'framer-motion'
+
+// Clip-path keyframes for the expanding window: tiny → full-height narrow strip → full screen
+const CLIP_INIT = 'inset(49% 49% 49% 49% round 28px)'
+const CLIP_TALL = 'inset(0% 45% 0% 45% round 7px)'
+const CLIP_FULL = 'inset(0% 0% 0% 0% round 0px)'
+const CLIP_SEQ  = [CLIP_INIT, CLIP_TALL, CLIP_FULL]
+// Spring-like cubic bezier: moderate start → overshoots slightly → settles (bubbly feel)
+const EASE_SPRING = [0.25, 0.92, 0.32, 1] as [number, number, number, number]
 import { Header } from './components/layout/Header'
 import { SideNav } from './components/layout/SideNav'
 import { SectionStack } from './components/layout/SectionStack'
@@ -19,6 +27,7 @@ import { PerformanceProvider } from './contexts/PerformanceContext'
 import { usePerformanceTier } from './hooks/usePerformanceTier'
 import { t } from './utils/translations'
 import type { Language } from './utils/translations'
+import { SplashGate } from './components/ui/SplashGate'
 
 const TOTAL_SECTIONS = 7
 
@@ -36,9 +45,9 @@ function detectLanguage(): Language {
   return 'en'
 }
 
-// Premium 2-phase intro:
-// Phase 1 — a box scales from small to full-screen (box expand)
-// Phase 2 — titles split/cross/spring, then blur lifts
+// Premium intro:
+// The website itself is clipped to an expanding window (height first, then width).
+// Titles fly in from opposite sides simultaneously. No blur, no dim — content visible immediately inside the window.
 function IntroReveal({ children, onDone, isMobile, title1, title2 }: {
   children: React.ReactNode
   onDone: () => void
@@ -46,150 +55,83 @@ function IntroReveal({ children, onDone, isMobile, title1, title2 }: {
   title1: string
   title2: string
 }) {
-  const t1Ref = useRef<HTMLHeadingElement>(null)
-  const t2Ref = useRef<HTMLHeadingElement>(null)
+  const t1Ref   = useRef<HTMLHeadingElement>(null)
+  const t2Ref   = useRef<HTMLHeadingElement>(null)
   const [done, setDone] = useState(false)
-  const [revealing, setRevealing] = useState(false)
-  const [boxOpen, setBoxOpen] = useState(false)
 
-  // Phase 2: title choreography — starts after box is mostly open
   useEffect(() => {
-    if (!boxOpen) return
+    const t1 = t1Ref.current
+    const t2 = t2Ref.current
+    if (!t1 || !t2) return
+
+    const vw = window.innerWidth
 
     const run = async () => {
-      await new Promise<void>(r => setTimeout(r, 60))
-      const t1 = t1Ref.current
-      const t2 = t2Ref.current
-      if (!t1 || !t2) return
-
-      const travel = window.innerWidth * (isMobile ? 0.34 : 0.42)
-
-      // Fade in centered titles
       await Promise.all([
-        animate(t1, { opacity: 1 }, { duration: 0.28 }),
-        animate(t2, { opacity: 1 }, { duration: 0.28, delay: 0.1 }),
-      ])
-      await new Promise<void>(r => setTimeout(r, 80))
-
-      // Split — t1 left, t2 right
-      await Promise.all([
-        animate(t1, { x: -travel }, { duration: 0.32, ease: [0.4, 0, 0.2, 1] }),
-        animate(t2, { x: travel },  { duration: 0.32, ease: [0.4, 0, 0.2, 1] }),
-      ])
-      await new Promise<void>(r => setTimeout(r, 75))
-
-      // Cross — t1 right, t2 left
-      await Promise.all([
-        animate(t1, { x: travel * 0.88 },  { duration: 0.36, ease: [0.4, 0, 0.6, 1] }),
-        animate(t2, { x: -travel * 0.88 }, { duration: 0.36, ease: [0.4, 0, 0.6, 1] }),
-      ])
-      await new Promise<void>(r => setTimeout(r, 65))
-
-      // Split again, smaller
-      await Promise.all([
-        animate(t1, { x: -travel * 0.40 }, { duration: 0.26, ease: [0.4, 0, 0.2, 1] }),
-        animate(t2, { x: travel * 0.40 },  { duration: 0.26, ease: [0.4, 0, 0.2, 1] }),
+        // t1 flies in from the left, scaling up with spring-like overshoot
+        animate(t1,
+          { x: [-vw * 1.15, 0], opacity: [0, 1], scale: [0.76, 1] },
+          { duration: 1.52, ease: EASE_SPRING }
+        ),
+        // t2 flies in from the right, slight stagger
+        animate(t2,
+          { x: [vw * 1.15, 0], opacity: [0, 1], scale: [0.76, 1] },
+          { duration: 1.52, ease: EASE_SPRING, delay: 0.12 }
+        ),
       ])
 
-      // Spring back to center + start unblurring
-      animate(t1, { x: 0 }, { type: 'spring', damping: 22, stiffness: 300, mass: 0.7 })
-      animate(t2, { x: 0 }, { type: 'spring', damping: 22, stiffness: 300, mass: 0.7, delay: 0.05 })
-      setRevealing(true)
-
-      await new Promise<void>(r => setTimeout(r, 660))
-
-      // Titles drift down and fade out
-      const toY = window.innerHeight * 0.21
-      await Promise.all([
-        animate(t1, { y: toY, opacity: 0 }, { duration: 0.46, ease: [0.4, 0, 1, 1] }),
-        animate(t2, { y: toY, opacity: 0 }, { duration: 0.46, ease: [0.4, 0, 1, 1], delay: 0.06 }),
-      ])
+      // Brief hold — titles settled, window fully open
+      await new Promise<void>(r => setTimeout(r, 300))
 
       setDone(true)
       onDone()
     }
+
     run()
-  }, [boxOpen]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <>
-      {/* App content always lives in the same fixed container — never remounts */}
-      <div className={isMobile ? 'min-h-screen' : 'fixed inset-0'} style={{ zIndex: done ? 0 : 190 }}>
-        <motion.div
-          className="w-full h-full"
-          initial={{ opacity: 0.12 }}
-          animate={{ opacity: done || revealing ? 1 : 0.12 }}
-          transition={{ duration: 0.95, ease: 'easeOut' }}
-        >
-          {children}
-        </motion.div>
-      </div>
-
-      {/* Intro overlay — sits on top, removed when done */}
+      {/* Black backdrop — fills screen around the expanding clip window */}
       {!done && (
-        <>
-          {/* Black backdrop behind the expanding box */}
-          <div className="fixed inset-0 z-[192] pointer-events-none" style={{ background: '#000' }} />
+        <div className="fixed inset-0 z-[192] pointer-events-none" style={{ background: '#000' }} />
+      )}
 
-          {/* The box: scales from small to full-screen */}
-          <motion.div
-            className="fixed z-[195] pointer-events-none overflow-hidden"
-            style={{
-              top: '50%', left: '50%',
-              width: '100vw', height: '100vh',
-              x: '-50%', y: '-50%',
-              willChange: 'transform, borderRadius',
-            }}
-            initial={{ scale: 0.18, borderRadius: '28px' }}
-            animate={{ scale: 1, borderRadius: '0px' }}
-            transition={{ type: 'spring', damping: 28, stiffness: 180, mass: 1 }}
-            onAnimationComplete={() => setBoxOpen(true)}
-          >
-            {/* Glow border fades as box expands */}
-            <motion.div
-              className="absolute inset-0"
-              initial={{ opacity: 1 }}
-              animate={{ opacity: 0 }}
-              transition={{ duration: 0.7, delay: 0.3 }}
-              style={{
-                borderRadius: 'inherit',
-                boxShadow: '0 0 0 1.5px rgba(255,255,255,0.22), 0 0 50px rgba(255,255,255,0.10), inset 0 0 50px rgba(255,255,255,0.05)',
-                pointerEvents: 'none',
-              }}
-            />
-          </motion.div>
+      {/* App content — clipped to the expanding window shape, full opacity, content visible inside */}
+      <motion.div
+        className={isMobile ? 'min-h-screen' : 'fixed inset-0'}
+        style={{ zIndex: done ? 0 : 193 }}
+        initial={{ clipPath: CLIP_INIT }}
+        animate={{ clipPath: done ? CLIP_FULL : CLIP_SEQ }}
+        transition={{
+          clipPath: done
+            ? { duration: 0 }
+            : { duration: 2.05, times: [0, 0.44, 1], ease: EASE_SPRING },
+        }}
+      >
+        {children}
+      </motion.div>
 
-          {/* Backdrop blur — fades once revealing */}
-          <motion.div
-            className="fixed inset-0 z-[196] pointer-events-none"
-            animate={{ opacity: revealing ? 0 : 1 }}
-            transition={{ duration: 0.95, ease: 'easeOut' }}
-            style={{ backdropFilter: 'blur(22px)', WebkitBackdropFilter: 'blur(22px)' }}
-          />
-
-          {/* Titles — appear after box is open */}
-          {boxOpen && (
-            <div
-              className="fixed inset-0 z-[197] flex flex-col items-center justify-center gap-1 md:gap-2 pointer-events-none"
-              style={{ mixBlendMode: 'difference' }}
+      {/* Titles — float freely above, not clipped, land at hero's exact bottom-left */}
+      {!done && (
+        <div className="fixed inset-0 z-[197] pointer-events-none">
+          <div className="absolute bottom-20 md:bottom-18 inset-x-0 flex flex-col items-start md:pl-36 lg:pl-40 px-5 md:px-0">
+            <h1
+              ref={t1Ref}
+              className="text-[clamp(2.2rem,6vw,6.5rem)] font-serif text-white leading-[1] tracking-tight mb-2 md:mb-0.5"
+              style={{ opacity: 0, willChange: 'transform, opacity', textShadow: '0 0 38px rgba(255,130,50,0.55), 0 0 80px rgba(255,90,20,0.28)' }}
             >
-              <h1
-                ref={t1Ref}
-                className="text-[clamp(2.2rem,6vw,6.5rem)] font-serif leading-[1] tracking-tight text-white"
-                style={{ opacity: 0, willChange: 'transform, opacity' }}
-              >
-                {title1}
-              </h1>
-              <h1
-                ref={t2Ref}
-                className="text-[clamp(2.2rem,6vw,6.5rem)] font-serif leading-[1] tracking-tight"
-                style={{ color: 'rgba(255,255,255,0.82)', opacity: 0, willChange: 'transform, opacity' }}
-              >
-                {title2}
-              </h1>
-            </div>
-          )}
-        </>
+              {title1}
+            </h1>
+            <h1
+              ref={t2Ref}
+              className="text-[clamp(2.2rem,6vw,6.5rem)] font-serif leading-[1] tracking-tight"
+              style={{ color: 'rgba(255,255,255,0.70)', opacity: 0, willChange: 'transform, opacity', textShadow: '0 0 38px rgba(255,130,50,0.40), 0 0 80px rgba(255,90,20,0.20)' }}
+            >
+              {title2}
+            </h1>
+          </div>
+        </div>
       )}
     </>
   )
@@ -202,6 +144,9 @@ function AppInner() {
   const [chatContext, setChatContext] = useState('')
   const [language, setLanguage] = useState<Language>(detectLanguage)
   const [introDone, setIntroDone] = useState(false)
+  const [splashDone, setSplashDone] = useState<boolean>(
+    () => sessionStorage.getItem('hv_splash_seen') === '1'
+  )
   const [mailMessages, setMailMessages] = useState<MailMessage[]>([])
   const [mailboxOpen, setMailboxOpen] = useState(false)
   const heroInputRef = useRef<HTMLTextAreaElement>(null)
@@ -210,6 +155,11 @@ function AppInner() {
 
   const handleNavigate = useCallback((index: number) => {
     setCurrentSection(Math.max(0, Math.min(TOTAL_SECTIONS - 1, index)))
+  }, [])
+
+  const handleSplashEnter = useCallback(() => {
+    sessionStorage.setItem('hv_splash_seen', '1')
+    setSplashDone(true)
   }, [])
 
   useSectionScroll({
@@ -337,7 +287,7 @@ function AppInner() {
         ]}
       </SectionStack>
 
-      {currentSection !== 0 && (
+      {currentSection !== 0 && currentSection !== 1 && (
         <ChatBot
           language={language}
           context={chatContext}
@@ -359,11 +309,18 @@ function AppInner() {
   const tr = t(language)
 
   return (
-    <PerformanceProvider tier={tier}>
-      <IntroReveal onDone={() => setIntroDone(true)} isMobile={isMobile} title1={tr.heroTitle1} title2={tr.heroTitle2}>
-        {appContent}
-      </IntroReveal>
-    </PerformanceProvider>
+    <>
+      <AnimatePresence>
+        {!splashDone && (
+          <SplashGate key="splash" language={language} onEnter={handleSplashEnter} />
+        )}
+      </AnimatePresence>
+      <PerformanceProvider tier={tier}>
+        <IntroReveal onDone={() => setIntroDone(true)} isMobile={isMobile} title1={tr.heroTitle1} title2={tr.heroTitle2}>
+          {appContent}
+        </IntroReveal>
+      </PerformanceProvider>
+    </>
   )
 }
 

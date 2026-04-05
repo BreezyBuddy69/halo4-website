@@ -78,7 +78,7 @@ export function ProcessSection({ language, isActive, onBooking }: ProcessSection
             initial={{ opacity: 0 }}
             animate={isActive ? { opacity: 1 } : {}}
             transition={{ delay: 0.2 }}
-            className="text-white/30 max-md:text-white/58 text-[11px] md:text-sm tracking-[0.35em] uppercase mb-6"
+            className="text-white text-xl md:text-3xl font-bold tracking-tight mb-6"
           >
             {tr.processTitle}
           </motion.p>

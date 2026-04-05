@@ -7,9 +7,10 @@ interface NeonButtonProps {
   onClick?: () => void
   className?: string
   size?: 'sm' | 'md' | 'lg'
+  variant?: 'default' | 'orange'
 }
 
-export function NeonButton({ children, onClick, className = '', size = 'md' }: NeonButtonProps) {
+export function NeonButton({ children, onClick, className = '', size = 'md', variant = 'default' }: NeonButtonProps) {
   const [hovered, setHovered] = useState(false)
 
   const sizeClass = {
@@ -17,6 +18,36 @@ export function NeonButton({ children, onClick, className = '', size = 'md' }: N
     md: 'px-7 py-3.5 text-sm',
     lg: 'px-9 py-4 text-[15px]',
   }[size]
+
+  const isOrange = variant === 'orange'
+
+  const bgStyle = isOrange
+    ? (hovered
+        ? 'linear-gradient(135deg, #FF6B20 0%, #E84500 100%)'
+        : 'linear-gradient(135deg, #FF5500 0%, #D83A00 100%)')
+    : (hovered
+        ? 'linear-gradient(135deg, rgba(14,7,38,0.88) 0%, rgba(10,5,28,0.82) 100%)'
+        : 'linear-gradient(135deg, rgba(10,5,30,0.82) 0%, rgba(7,3,20,0.76) 100%)')
+
+  const borderStyle = isOrange
+    ? `1px solid ${hovered ? 'rgba(255,160,100,0.9)' : 'rgba(255,130,70,0.7)'}`
+    : `1px solid ${hovered ? 'rgba(255,195,90,0.75)' : 'rgba(255,180,75,0.50)'}`
+
+  const shadowStyle = isOrange
+    ? (hovered
+        ? '0 0 40px rgba(255,100,30,0.65), 0 0 100px rgba(255,70,20,0.32), inset 0 1px 0 rgba(255,210,170,0.38)'
+        : '0 0 24px rgba(255,100,30,0.42), 0 0 70px rgba(255,70,20,0.22), inset 0 1px 0 rgba(255,200,155,0.28)')
+    : (hovered
+        ? '0 0 32px rgba(255,170,60,0.40), 0 0 80px rgba(255,120,40,0.20), inset 0 1px 0 rgba(255,220,120,0.28)'
+        : '0 0 18px rgba(255,160,55,0.22), 0 0 50px rgba(255,110,40,0.10), inset 0 1px 0 rgba(255,205,100,0.18)')
+
+  const shimmerColor = isOrange
+    ? 'rgba(255,240,220,0.22)'
+    : 'rgba(255,220,130,0.18)'
+
+  const shimmerLineColor = isOrange
+    ? `rgba(255,230,200,${hovered ? '0.45' : '0.22'})`
+    : `rgba(255,210,110,${hovered ? '0.55' : '0.30'})`
 
   return (
     <motion.button
@@ -28,13 +59,9 @@ export function NeonButton({ children, onClick, className = '', size = 'md' }: N
       onClick={onClick}
       className={`relative rounded-full font-medium text-white tracking-wide overflow-hidden flex items-center gap-2.5 ${sizeClass} ${className}`}
       style={{
-        background: hovered
-          ? 'linear-gradient(135deg, rgba(255,185,75,0.22) 0%, rgba(255,110,50,0.18) 100%)'
-          : 'linear-gradient(135deg, rgba(255,175,65,0.14) 0%, rgba(255,100,45,0.10) 100%)',
-        border: `1px solid ${hovered ? 'rgba(255,185,75,0.55)' : 'rgba(255,175,65,0.35)'}`,
-        boxShadow: hovered
-          ? '0 0 28px rgba(255,170,60,0.28), 0 0 72px rgba(255,120,40,0.14), inset 0 1px 0 rgba(255,210,110,0.22)'
-          : '0 0 16px rgba(255,160,55,0.16), 0 0 44px rgba(255,110,40,0.08), inset 0 1px 0 rgba(255,200,100,0.14)',
+        background: bgStyle,
+        border: borderStyle,
+        boxShadow: shadowStyle,
         transition: 'background 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease',
       }}
     >
@@ -42,7 +69,7 @@ export function NeonButton({ children, onClick, className = '', size = 'md' }: N
       <span
         className="absolute top-0 left-6 right-6 h-px pointer-events-none"
         style={{
-          background: `linear-gradient(90deg, transparent, rgba(255,210,110,${hovered ? '0.55' : '0.30'}), transparent)`,
+          background: `linear-gradient(90deg, transparent, ${shimmerLineColor}, transparent)`,
           transition: 'opacity 0.3s ease',
         }}
       />
@@ -54,7 +81,7 @@ export function NeonButton({ children, onClick, className = '', size = 'md' }: N
         animate={hovered ? { x: '120%', opacity: 1 } : { x: '-100%', opacity: 0 }}
         transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
         style={{
-          background: 'linear-gradient(90deg, transparent 0%, rgba(255,220,130,0.18) 50%, transparent 100%)',
+          background: `linear-gradient(90deg, transparent 0%, ${shimmerColor} 50%, transparent 100%)`,
           skewX: '-12deg',
         }}
       />
@@ -73,9 +100,9 @@ export function NeonButton({ children, onClick, className = '', size = 'md' }: N
           style={{
             width: size === 'sm' ? 13 : size === 'lg' ? 17 : 15,
             height: size === 'sm' ? 13 : size === 'lg' ? 17 : 15,
-            opacity: hovered ? 0.9 : 0.55,
+            opacity: hovered ? 0.95 : isOrange ? 0.85 : 0.55,
             transition: 'opacity 0.3s ease',
-            color: 'rgba(255,210,110,1)',
+            color: isOrange ? 'rgba(255,235,210,1)' : 'rgba(255,210,110,1)',
           }}
         />
       </motion.span>

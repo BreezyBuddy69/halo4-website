@@ -12,12 +12,12 @@ import { Clock, CheckCircle } from 'lucide-react'
 const BOOK_CLOUDS_CONFIG = {
   variant: 'clouds' as const,
   backgroundColor: 0x0d0510,
-  skyColor: 0xff6b35,
-  cloudColor: 0xff9f45,
-  cloudShadowColor: 0x1a0a20,
+  skyColor: 0xff7040,
+  cloudColor: 0xfff0d8,
+  cloudShadowColor: 0x3d1808,
   sunColor: 0xffd700,
   sunGlareColor: 0xff4500,
-  sunlightColor: 0xffa500,
+  sunlightColor: 0xffc060,
   speed: 0.6,
 }
 
@@ -73,7 +73,7 @@ export function BookSection({ language, isActive, onBooking }: BookSectionProps)
 
         {/* Dark overlay to preserve readability */}
         <div className="absolute inset-0 z-[1] m-book-overlay"
-          style={{ background: 'linear-gradient(180deg, rgba(6,2,18,0.05) 0%, rgba(6,2,18,0.20) 35%, rgba(6,2,18,0.52) 62%, rgba(6,2,18,0.72) 100%)' }}
+          style={{ background: 'linear-gradient(180deg, rgba(6,2,18,0.42) 0%, rgba(6,2,18,0.52) 35%, rgba(6,2,18,0.68) 62%, rgba(6,2,18,0.85) 100%)' }}
         />
 
         <div className="relative z-10 w-full h-full flex flex-col items-center justify-center px-8 md:px-16 text-center pt-16 md:pt-0">
@@ -115,7 +115,7 @@ export function BookSection({ language, isActive, onBooking }: BookSectionProps)
             initial={{ opacity: 0 }}
             animate={isActive ? { opacity: 1 } : {}}
             transition={{ delay: 0.5 }}
-            className="text-white/40 text-sm mb-10 max-w-sm leading-relaxed"
+            className="text-white/80 text-sm mb-10 max-w-sm leading-relaxed"
           >
             {tr.growthMappingDesc}
           </motion.p>
@@ -155,8 +155,8 @@ export function BookSection({ language, isActive, onBooking }: BookSectionProps)
                 )
               })}
             </div>
-            <p className="text-white/35 text-[11px] tracking-wide">
-              <span className="text-white/58 font-medium">12+</span> {language === 'de' ? 'Unternehmen bereits dabei' : language === 'fr' ? 'entreprises déjà automatisées' : 'businesses already automating'}
+            <p className="text-white/60 text-[11px] tracking-wide">
+              <span className="text-white/85 font-medium">12+</span> {language === 'de' ? 'Unternehmen bereits dabei' : language === 'fr' ? 'entreprises déjà automatisées' : 'businesses already automating'}
             </p>
           </motion.div>
 
@@ -190,7 +190,7 @@ export function BookSection({ language, isActive, onBooking }: BookSectionProps)
                     </motion.div>
                     <motion.span
                       className="text-xs tracking-wider"
-                      animate={{ color: lit ? 'rgba(52,211,153,0.90)' : 'rgba(255,255,255,0.35)' }}
+                      animate={{ color: lit ? 'rgba(52,211,153,0.90)' : 'rgba(255,255,255,0.58)' }}
                       transition={{ duration: 0.4 }}
                     >
                       {step.text}
@@ -198,7 +198,7 @@ export function BookSection({ language, isActive, onBooking }: BookSectionProps)
                   </motion.div>
 
                   {i < steps.length - 1 && (
-                    <div className="relative mx-2" style={{ width: 40, height: 1, background: 'rgba(255,255,255,0.10)' }}>
+                    <div className="relative mx-2" style={{ width: 40, height: 1, background: 'rgba(255,255,255,0.25)' }}>
                       <motion.div
                         className="absolute inset-0"
                         style={{
@@ -221,7 +221,7 @@ export function BookSection({ language, isActive, onBooking }: BookSectionProps)
             initial={{ opacity: 0 }}
             animate={isActive ? { opacity: 1 } : {}}
             transition={{ delay: 1.2 }}
-            className="text-white/20 text-[10px] tracking-wider mt-5 hidden md:block"
+            className="text-white/45 text-[10px] tracking-wider mt-5 hidden md:block"
           >
             {tr.agencyNote}
           </motion.p>
