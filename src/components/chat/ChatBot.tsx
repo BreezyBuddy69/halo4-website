@@ -232,7 +232,7 @@ export function ChatBot({ language, context, onContextUsed }: ChatBotProps) {
             transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
             onClick={openChat}
             onMouseEnter={handleButtonMouseEnter}
-            className="absolute bottom-16 right-6 pointer-events-auto flex items-center justify-center overflow-hidden"
+            className="absolute bottom-6 right-6 pointer-events-auto flex items-center justify-center overflow-hidden"
             style={{
               width: CLOSED_W,
               height: CLOSED_H,
@@ -266,7 +266,7 @@ export function ChatBot({ language, context, onContextUsed }: ChatBotProps) {
               height: OPEN_H,
               borderRadius: 20,
               right: 24,
-              bottom: 120,
+              bottom: 80,
               background: 'linear-gradient(160deg, rgba(28,16,60,0.96) 0%, rgba(14,8,34,0.98) 55%, rgba(7,4,18,0.99) 100%)',
               border: '1px solid rgba(160,120,255,0.22)',
               boxShadow: '0 32px 72px rgba(0,0,0,0.72), 0 8px 28px rgba(0,0,0,0.42), 0 0 0 1px rgba(255,255,255,0.06), inset 0 1.5px 0 rgba(255,255,255,0.18), inset 0 -1px 0 rgba(0,0,0,0.30)',

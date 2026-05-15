@@ -68,7 +68,10 @@ function AnimatedWord({ word, delay, style, className }: {
           key={i}
           initial={{ opacity: 0, y: 60 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.9, delay: delay + i * 0.06, ease: [0.16, 1, 0.3, 1] }}
+          transition={{
+            y: { duration: 0.85, delay: delay + i * 0.06, ease: [0.16, 1, 0.3, 1] },
+            opacity: { duration: 1.5, delay: delay + i * 0.06, ease: 'easeOut' },
+          }}
           style={{ display: 'inline-block', willChange: 'transform, opacity' }}
         >
           {char}
@@ -394,7 +397,7 @@ export function HeroSection({ language, isActive, onBooking, inputRef, introDone
         {/* Chat area — input fixed at center, messages grow upward */}
         <motion.div
           className="absolute inset-x-0 flex flex-col items-center px-4 md:px-12 lg:px-20 z-[5]"
-          style={{ top: '10%', bottom: '8%' }}
+          style={{ top: '0%', bottom: '30%' }}
           animate={{ opacity: chatAreaVisible ? 1 : 0 }}
           transition={{ duration: 1.2, ease: 'easeOut' }}
         >
@@ -427,16 +430,15 @@ export function HeroSection({ language, isActive, onBooking, inputRef, introDone
                 }}
               />
               <motion.span
-                className="text-[11px] tracking-[0.14em] uppercase font-semibold px-2 py-0.5 rounded"
-                animate={{ opacity: [0.75, 1, 0.75] }}
-                transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+                className="text-[10px] tracking-[0.22em] uppercase font-medium px-3 py-1 rounded-full"
+                animate={{ opacity: [0.6, 0.9, 0.6] }}
+                transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
                 style={{
                   willChange: 'opacity',
-                  color: 'rgba(255,255,255,0.92)',
-                  textShadow: '0 1px 4px rgba(0,0,0,0.9), 0 0 12px rgba(0,0,0,0.7)',
-                  background: 'rgba(0,0,0,0.28)',
-                  backdropFilter: 'blur(6px)',
-                  WebkitBackdropFilter: 'blur(6px)',
+                  color: 'rgba(200,180,255,0.85)',
+                  background: 'rgba(8,5,20,0.92)',
+                  border: '1px solid rgba(139,92,246,0.28)',
+                  letterSpacing: '0.20em',
                 }}
               >
                 {tr.talkToIntegratedAI}
@@ -507,7 +509,7 @@ export function HeroSection({ language, isActive, onBooking, inputRef, introDone
                             background: 'rgba(7,4,24,1)',
                             border: '1px solid rgba(139,92,246,0.38)',
                             color: 'rgba(255,255,255,0.96)',
-                            boxShadow: '0 8px 40px rgba(0,0,0,0.72), 0 0 0 1px rgba(139,92,246,0.10)',
+                            boxShadow: '0 4px 32px rgba(0,0,0,0.18)',
                             backdropFilter: 'blur(20px)',
                             WebkitBackdropFilter: 'blur(20px)',
                           }}
@@ -549,7 +551,7 @@ export function HeroSection({ language, isActive, onBooking, inputRef, introDone
                       style={{
                         background: 'rgba(7, 4, 24, 1.0)',
                         border: '1px solid rgba(139, 92, 246, 0.32)',
-                        boxShadow: '0 8px 40px rgba(0,0,0,0.72), 0 0 0 1px rgba(139,92,246,0.10)',
+                        boxShadow: '0 20px 120px rgba(0,0,0,0.38), 0 8px 60px rgba(0,0,0,0.28)',
                         backdropFilter: 'blur(20px)',
                         WebkitBackdropFilter: 'blur(20px)',
                       }}>
@@ -693,7 +695,7 @@ export function HeroSection({ language, isActive, onBooking, inputRef, introDone
                   lineHeight: 0.88,
                   whiteSpace: 'nowrap',
                   letterSpacing: '0.02em',
-                  textShadow: `0 0 160px ${ORANGE}44, 0 4px 40px rgba(0,0,0,0.5)`,
+                  textShadow: `0 0 120px rgba(185,155,255,0.55), 0 0 40px rgba(139,92,246,0.35), 0 0 8px rgba(255,255,255,0.20)`,
                 }}
               />
 
@@ -703,7 +705,10 @@ export function HeroSection({ language, isActive, onBooking, inputRef, introDone
                 <motion.svg
                   initial={{ opacity: 0, y: 60 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.9, delay: 0.22, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{
+                    y: { duration: 0.85, delay: 0.85, ease: [0.16, 1, 0.3, 1] },
+                    opacity: { duration: 1.5, delay: 0.85, ease: 'easeOut' },
+                  }}
                   style={{ display: 'block', overflow: 'visible', flexShrink: 1 }}
                   height={Math.ceil(visionFontPx * 0.88)}
                   width="auto"
@@ -716,7 +721,7 @@ export function HeroSection({ language, isActive, onBooking, inputRef, introDone
                       <feMerge><feMergeNode in="glow" /><feMergeNode in="SourceGraphic" /></feMerge>
                     </filter>
                   </defs>
-                  {/* Outer wide stroke — soft halo */}
+                  {/* Outer stroke — thin soft halo band */}
                   <text
                     y={Math.ceil(visionFontPx * 0.82)}
                     fontFamily="anurati, sans-serif"
@@ -724,10 +729,10 @@ export function HeroSection({ language, isActive, onBooking, inputRef, introDone
                     fontWeight={900}
                     letterSpacing={visionFontPx * 0.02}
                     fill="none"
-                    stroke="rgba(139,92,246,0.35)"
-                    strokeWidth={7}
+                    stroke="rgba(139,92,246,0.55)"
+                    strokeWidth={5}
                   >VISION</text>
-                  {/* Inner thin stroke — crisp neon line */}
+                  {/* Inner crisp stroke — bright neon line on path center */}
                   <text
                     y={Math.ceil(visionFontPx * 0.82)}
                     fontFamily="anurati, sans-serif"
@@ -735,7 +740,7 @@ export function HeroSection({ language, isActive, onBooking, inputRef, introDone
                     fontWeight={900}
                     letterSpacing={visionFontPx * 0.02}
                     fill="none"
-                    stroke="rgba(167,139,250,0.90)"
+                    stroke="rgba(220,200,255,0.98)"
                     strokeWidth={1.6}
                     filter="url(#vision-glow)"
                   >VISION</text>
@@ -744,7 +749,10 @@ export function HeroSection({ language, isActive, onBooking, inputRef, introDone
                   className="font-anurati"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.9, delay: 0.9, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{
+                    y: { duration: 0.85, delay: 1.55, ease: [0.16, 1, 0.3, 1] },
+                    opacity: { duration: 1.5, delay: 1.55, ease: 'easeOut' },
+                  }}
                   style={{
                     fontSize: aiFontPx + 'px',
                     color: 'rgba(185,155,255,0.97)',
