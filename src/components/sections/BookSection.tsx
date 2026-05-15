@@ -23,17 +23,30 @@ export function BookSection({ language, isActive, onBooking }: BookSectionProps)
   const steps = stepLabels[language].map((text, i) => ({ num: `0${i + 1}`, text }))
 
   const [activeStep, setActiveStep] = useState(-1)
+  // controls visibility of post-steps elements
+  const [showText, setShowText] = useState(false)
+  const [showButton, setShowButton] = useState(false)
+
+  // Steps start at 1.1s, each 420ms apart → last step lights at ~1.1 + 3×0.42 = 2.36s
+  // Text appears ~0.5s after last step, button 0.6s after text
+  const STEP_BASE = 1100
+  const STEP_GAP = 420
+  const TEXT_DELAY = STEP_BASE + (steps.length - 1) * STEP_GAP + 600
+  const BUTTON_DELAY = TEXT_DELAY + 550
 
   useEffect(() => {
     if (!isActive) {
       setActiveStep(-1)
+      setShowText(false)
+      setShowButton(false)
       return
     }
     const timers: ReturnType<typeof setTimeout>[] = []
     steps.forEach((_, i) => {
-      // row fades in at 0.9s, then each step fires 550ms apart
-      timers.push(setTimeout(() => setActiveStep(i), 1100 + i * 600))
+      timers.push(setTimeout(() => setActiveStep(i), STEP_BASE + i * STEP_GAP))
     })
+    timers.push(setTimeout(() => setShowText(true), TEXT_DELAY))
+    timers.push(setTimeout(() => setShowButton(true), BUTTON_DELAY))
     return () => timers.forEach(clearTimeout)
   }, [isActive]) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -47,12 +60,12 @@ export function BookSection({ language, isActive, onBooking }: BookSectionProps)
 
         <div className="relative z-10 w-full h-full flex flex-col items-center justify-center px-8 md:px-16 text-center pt-16 md:pt-0">
 
-          {/* Badge */}
+          {/* 1 — Badge */}
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={isActive ? { opacity: 1, y: 0 } : {}}
-            transition={{ delay: 0.25 }}
-            className="rounded-full px-4 py-2 flex items-center gap-2 mb-8 mx-auto w-fit"
+            transition={{ delay: 0.2 }}
+            className="rounded-full px-4 py-2 flex items-center gap-2 mb-6 mx-auto w-fit"
             style={{
               background: 'linear-gradient(135deg, rgba(160,100,255,0.14) 0%, rgba(120,60,220,0.10) 100%)',
               border: '1px solid rgba(180,120,255,0.28)',
@@ -70,71 +83,22 @@ export function BookSection({ language, isActive, onBooking }: BookSectionProps)
             <span className="text-xs tracking-wider" style={{ color: 'rgba(220,185,255,0.72)' }}>{tr.duration} · {tr.growthMappingCall}</span>
           </motion.div>
 
-          {/* Headline */}
+          {/* 2 — Headline */}
           <motion.h2
             initial={{ opacity: 0, y: 28 }}
             animate={isActive ? { opacity: 1, y: 0 } : {}}
-            transition={{ delay: 0.35, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-            className="text-4xl md:text-7xl lg:text-8xl font-serif text-white leading-none mb-4"
+            transition={{ delay: 0.38, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+            className="text-4xl md:text-7xl lg:text-8xl font-serif text-white leading-none mb-10"
           >
             {tr.workWithUs}
           </motion.h2>
 
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={isActive ? { opacity: 1 } : {}}
-            transition={{ delay: 0.5 }}
-            className="text-white/80 text-sm mb-10 max-w-sm leading-relaxed"
-          >
-            {tr.growthMappingDesc}
-          </motion.p>
-
-          {/* ── CTA — the focal point ── */}
+          {/* 3 — Steps row (green animation) */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.9, y: 10 }}
-            animate={isActive ? { opacity: 1, scale: 1, y: 0 } : {}}
-            transition={{ delay: 0.58, type: 'spring', damping: 14, stiffness: 160 }}
-            className="mb-5"
-          >
-            <NeonButton onClick={onBooking} size="lg">
-              {tr.bookCall}
-            </NeonButton>
-          </motion.div>
-
-          {/* Social proof — tight below CTA */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={isActive ? { opacity: 1 } : {}}
-            transition={{ delay: 0.72 }}
-            className="flex items-center gap-3 mb-10 justify-center"
-          >
-            <div className="flex -space-x-2">
-              {['A','M','T','J'].map((initial, i) => {
-                const gradients = [
-                  'linear-gradient(135deg, rgba(100,120,255,0.6), rgba(80,100,220,0.4))',
-                  'linear-gradient(135deg, rgba(190,110,255,0.6), rgba(150,70,220,0.4))',
-                  'linear-gradient(135deg, rgba(52,211,153,0.6), rgba(32,180,130,0.4))',
-                  'linear-gradient(135deg, rgba(139,92,246,0.6), rgba(109,40,217,0.4))',
-                ]
-                return (
-                  <div key={i} className="w-6 h-6 rounded-full flex items-center justify-center text-[8px] font-semibold text-white/80"
-                    style={{ background: gradients[i], border: '1.5px solid rgba(255,255,255,0.15)', zIndex: 4 - i }}>
-                    {initial}
-                  </div>
-                )
-              })}
-            </div>
-            <p className="text-white/60 text-[11px] tracking-wide">
-              <span className="text-white/85 font-medium">12+</span> {language === 'de' ? 'Unternehmen bereits dabei' : language === 'fr' ? 'entreprises déjà automatisées' : 'businesses already automating'}
-            </p>
-          </motion.div>
-
-          {/* ── Steps row — animated, hidden on mobile ── */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 16 }}
             animate={isActive ? { opacity: 1, y: 0 } : {}}
-            transition={{ delay: 0.85 }}
-            className="hidden md:flex items-center"
+            transition={{ delay: 0.78, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            className="hidden md:flex items-center mb-10"
           >
             {steps.map((step, i) => {
               const lit = activeStep >= i
@@ -177,7 +141,7 @@ export function BookSection({ language, isActive, onBooking }: BookSectionProps)
                         }}
                         initial={{ scaleX: 0 }}
                         animate={{ scaleX: activeStep > i ? 1 : 0 }}
-                        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                        transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
                       />
                     </div>
                   )}
@@ -186,11 +150,61 @@ export function BookSection({ language, isActive, onBooking }: BookSectionProps)
             })}
           </motion.div>
 
+          {/* 4 — Description text (appears after steps finish) */}
+          <motion.p
+            initial={{ opacity: 0, y: 12 }}
+            animate={showText ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+            className="text-white/80 text-sm mb-8 max-w-sm leading-relaxed"
+          >
+            {tr.growthMappingDesc}
+          </motion.p>
+
+          {/* 5 — CTA button (last to appear) */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.88, y: 12 }}
+            animate={showButton ? { opacity: 1, scale: 1, y: 0 } : {}}
+            transition={{ type: 'spring', damping: 14, stiffness: 160 }}
+            className="mb-5"
+          >
+            <NeonButton onClick={onBooking} size="lg">
+              {tr.bookCall}
+            </NeonButton>
+          </motion.div>
+
+          {/* Social proof — fades in with button */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={showButton ? { opacity: 1 } : {}}
+            transition={{ delay: 0.2, duration: 0.5 }}
+            className="flex items-center gap-3 justify-center"
+          >
+            <div className="flex -space-x-2">
+              {['A','M','T','J'].map((initial, i) => {
+                const gradients = [
+                  'linear-gradient(135deg, rgba(100,120,255,0.6), rgba(80,100,220,0.4))',
+                  'linear-gradient(135deg, rgba(190,110,255,0.6), rgba(150,70,220,0.4))',
+                  'linear-gradient(135deg, rgba(52,211,153,0.6), rgba(32,180,130,0.4))',
+                  'linear-gradient(135deg, rgba(139,92,246,0.6), rgba(109,40,217,0.4))',
+                ]
+                return (
+                  <div key={i} className="w-6 h-6 rounded-full flex items-center justify-center text-[8px] font-semibold text-white/80"
+                    style={{ background: gradients[i], border: '1.5px solid rgba(255,255,255,0.15)', zIndex: 4 - i }}>
+                    {initial}
+                  </div>
+                )
+              })}
+            </div>
+            <p className="text-white/60 text-[11px] tracking-wide">
+              <span className="text-white/85 font-medium">12+</span> {language === 'de' ? 'Unternehmen bereits dabei' : language === 'fr' ? 'entreprises déjà automatisées' : 'businesses already automating'}
+            </p>
+          </motion.div>
+
           <motion.p
             initial={{ opacity: 0 }}
-            animate={isActive ? { opacity: 1 } : {}}
-            transition={{ delay: 1.2 }}
-            className="text-white/45 text-[10px] tracking-wider mt-5 hidden md:block"
+            animate={showButton ? { opacity: 1 } : {}}
+            transition={{ delay: 0.35, duration: 0.5 }}
+            className="text-white/45 text-[10px] tracking-wider mt-4 hidden md:block"
           >
             {tr.agencyNote}
           </motion.p>
