@@ -235,55 +235,6 @@ export function AboutSection({ language, isActive }: AboutSectionProps) {
               </div>
             </motion.div>
 
-            {/* AIOS Callout */}
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              animate={isActive ? { opacity: 1, y: 0 } : {}}
-              transition={{ delay: 1.1, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-              className="hidden md:block mt-6"
-            >
-              <div
-                className="relative rounded-xl px-5 py-4 overflow-hidden"
-                style={{
-                  background: 'linear-gradient(135deg, rgba(120,60,220,0.18) 0%, rgba(80,30,160,0.12) 50%, rgba(160,80,255,0.10) 100%)',
-                  border: '1px solid rgba(160,100,255,0.28)',
-                  boxShadow: '0 0 32px rgba(120,60,220,0.12)',
-                }}
-              >
-                {/* Subtle glow orb */}
-                <div className="absolute -top-6 -right-6 w-24 h-24 rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(160,80,255,0.18) 0%, transparent 70%)' }} />
-
-                {/* Badge */}
-                <div className="flex items-center gap-2 mb-2.5">
-                  <div className="flex gap-[3px] items-center">
-                    {[0, 1, 2, 3].map(i => (
-                      <motion.div
-                        key={i}
-                        animate={isActive ? { scaleY: [0.4, 1, 0.4], opacity: [0.4, 1, 0.4] } : {}}
-                        transition={{ duration: 1.4, repeat: Infinity, delay: i * 0.18, ease: 'easeInOut' }}
-                        style={{
-                          width: 3,
-                          height: 10,
-                          borderRadius: 2,
-                          background: 'rgba(180,120,255,0.85)',
-                          transformOrigin: 'center',
-                        }}
-                      />
-                    ))}
-                  </div>
-                  <span style={{ fontSize: 10, letterSpacing: '0.22em', color: 'rgba(180,120,255,0.85)', fontWeight: 600, textTransform: 'uppercase' }}>
-                    {c.aiosBadge}
-                  </span>
-                </div>
-
-                <p className="text-white/90 text-sm font-medium leading-snug mb-1.5">
-                  {c.aiosCallout}
-                </p>
-                <p className="text-white/45 text-xs leading-relaxed">
-                  {c.aiosCalloutSub}
-                </p>
-              </div>
-            </motion.div>
           </div>
 
           {/* Right: Photo */}

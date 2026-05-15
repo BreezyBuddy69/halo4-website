@@ -33,33 +33,63 @@ export function WorkSection({ language, isActive, onAskAI }: WorkSectionProps) {
   const [activeIdx, setActiveIdx] = useState(0)
   const [autoPlay, setAutoPlay] = useState(true)
   const [phase, setPhase] = useState<Phase>('idle')
-  const [typeChars, setTypeChars] = useState(0)
+  const [titleChars, setTitleChars] = useState(0)
+  const [descChars, setDescChars] = useState(0)
 
   const titleLen = tr.aiosTitle.length
-  const titleDone = typeChars >= titleLen
+  const descLen = tr.aiosDesc.length
+  const titleDone = titleChars >= titleLen
+  const descDone = descChars >= descLen
 
-  // Phase orchestration
+  // Phase orchestration — type title, pause, type desc, reading pause, then settle
   useEffect(() => {
+    const timers: ReturnType<typeof setTimeout>[] = []
+    const intervals: ReturnType<typeof setInterval>[] = []
+
     if (!isActive) {
       setPhase('idle')
-      setTypeChars(0)
+      setTitleChars(0)
+      setDescChars(0)
       return
     }
-    // Always restart from intro when section becomes active
+
     setPhase('intro')
-    setTypeChars(0)
+    setTitleChars(0)
+    setDescChars(0)
 
-    let i = 0
-    const interval = setInterval(() => {
-      i++
-      setTypeChars(i)
-      if (i >= titleLen) {
-        clearInterval(interval)
-        setTimeout(() => setPhase('settled'), 820)
+    // 1. Type the title
+    let ti = 0
+    const titleInterval = setInterval(() => {
+      ti++
+      setTitleChars(ti)
+      if (ti >= titleLen) {
+        clearInterval(titleInterval)
+
+        // 2. Pause after title, then start typing description
+        const t1 = setTimeout(() => {
+          let di = 0
+          const descInterval = setInterval(() => {
+            di++
+            setDescChars(di)
+            if (di >= descLen) {
+              clearInterval(descInterval)
+
+              // 3. Reading pause after desc is fully typed, then settle
+              const t2 = setTimeout(() => setPhase('settled'), 2200)
+              timers.push(t2)
+            }
+          }, 22)
+          intervals.push(descInterval)
+        }, 480)
+        timers.push(t1)
       }
-    }, 52)
+    }, 55)
+    intervals.push(titleInterval)
 
-    return () => clearInterval(interval)
+    return () => {
+      intervals.forEach(clearInterval)
+      timers.forEach(clearTimeout)
+    }
   }, [isActive])
 
   const displayNodes = SERVICE_NODES.filter(n => n.filterGroup === filter)
@@ -76,7 +106,7 @@ export function WorkSection({ language, isActive, onAskAI }: WorkSectionProps) {
         setFilter(nextCat)
         setActiveIdx(0)
       }
-    }, 5100)
+    }, 6375)
     return () => clearTimeout(timer)
   }, [activeIdx, filter, isActive, autoPlay, displayNodes.length, phase])
 
@@ -156,7 +186,7 @@ export function WorkSection({ language, isActive, onAskAI }: WorkSectionProps) {
                       className="text-white/90 font-medium mb-4 leading-snug"
                       style={{ fontSize: 'clamp(1.5rem, 3.5vw, 2.4rem)' }}
                     >
-                      {tr.aiosTitle.slice(0, typeChars)}
+                      {tr.aiosTitle.slice(0, titleChars)}
                       {!titleDone && (
                         <motion.span
                           animate={{ opacity: [1, 0, 1] }}
@@ -173,190 +203,208 @@ export function WorkSection({ language, isActive, onAskAI }: WorkSectionProps) {
                         />
                       )}
                     </p>
-                    <AnimatePresence>
-                      {titleDone && (
-                        <motion.p
-                          initial={{ opacity: 0, y: 8 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-                          className="text-white/52 leading-relaxed"
-                          style={{ fontSize: 'clamp(0.8rem, 1.4vw, 1rem)' }}
-                        >
-                          {tr.aiosDesc}
-                        </motion.p>
-                      )}
-                    </AnimatePresence>
+                    {titleDone && (
+                      <p
+                        className="text-white/58 leading-relaxed"
+                        style={{ fontSize: 'clamp(0.82rem, 1.4vw, 1rem)' }}
+                      >
+                        {tr.aiosDesc.slice(0, descChars)}
+                        {!descDone && (
+                          <motion.span
+                            animate={{ opacity: [1, 0, 1] }}
+                            transition={{ duration: 0.85, repeat: Infinity, ease: 'easeInOut' }}
+                            style={{
+                              display: 'inline-block',
+                              width: 2,
+                              height: '0.8em',
+                              background: 'rgba(180,120,255,0.75)',
+                              marginLeft: 2,
+                              verticalAlign: 'middle',
+                              borderRadius: 1,
+                            }}
+                          />
+                        )}
+                      </p>
+                    )}
                   </div>
                 </motion.div>
               </motion.div>
             )}
           </AnimatePresence>
 
-          {/* ── Left panel — only when settled ── */}
+          {/* ── Settled layout — AIOS box centered top, examples below ── */}
           <AnimatePresence>
             {phase === 'settled' && (
               <motion.div
                 key="settled-panel"
-                className="absolute left-0 top-0 bottom-0 z-20 flex flex-col justify-center pl-6 md:pl-36 lg:pl-44 pr-8 w-full md:w-[55%]"
+                className="absolute inset-0 z-20 flex flex-col"
                 initial={{ opacity: 1 }}
                 animate={{ opacity: 1 }}
               >
-                {/* AIOS box — settled, small */}
-                <motion.div
-                  layoutId="aios-box"
-                  className="mb-7 relative max-w-sm"
-                  style={{ border: '1px solid rgba(160,100,255,0.45)' }}
-                  transition={{ type: 'spring', damping: 28, stiffness: 220, mass: 0.7 }}
-                >
-                  <DotPattern width={5} height={5} className="fill-purple-400/20" />
-                  <CornerDots />
-                  <div className="relative z-20 p-5">
-                    <p className="text-sm font-medium text-white/90 leading-snug mb-2">{tr.aiosTitle}</p>
-                    <p className="text-xs text-white/52 leading-relaxed">{tr.aiosDesc}</p>
-                  </div>
-                </motion.div>
+                {/* AIOS box — centered at top, larger */}
+                <div className="flex justify-center pt-20 md:pt-28 pb-6 px-6">
+                  <motion.div
+                    layoutId="aios-box"
+                    className="relative w-full"
+                    style={{
+                      maxWidth: 'min(680px, 88vw)',
+                      border: '1px solid rgba(160,100,255,0.45)',
+                    }}
+                    transition={{ type: 'spring', damping: 28, stiffness: 220, mass: 0.7 }}
+                  >
+                    <DotPattern width={5} height={5} className="fill-purple-400/20" />
+                    <CornerDots />
+                    <div className="relative z-20 px-8 py-7 md:px-12 md:py-9 text-center">
+                      <p
+                        className="text-white/95 font-medium leading-snug mb-4"
+                        style={{ fontSize: 'clamp(1.1rem, 2.2vw, 1.55rem)' }}
+                      >
+                        {tr.aiosTitle}
+                      </p>
+                      <p
+                        className="text-white/58 leading-relaxed mx-auto"
+                        style={{ fontSize: 'clamp(0.82rem, 1.3vw, 0.98rem)', maxWidth: '52ch' }}
+                      >
+                        {tr.aiosDesc}
+                      </p>
+                    </div>
+                  </motion.div>
+                </div>
 
-                {/* Category filter tabs */}
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.18, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                  className="flex gap-2 mb-11"
-                >
-                  {CATEGORIES.map(cat => (
-                    <button
-                      key={cat}
-                      onClick={() => { setFilter(cat); setActiveIdx(0) }}
-                      className={`px-4 py-1.5 rounded-full text-xs tracking-wide transition-all whitespace-nowrap ${
-                        filter === cat
-                          ? 'bg-white/12 border border-white/35 text-white'
-                          : 'border border-white/[0.08] text-white/30 max-md:text-white/58 hover:text-white/55 hover:border-white/20'
-                      }`}
-                    >
-                      {catLabels[cat]}
-                    </button>
-                  ))}
-                </motion.div>
+                {/* Bottom section — category filter + cards side by side */}
+                <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
+                  {/* Left: filter tabs + active title/desc/controls */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.15, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                    className="flex flex-col justify-center pl-6 md:pl-36 lg:pl-52 pr-6 md:pr-4 w-full md:w-[52%] py-4"
+                  >
+                    {/* Category filter tabs */}
+                    <div className="flex gap-2 mb-8">
+                      {CATEGORIES.map(cat => (
+                        <button
+                          key={cat}
+                          onClick={() => { setFilter(cat); setActiveIdx(0) }}
+                          className={`px-4 py-1.5 rounded-full text-xs tracking-wide transition-all whitespace-nowrap ${
+                            filter === cat
+                              ? 'bg-white/12 border border-white/35 text-white'
+                              : 'border border-white/[0.08] text-white/30 max-md:text-white/58 hover:text-white/55 hover:border-white/20'
+                          }`}
+                        >
+                          {catLabels[cat]}
+                        </button>
+                      ))}
+                    </div>
 
-                {/* Title */}
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.28, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                  className="mb-9"
-                  style={{ minHeight: 'clamp(4rem, 9vw, 9rem)' }}
-                >
-                  <AnimatePresence mode="wait">
-                    <motion.h2
-                      key={activeTitle}
+                    {/* Title */}
+                    <div className="mb-6" style={{ minHeight: 'clamp(3rem, 7vw, 7rem)' }}>
+                      <AnimatePresence mode="wait">
+                        <motion.h2
+                          key={activeTitle}
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: 0.2 }}
+                          className="font-serif text-white leading-[0.93] tracking-tight"
+                          style={{ fontSize: 'clamp(2.2rem, 4.5vw, 4.4rem)' }}
+                        >
+                          {activeTitle}{/[.!?]$/.test(activeTitle) ? '' : '.'}
+                        </motion.h2>
+                      </AnimatePresence>
+                    </div>
+
+                    {/* Description */}
+                    <div className="mb-7" style={{ minHeight: '5.5rem' }}>
+                      <AnimatePresence mode="wait">
+                        <motion.p
+                          key={`${filter}-${activeNode.id}`}
+                          initial={{ opacity: 0, y: 5 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -4 }}
+                          transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+                          className="text-white/72 max-md:text-white/90 text-[1rem] leading-[1.7] max-w-lg"
+                        >
+                          {activeDesc}
+                        </motion.p>
+                      </AnimatePresence>
+                    </div>
+
+                    {/* Explore button */}
+                    <motion.button
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: 0.2 }}
-                      className="font-serif text-white leading-[0.93] tracking-tight"
-                      style={{ fontSize: 'clamp(2.6rem, 5.5vw, 5.2rem)' }}
+                      transition={{ delay: 0.42, duration: 0.5 }}
+                      onClick={() => onAskAI(`__suggest__:What can ${activeTitle} do for my business?|How does ${activeTitle} work in practice?|What's the ROI of implementing ${activeTitle}?`)}
+                      className="text-xs tracking-wider text-left transition-colors w-fit mb-7"
+                      style={{ color: activeColors.accent.replace('0.9', '0.45') }}
+                      onMouseEnter={e => (e.currentTarget.style.color = activeColors.accent)}
+                      onMouseLeave={e => (e.currentTarget.style.color = activeColors.accent.replace('0.9', '0.45'))}
                     >
-                      {activeTitle}{/[.!?]$/.test(activeTitle) ? '' : '.'}
-                    </motion.h2>
-                  </AnimatePresence>
-                </motion.div>
+                      {tr.exploreAI} →
+                    </motion.button>
 
-                {/* Description */}
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.35, duration: 0.5 }}
-                  className="mb-10"
-                  style={{ minHeight: '7rem' }}
-                >
-                  <AnimatePresence mode="wait">
-                    <motion.p
-                      key={`${filter}-${activeNode.id}`}
-                      initial={{ opacity: 0, y: 5 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -4 }}
-                      transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
-                      className="text-white/72 max-md:text-white/90 text-[1.05rem] leading-[1.7] max-w-lg"
-                    >
-                      {activeDesc}
-                    </motion.p>
-                  </AnimatePresence>
-                </motion.div>
-
-                {/* Explore button */}
-                <motion.button
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.42, duration: 0.5 }}
-                  onClick={() => onAskAI(`__suggest__:What can ${activeTitle} do for my business?|How does ${activeTitle} work in practice?|What's the ROI of implementing ${activeTitle}?`)}
-                  className="text-xs tracking-wider text-left transition-colors w-fit mb-11"
-                  style={{ color: activeColors.accent.replace('0.9', '0.45') }}
-                  onMouseEnter={e => (e.currentTarget.style.color = activeColors.accent)}
-                  onMouseLeave={e => (e.currentTarget.style.color = activeColors.accent.replace('0.9', '0.45'))}
-                >
-                  {tr.exploreAI} →
-                </motion.button>
-
-                {/* Controls */}
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.5, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                  className="flex items-center gap-2"
-                >
-                  <button
-                    onClick={prevCard}
-                    className="w-7 h-7 rounded-full border border-white/15 flex items-center justify-center text-white/45 hover:text-white/80 hover:border-white/35 transition-all"
-                  >
-                    <ChevronLeft className="w-3.5 h-3.5" />
-                  </button>
-
-                  <div className="flex gap-1.5 mx-1">
-                    {displayNodes.map((_, i) => (
+                    {/* Controls */}
+                    <div className="flex items-center gap-2">
                       <button
-                        key={i}
-                        onClick={() => setActiveIdx(i)}
-                        className={`rounded-full transition-all duration-300 ${
-                          i === activeIdx ? 'w-5 h-1 bg-white/70' : 'w-1 h-1 bg-white/25 hover:bg-white/50'
+                        onClick={prevCard}
+                        className="w-7 h-7 rounded-full border border-white/15 flex items-center justify-center text-white/45 hover:text-white/80 hover:border-white/35 transition-all"
+                      >
+                        <ChevronLeft className="w-3.5 h-3.5" />
+                      </button>
+
+                      <div className="flex gap-1.5 mx-1">
+                        {displayNodes.map((_, i) => (
+                          <button
+                            key={i}
+                            onClick={() => setActiveIdx(i)}
+                            className={`rounded-full transition-all duration-300 ${
+                              i === activeIdx ? 'w-5 h-1 bg-white/70' : 'w-1 h-1 bg-white/25 hover:bg-white/50'
+                            }`}
+                          />
+                        ))}
+                      </div>
+
+                      <button
+                        onClick={nextCard}
+                        className="w-7 h-7 rounded-full border border-white/15 flex items-center justify-center text-white/45 hover:text-white/80 hover:border-white/35 transition-all"
+                      >
+                        <ChevronRight className="w-3.5 h-3.5" />
+                      </button>
+
+                      <button
+                        onClick={() => setAutoPlay(p => !p)}
+                        className={`w-7 h-7 rounded-full border flex items-center justify-center transition-all ml-1 ${
+                          autoPlay
+                            ? 'border-white/12 text-white/35 hover:text-white/65 hover:border-white/28'
+                            : 'border-white/30 text-white/65 bg-white/[0.05]'
                         }`}
-                      />
-                    ))}
-                  </div>
+                      >
+                        {autoPlay ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3" />}
+                      </button>
+                    </div>
+                  </motion.div>
 
-                  <button
-                    onClick={nextCard}
-                    className="w-7 h-7 rounded-full border border-white/15 flex items-center justify-center text-white/45 hover:text-white/80 hover:border-white/35 transition-all"
-                  >
-                    <ChevronRight className="w-3.5 h-3.5" />
-                  </button>
-
-                  <button
-                    onClick={() => setAutoPlay(p => !p)}
-                    className={`w-7 h-7 rounded-full border flex items-center justify-center transition-all ml-1 ${
-                      autoPlay
-                        ? 'border-white/12 text-white/35 hover:text-white/65 hover:border-white/28'
-                        : 'border-white/30 text-white/65 bg-white/[0.05]'
-                    }`}
-                  >
-                    {autoPlay ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3" />}
-                  </button>
-                </motion.div>
+                  {/* Right: 3D card cascade placeholder (cards rendered separately below) */}
+                  <div className="hidden md:block flex-1" />
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
         </LayoutGroup>
 
-        {/* 3D card cascade — right side, only when settled */}
+        {/* 3D card cascade — right side of bottom half, only when settled */}
         <AnimatePresence>
           {phase === 'settled' && (
             <motion.div
               key="cards"
-              className="absolute right-0 top-0 bottom-0 hidden md:block"
+              className="absolute right-0 bottom-0 hidden md:block"
               initial={{ opacity: 0, x: 80 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2, duration: 0.75, ease: [0.16, 1, 0.3, 1] }}
               style={{
-                width: '62%',
+                width: '52%',
+                top: '38%',
                 perspective: '1000px',
                 perspectiveOrigin: '30% 50%',
               }}
