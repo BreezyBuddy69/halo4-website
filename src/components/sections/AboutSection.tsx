@@ -3,6 +3,7 @@ import { SectionReveal } from '../ui/SectionReveal'
 import { AnimatedBg } from '../ui/AnimatedBg'
 import { CheckCircle } from 'lucide-react'
 import type { Language } from '../../utils/translations'
+import { DotPattern } from '../ui/dot-pattern-1'
 
 interface AboutSectionProps {
   language: Language
@@ -50,7 +51,7 @@ export function AboutSection({ language, isActive }: AboutSectionProps) {
 
   return (
     <SectionReveal isActive={isActive}>
-      <div className="relative w-full h-full overflow-hidden bg-[#17152e] m-bg-about flex items-center">
+      <div className="relative w-full h-full overflow-hidden m-bg-about flex items-center">
 
         {/* Rich purple radial */}
         <div className="absolute inset-0 pointer-events-none" style={{
@@ -122,40 +123,41 @@ export function AboutSection({ language, isActive }: AboutSectionProps) {
             </div>
           </div>
 
-          {/* Right: Photo placeholder (hidden on mobile) */}
+          {/* Right: Quote block with dot pattern */}
           <motion.div
             initial={{ opacity: 0, scale: 0.94, y: 20 }}
             animate={isActive ? { opacity: 1, scale: 1, y: 0 } : {}}
             transition={{ delay: 0.35, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-            className="shrink-0 hidden md:flex"
+            className="shrink-0 hidden md:flex items-center"
           >
             <div
-              className="relative rounded-2xl overflow-hidden"
+              className="relative flex flex-col items-start"
               style={{
-                width: 220,
-                height: 300,
-                boxShadow: '0 24px 64px rgba(80,30,180,0.28), inset 0 1px 0 rgba(200,160,255,0.08)',
-                border: '1px solid rgba(180,130,255,0.18)',
+                width: 280,
+                border: '1px solid rgba(160,100,255,0.45)',
               }}
             >
-              {/* Photo — zoomed in ~20% via scale */}
-              <img
-                src="/gallery/WhatsApp Image 2026-04-04 at 18.13.03.jpeg"
-                alt="Team"
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover',
-                  objectPosition: 'center 35%',
-                  transform: 'scale(1.2)',
-                  transformOrigin: 'center 35%',
-                }}
+              {/* Dot pattern fill */}
+              <DotPattern
+                width={5}
+                height={5}
+                className="fill-purple-400/20"
               />
 
-              {/* Subtle purple tint overlay */}
-              <div className="absolute inset-0 pointer-events-none"
-                style={{ background: 'linear-gradient(to top, rgba(80,30,180,0.35) 0%, transparent 55%)' }}
-              />
+              {/* Corner dots */}
+              <div className="absolute -left-1.5 -top-1.5 h-3 w-3 bg-purple-400" style={{ opacity: 0.85 }} />
+              <div className="absolute -bottom-1.5 -left-1.5 h-3 w-3 bg-purple-400" style={{ opacity: 0.85 }} />
+              <div className="absolute -right-1.5 -top-1.5 h-3 w-3 bg-purple-400" style={{ opacity: 0.85 }} />
+              <div className="absolute -bottom-1.5 -right-1.5 h-3 w-3 bg-purple-400" style={{ opacity: 0.85 }} />
+
+              {/* Quote content */}
+              <div className="relative z-20 p-6">
+                <p className="text-[10px] text-purple-300 tracking-[0.25em] uppercase mb-3">Philosophy</p>
+                <blockquote className="text-white/85 font-serif leading-snug tracking-tight" style={{ fontSize: 'clamp(1.1rem, 2.5vw, 1.4rem)' }}>
+                  "AI should work for you — not the other way around."
+                </blockquote>
+                <p className="text-white/30 text-[11px] mt-4">— Halo AI</p>
+              </div>
             </div>
           </motion.div>
 

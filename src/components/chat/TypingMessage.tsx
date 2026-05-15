@@ -45,9 +45,13 @@ function renderPartial(segs: Segment[], charCount: number): React.ReactNode[] {
       if (i > 0) result.push(<br key={`br${key++}`} />)
       if (!line) return
       if (seg.bold) {
-        result.push(<strong key={key++} style={{ color: 'rgba(255,255,255,0.96)', fontWeight: 600 }}>{line}</strong>)
+        result.push(
+          <strong key={key++} style={{ color: 'rgba(255,255,255,0.97)', fontWeight: 650 }}>
+            {line}
+          </strong>
+        )
       } else {
-        result.push(line)
+        result.push(<span key={key++}>{line}</span>)
       }
     })
   }
@@ -64,24 +68,36 @@ export function TypingMessage({ text, scrollRef, onComplete, isActive = true }: 
   const isActiveRef = useRef(isActive)
   const doneRef     = useRef(false)
 
+  function nextDelay(char: string, index: number): number {
+    if (char === '\n') return 90 + Math.random() * 60
+    if (char === '.') return 160 + Math.random() * 120
+    if (char === ',') return 90 + Math.random() * 70
+    if (char === ' ') return Math.random() < 0.18 ? 120 + Math.random() * 180 : 40 + Math.random() * 55
+    // Occasional hesitation — slightly more frequent near the start
+    const hesitateChance = index < 20 ? 0.10 : 0.05
+    const base = 38 + Math.random() * 42
+    return Math.random() < hesitateChance ? base + 160 + Math.random() * 200 : base
+  }
+
   // Keep ref in sync without restarting the animation
   useEffect(() => {
     isActiveRef.current = isActive
     // If we paused mid-type and just became active again, resume
     if (isActive && !doneRef.current && indexRef.current < cleanText.length) {
       const tick = () => {
-        if (!isActiveRef.current) return  // paused — stop scheduling
+        if (!isActiveRef.current) return
+        const char = cleanText[indexRef.current] ?? ''
         indexRef.current++
         setCharCount(indexRef.current)
         if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight
         if (indexRef.current < cleanText.length) {
-          timerRef.current = setTimeout(tick, 24)
+          timerRef.current = setTimeout(tick, nextDelay(char, indexRef.current))
         } else {
           doneRef.current = true
           onComplete()
         }
       }
-      timerRef.current = setTimeout(tick, 24)
+      timerRef.current = setTimeout(tick, 42)
     }
     return () => clearTimeout(timerRef.current)
   }, [isActive]) // eslint-disable-line react-hooks/exhaustive-deps
@@ -93,19 +109,20 @@ export function TypingMessage({ text, scrollRef, onComplete, isActive = true }: 
     setCharCount(0)
 
     const tick = () => {
-      if (!isActiveRef.current) return  // paused — stop scheduling
+      if (!isActiveRef.current) return
+      const char = cleanText[indexRef.current] ?? ''
       indexRef.current++
       setCharCount(indexRef.current)
       if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight
       if (indexRef.current < cleanText.length) {
-        timerRef.current = setTimeout(tick, 24)
+        timerRef.current = setTimeout(tick, nextDelay(char, indexRef.current))
       } else {
         doneRef.current = true
         onComplete()
       }
     }
 
-    timerRef.current = setTimeout(tick, 24)
+    timerRef.current = setTimeout(tick, 42)
     return () => clearTimeout(timerRef.current)
   }, [text]) // eslint-disable-line react-hooks/exhaustive-deps
 

@@ -1,13 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
-import { motion, animate, AnimatePresence } from 'framer-motion'
-
-// Clip-path keyframes for the expanding window: tiny → full-height narrow strip → full screen
-const CLIP_INIT = 'inset(49% 49% 49% 49% round 28px)'
-const CLIP_TALL = 'inset(0% 45% 0% 45% round 7px)'
-const CLIP_FULL = 'inset(0% 0% 0% 0% round 0px)'
-const CLIP_SEQ  = [CLIP_INIT, CLIP_TALL, CLIP_FULL]
-// Spring-like cubic bezier: moderate start → overshoots slightly → settles (bubbly feel)
-const EASE_SPRING = [0.25, 0.92, 0.32, 1] as [number, number, number, number]
+import { AnimatePresence } from 'framer-motion'
 import { Header } from './components/layout/Header'
 import { SideNav } from './components/layout/SideNav'
 import { SectionStack } from './components/layout/SectionStack'
@@ -15,9 +7,9 @@ import { HeroSection } from './components/sections/HeroSection'
 import { VideoSection } from './components/sections/VideoSection'
 import { WorkSection } from './components/sections/WorkSection'
 import { ResultsSection } from './components/sections/ResultsSection'
-import { ProcessSection } from './components/sections/ProcessSection'
 import { AboutSection } from './components/sections/AboutSection'
 import { BookSection } from './components/sections/BookSection'
+import { SplashGate } from './components/ui/SplashGate'
 import { ChatBot } from './components/chat/ChatBot'
 import { BookingModal } from './components/booking/BookingModal'
 import { useSectionScroll } from './hooks/useSectionScroll'
@@ -27,9 +19,25 @@ import { PerformanceProvider } from './contexts/PerformanceContext'
 import { usePerformanceTier } from './hooks/usePerformanceTier'
 import { t } from './utils/translations'
 import type { Language } from './utils/translations'
-import { SplashGate } from './components/ui/SplashGate'
+import { GradientBackground } from './components/ui/paper-design-shader-background'
 
-const TOTAL_SECTIONS = 7
+const SECTION_COLORS = [
+  ['hsl(258, 60%, 40%)', 'hsl(278, 55%, 35%)', 'hsl(220, 50%, 35%)'], // 0: Hero
+  ['hsl(240, 60%, 35%)', 'hsl(260, 55%, 30%)', 'hsl(220, 50%, 30%)'], // 1: Video
+  ['hsl(228, 72%, 52%)', 'hsl(255, 68%, 48%)', 'hsl(210, 62%, 46%)'], // 2: Results
+  ['hsl(243, 68%, 50%)', 'hsl(263, 63%, 46%)', 'hsl(223, 58%, 46%)'], // 3: Work
+  ['hsl(268, 68%, 52%)', 'hsl(283, 62%, 47%)', 'hsl(250, 58%, 50%)'], // 4: About
+  ['hsl(270, 72%, 48%)', 'hsl(255, 70%, 44%)', 'hsl(285, 65%, 44%)'], // 5: Book
+]
+
+function getSplashSeen() {
+  try { return sessionStorage.getItem('splash_seen') === '1' } catch { return false }
+}
+function setSplashSeen() {
+  try { sessionStorage.setItem('splash_seen', '1') } catch { /* */ }
+}
+
+const TOTAL_SECTIONS = 6
 
 export interface MailMessage {
   id: string
@@ -45,121 +53,34 @@ function detectLanguage(): Language {
   return 'en'
 }
 
-// Premium intro:
-// The website itself is clipped to an expanding window (height first, then width).
-// Titles fly in from opposite sides simultaneously. No blur, no dim — content visible immediately inside the window.
-function IntroReveal({ children, onDone, isMobile, title1, title2 }: {
-  children: React.ReactNode
-  onDone: () => void
-  isMobile: boolean
-  title1: string
-  title2: string
-}) {
-  const t1Ref   = useRef<HTMLHeadingElement>(null)
-  const t2Ref   = useRef<HTMLHeadingElement>(null)
-  const [done, setDone] = useState(false)
-
-  useEffect(() => {
-    const t1 = t1Ref.current
-    const t2 = t2Ref.current
-    if (!t1 || !t2) return
-
-    const vw = window.innerWidth
-
-    const run = async () => {
-      await Promise.all([
-        // t1 flies in from the left, scaling up with spring-like overshoot
-        animate(t1,
-          { x: [-vw * 1.15, 0], opacity: [0, 1], scale: [0.76, 1] },
-          { duration: 1.52, ease: EASE_SPRING }
-        ),
-        // t2 flies in from the right, slight stagger
-        animate(t2,
-          { x: [vw * 1.15, 0], opacity: [0, 1], scale: [0.76, 1] },
-          { duration: 1.52, ease: EASE_SPRING, delay: 0.12 }
-        ),
-      ])
-
-      // Brief hold — titles settled, window fully open
-      await new Promise<void>(r => setTimeout(r, 300))
-
-      setDone(true)
-      onDone()
-    }
-
-    run()
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
-
-  return (
-    <>
-      {/* Black backdrop — fills screen around the expanding clip window */}
-      {!done && (
-        <div className="fixed inset-0 z-[192] pointer-events-none" style={{ background: '#000' }} />
-      )}
-
-      {/* App content — clipped to the expanding window shape, full opacity, content visible inside */}
-      <motion.div
-        className={isMobile ? 'min-h-screen' : 'fixed inset-0'}
-        style={{ zIndex: done ? 0 : 193 }}
-        initial={{ clipPath: CLIP_INIT }}
-        animate={{ clipPath: done ? CLIP_FULL : CLIP_SEQ }}
-        transition={{
-          clipPath: done
-            ? { duration: 0 }
-            : { duration: 2.05, times: [0, 0.44, 1], ease: EASE_SPRING },
-        }}
-      >
-        {children}
-      </motion.div>
-
-      {/* Titles — float freely above, not clipped, land at hero's exact bottom-left */}
-      {!done && (
-        <div className="fixed inset-0 z-[197] pointer-events-none">
-          <div className="absolute bottom-20 md:bottom-18 inset-x-0 flex flex-col items-start md:pl-36 lg:pl-40 px-5 md:px-0">
-            <h1
-              ref={t1Ref}
-              className="text-[clamp(2.2rem,6vw,6.5rem)] font-serif text-white leading-[1] tracking-tight mb-2 md:mb-0.5"
-              style={{ opacity: 0, willChange: 'transform, opacity', textShadow: '0 0 38px rgba(255,130,50,0.55), 0 0 80px rgba(255,90,20,0.28)' }}
-            >
-              {title1}
-            </h1>
-            <h1
-              ref={t2Ref}
-              className="text-[clamp(2.2rem,6vw,6.5rem)] font-serif leading-[1] tracking-tight"
-              style={{ color: 'rgba(255,255,255,0.70)', opacity: 0, willChange: 'transform, opacity', textShadow: '0 0 38px rgba(255,130,50,0.40), 0 0 80px rgba(255,90,20,0.20)' }}
-            >
-              {title2}
-            </h1>
-          </div>
-        </div>
-      )}
-    </>
-  )
-}
 
 function AppInner() {
   const tier = usePerformanceTier()
+  const [splashDone, setSplashDone] = useState(getSplashSeen)
   const [currentSection, setCurrentSection] = useState(0)
   const [isBookingOpen, setIsBookingOpen] = useState(false)
   const [chatContext, setChatContext] = useState('')
   const [language, setLanguage] = useState<Language>(detectLanguage)
-  const [introDone, setIntroDone] = useState(false)
-  const [splashDone, setSplashDone] = useState<boolean>(
-    () => sessionStorage.getItem('hv_splash_seen') === '1'
-  )
+  const [introDone, setIntroDone] = useState(getSplashSeen)
+  const [titleReady, setTitleReady] = useState(getSplashSeen)
   const [mailMessages, setMailMessages] = useState<MailMessage[]>([])
   const [mailboxOpen, setMailboxOpen] = useState(false)
   const heroInputRef = useRef<HTMLTextAreaElement>(null)
+
+  const handleSplashDone = useCallback(() => {
+    setSplashDone(true)
+    setSplashSeen()
+    setIntroDone(true)
+  }, [])
+
+  const handleTitleReady = useCallback(() => {
+    setTitleReady(true)
+  }, [])
 
   const isMobile = useMediaQuery('(max-width: 767px)')
 
   const handleNavigate = useCallback((index: number) => {
     setCurrentSection(Math.max(0, Math.min(TOTAL_SECTIONS - 1, index)))
-  }, [])
-
-  const handleSplashEnter = useCallback(() => {
-    sessionStorage.setItem('hv_splash_seen', '1')
-    setSplashDone(true)
   }, [])
 
   useSectionScroll({
@@ -221,6 +142,7 @@ function AppInner() {
 
   const appContent = (
     <>
+      <GradientBackground colors={SECTION_COLORS[currentSection]} />
       <Header
         language={language}
         onLanguageChange={setLanguage}
@@ -250,6 +172,8 @@ function AppInner() {
             inputRef={heroInputRef}
             onIntroDone={() => setIntroDone(true)}
             introDone={introDone}
+            titleReady={titleReady}
+            onScrollToVideo={() => handleNavigate(1)}
           />,
           <VideoSection
             key="video"
@@ -272,16 +196,10 @@ function AppInner() {
             language={language}
             isActive={currentSection === 4}
           />,
-          <ProcessSection
-            key="process"
-            language={language}
-            isActive={currentSection === 5}
-            onBooking={() => setIsBookingOpen(true)}
-          />,
           <BookSection
             key="book"
             language={language}
-            isActive={currentSection === 6}
+            isActive={currentSection === 5}
             onBooking={() => setIsBookingOpen(true)}
           />,
         ]}
@@ -306,21 +224,16 @@ function AppInner() {
     </>
   )
 
-  const tr = t(language)
-
   return (
-    <>
-      <AnimatePresence>
-        {!splashDone && (
-          <SplashGate key="splash" language={language} onEnter={handleSplashEnter} />
-        )}
-      </AnimatePresence>
-      <PerformanceProvider tier={tier}>
-        <IntroReveal onDone={() => setIntroDone(true)} isMobile={isMobile} title1={tr.heroTitle1} title2={tr.heroTitle2}>
-          {appContent}
-        </IntroReveal>
-      </PerformanceProvider>
-    </>
+    <PerformanceProvider tier={tier}>
+      <div className="relative w-screen h-screen overflow-hidden" style={{ background: '#0D0B1A' }}>
+        <AnimatePresence>
+          {!splashDone && <SplashGate key="splash" onDone={handleSplashDone} onTitleReady={handleTitleReady} />}
+        </AnimatePresence>
+
+        {appContent}
+      </div>
+    </PerformanceProvider>
   )
 }
 

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+﻿import { useState, useEffect, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Send, MessageCircle } from 'lucide-react'
 import { ThinkingProcess } from './ThinkingProcess'
@@ -17,8 +17,22 @@ function renderText(content: string) {
   })
 }
 
-const CHATBOT_URL = 'https://n8n.halovisionai.cloud/webhook/halovisionchatbot997655'
+const CHATBOT_URL = import.meta.env.VITE_CHATBOT_URL as string
 const VALID_CATEGORIES = ['general', 'lead-generation', 'custom-solutions', 'save-time', 'examples']
+const CHAT_RATE_LIMIT_MS = 2_000
+const ALLOWED_INPUT_RE = /[<>'"]/g
+
+function sanitizeApiResponse(raw: string): string {
+  return raw
+    .replace(/<[^>]*>/g, '')
+    .replace(/javascript:/gi, '')
+    .replace(/data:/gi, '')
+    .replace(/#+\s/g, '')
+    .replace(/`/g, '')
+    .trim()
+}
+
+let lastChatTime = 0
 
 interface ChatBotProps {
   language: Language
@@ -31,7 +45,6 @@ export function ChatBot({ language, context, onContextUsed }: ChatBotProps) {
   const { messages, isLoading, addMessage, markDone, setIsLoading } = useChatContext()
 
   const [isOpen, setIsOpen] = useState(false)
-  const [animateOpen, setAnimateOpen] = useState(false)
   const [input, setInput] = useState('')
   const [recommendations, setRecommendations] = useState<string[]>([])
   const [userMsgCount, setUserMsgCount] = useState(0)
@@ -54,12 +67,10 @@ export function ChatBot({ language, context, onContextUsed }: ChatBotProps) {
     // Mark any isNew messages as done so they don't animate again
     messages.forEach(m => { if (m.isNew) markDone(m.id) })
     setIsOpen(true)
-    setTimeout(() => setAnimateOpen(true), 10)
   }, [messages, markDone])
 
   const closeChat = useCallback(() => {
-    setAnimateOpen(false)
-    setTimeout(() => setIsOpen(false), 300)
+    setIsOpen(false)
   }, [])
 
   const handleContainerMouseLeave = useCallback(() => {
@@ -149,6 +160,11 @@ export function ChatBot({ language, context, onContextUsed }: ChatBotProps) {
 
   const handleSendMessage = async (text: string) => {
     if (!text.trim() || isLoading) return
+
+    const now = Date.now()
+    if (now - lastChatTime < CHAT_RATE_LIMIT_MS) return
+    lastChatTime = now
+
     setRecommendations([])
     setLimitWarning(false)
     setUserMsgCount(c => c + 1)
@@ -165,10 +181,10 @@ export function ChatBot({ language, context, onContextUsed }: ChatBotProps) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ messages: history, language }),
       })
+      if (!res.ok) throw new Error('Non-OK response')
       const data = await res.json()
-      let raw = data.response ?? data.message ?? data.output ?? data.text ?? 'I apologize, I could not process your request.'
-      raw = raw.replace(/<[^>]*>/g, '').replace(/#+\s/g, '').replace(/`/g, '').replace(/>/g, '')
-      addMessage({ role: 'assistant', content: raw, isNew: true })
+      const raw = data.response ?? data.message ?? data.output ?? data.text ?? 'I apologize, I could not process your request.'
+      addMessage({ role: 'assistant', content: sanitizeApiResponse(String(raw)), isNew: true })
     } catch {
       addMessage({ role: 'assistant', content: 'Error connecting to service.' })
     } finally {
@@ -178,9 +194,11 @@ export function ChatBot({ language, context, onContextUsed }: ChatBotProps) {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const maxLen = userMsgCount === 0 ? 3000 : 750
-    const val = e.target.value.slice(0, maxLen)
+    const sanitized = e.target.value.replace(ALLOWED_INPUT_RE, '').slice(0, maxLen)
+    const val = sanitized
     setLimitWarning(val.length > maxLen * 0.88)
     setInput(val)
+    e.target.value = val
     e.target.style.height = 'auto'
     e.target.style.height = Math.min(e.target.scrollHeight, 80) + 'px'
   }
@@ -200,80 +218,63 @@ export function ChatBot({ language, context, onContextUsed }: ChatBotProps) {
   const OPEN_H = Math.min(Math.round(window.innerHeight * 0.60), 540)
 
   return (
-    <div ref={chatRef} className="fixed z-[100]"
-      style={{ bottom: '1.5rem', right: '1.5rem', width: 0, height: 0 }}
+    <div ref={chatRef} className="fixed z-[100] inset-0 pointer-events-none"
       onMouseEnter={handleContainerMouseEnter}
       onMouseLeave={handleContainerMouseLeave}
     >
-      <motion.div
-        data-cursor="hover"
-        onClick={!isOpen ? openChat : undefined}
-        onMouseEnter={handleButtonMouseEnter}
-        animate={{
-          width: isOpen ? OPEN_W : CLOSED_W,
-          height: isOpen ? OPEN_H : CLOSED_H,
-          borderRadius: isOpen ? 20 : 9999,
-        }}
-        transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-        className="absolute bottom-0 right-0 overflow-hidden flex flex-col"
-        style={{
-          background: isOpen
-            ? 'linear-gradient(160deg, rgba(28,16,60,0.96) 0%, rgba(14,8,34,0.98) 55%, rgba(7,4,18,0.99) 100%)'
-            : `linear-gradient(148deg, rgba(255,255,255,${0.38 + buttonBrightness * 0.14}) 0%, rgba(220,200,255,${0.30 + buttonBrightness * 0.16}) 45%, rgba(180,150,255,${0.22 + buttonBrightness * 0.12}) 100%)`,
-          border: isOpen
-            ? '1px solid rgba(160,120,255,0.22)'
-            : `1px solid rgba(255,255,255,${0.52 + buttonBrightness * 0.18})`,
-          boxShadow: isOpen
-            ? '0 32px 72px rgba(0,0,0,0.72), 0 8px 28px rgba(0,0,0,0.42), 0 0 0 1px rgba(255,255,255,0.06), inset 0 1.5px 0 rgba(255,255,255,0.18), inset 0 -1px 0 rgba(0,0,0,0.30)'
-            : `0 8px ${36 + buttonBrightness * 28}px rgba(180,140,255,${0.55 + buttonBrightness * 0.35}), 0 2px 14px rgba(0,0,0,0.28), inset 0 1.5px 0 rgba(255,255,255,${0.72 + buttonBrightness * 0.18}), inset 0 -1px 0 rgba(0,0,0,0.10)`,
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-          cursor: isOpen ? 'default' : 'pointer',
-        }}
-      >
-        {/* Liquid glass highlight — visible when closed */}
-        <AnimatePresence>
-          {!isOpen && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="absolute top-0 left-0 right-0 h-1/2 rounded-t-full pointer-events-none"
-              style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,0.55), rgba(255,255,255,0.08))' }}
-            />
-          )}
-        </AnimatePresence>
+      {/* Floating button — bottom-right, hidden when open */}
+      <AnimatePresence>
+        {!isOpen && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0.7 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.7 }}
+            transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+            onClick={openChat}
+            onMouseEnter={handleButtonMouseEnter}
+            className="absolute bottom-16 right-6 pointer-events-auto flex items-center justify-center overflow-hidden"
+            style={{
+              width: CLOSED_W,
+              height: CLOSED_H,
+              borderRadius: 9999,
+              background: `linear-gradient(148deg, rgba(255,255,255,${0.38 + buttonBrightness * 0.14}) 0%, rgba(220,200,255,${0.30 + buttonBrightness * 0.16}) 45%, rgba(180,150,255,${0.22 + buttonBrightness * 0.12}) 100%)`,
+              border: `1px solid rgba(255,255,255,${0.52 + buttonBrightness * 0.18})`,
+              boxShadow: `0 8px ${36 + buttonBrightness * 28}px rgba(180,140,255,${0.55 + buttonBrightness * 0.35}), 0 2px 14px rgba(0,0,0,0.28), inset 0 1.5px 0 rgba(255,255,255,${0.72 + buttonBrightness * 0.18}), inset 0 -1px 0 rgba(0,0,0,0.10)`,
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+            }}
+          >
+            {/* glass highlight */}
+            <div className="absolute top-0 left-0 right-0 h-1/2 rounded-t-full pointer-events-none"
+              style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,0.55), rgba(255,255,255,0.08))' }} />
+            <MessageCircle className="w-5 h-5 text-white/92 drop-shadow-sm relative z-10" />
+          </motion.button>
+        )}
+      </AnimatePresence>
 
-        {/* Button icon — visible when closed */}
-        <AnimatePresence>
-          {!isOpen && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.7 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.7 }}
-              transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-              className="absolute inset-0 flex items-center justify-center z-10"
-            >
-              <MessageCircle className="w-5 h-5 text-white/92 drop-shadow-sm" />
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Chat content — visible when open */}
-        <AnimatePresence>
-          {isOpen && animateOpen && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2, delay: 0.15 }}
-              className="flex flex-col h-full w-full"
-            >
-              {/* Accent line at top */}
-              <div className="absolute top-0 left-0 right-0 h-[2px] rounded-t-2xl pointer-events-none" style={{
-                background: 'linear-gradient(90deg, transparent 0%, rgba(139,92,246,0.7) 30%, rgba(167,139,250,0.9) 50%, rgba(139,92,246,0.7) 70%, transparent 100%)',
-              }} />
+      {/* Chat panel — centered on screen */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.92, y: 12 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.92, y: 12 }}
+            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+            className="absolute pointer-events-auto overflow-hidden flex flex-col"
+            style={{
+              width: OPEN_W,
+              height: OPEN_H,
+              borderRadius: 20,
+              right: 24,
+              bottom: 120,
+              background: 'linear-gradient(160deg, rgba(28,16,60,0.96) 0%, rgba(14,8,34,0.98) 55%, rgba(7,4,18,0.99) 100%)',
+              border: '1px solid rgba(160,120,255,0.22)',
+              boxShadow: '0 32px 72px rgba(0,0,0,0.72), 0 8px 28px rgba(0,0,0,0.42), 0 0 0 1px rgba(255,255,255,0.06), inset 0 1.5px 0 rgba(255,255,255,0.18), inset 0 -1px 0 rgba(0,0,0,0.30)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+            }}
+          >
+        <div className="flex flex-col h-full w-full">
 
               {/* Header */}
               <div className="flex items-center justify-between px-4 py-3 shrink-0" style={{
@@ -287,25 +288,26 @@ export function ChatBot({ language, context, onContextUsed }: ChatBotProps) {
                   </div>
                   <span className="text-xs font-semibold text-white/90 tracking-wide">{tr.chatSub}</span>
                 </div>
-                <button data-cursor="hover" onClick={closeChat}
+                <button onClick={closeChat}
                   className="w-6 h-6 rounded-full flex items-center justify-center text-white/40 hover:text-white/80 hover:bg-white/10 transition-all">
                   <X className="w-3.5 h-3.5" />
                 </button>
               </div>
 
-              {/* Messages */}
+              {/* Messages — flex-col with spacer so messages anchor to bottom, growing upward */}
               <div
                 ref={scrollRef}
                 className="flex-1 overflow-y-auto px-4 py-3 chat-scroll flex flex-col gap-3"
                 style={{ minHeight: 0 }}
               >
+                <div className="flex-1" />
                 {messages.map((msg) => (
                   <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                     {msg.isConfirmation ? (
                       <div className="max-w-[85%] rounded-xl px-3 py-2.5 text-xs leading-relaxed"
                         style={{
-                          background: msg.content.startsWith('📬') ? 'rgba(251,191,36,0.10)' : 'rgba(52,211,153,0.10)',
-                          border: msg.content.startsWith('📬') ? '1px solid rgba(251,191,36,0.28)' : '1px solid rgba(52,211,153,0.28)',
+                          background: msg.content.startsWith('📬') ? 'rgba(28,12,70,0.97)' : 'rgba(8,36,26,0.97)',
+                          border: msg.content.startsWith('📬') ? '1px solid rgba(139,92,246,0.42)' : '1px solid rgba(52,211,153,0.40)',
                         }}>
                         {(() => {
                           const sep = msg.content.indexOf('\n\n')
@@ -313,7 +315,7 @@ export function ChatBot({ language, context, onContextUsed }: ChatBotProps) {
                           const body = sep >= 0 ? msg.content.slice(sep + 2) : ''
                           return (
                             <>
-                              <p className={`font-medium mb-1 text-[10px] tracking-wider ${msg.content.startsWith('📬') ? 'text-amber-400/90' : 'text-emerald-400/90'}`}>{title}</p>
+                              <p className={`font-medium mb-1 text-[10px] tracking-wider ${msg.content.startsWith('📬') ? 'text-violet-400/90' : 'text-emerald-400/90'}`}>{title}</p>
                               {body && <p className="text-white/70 whitespace-pre-line">{body}</p>}
                             </>
                           )
@@ -323,14 +325,15 @@ export function ChatBot({ language, context, onContextUsed }: ChatBotProps) {
                       <div
                         className="max-w-[85%] rounded-xl px-3 py-2.5 text-xs leading-relaxed"
                         style={msg.role === 'user' ? {
-                          background: 'linear-gradient(135deg, rgba(139,92,246,0.28) 0%, rgba(109,40,217,0.22) 100%)',
-                          border: '1px solid rgba(167,139,250,0.28)',
-                          color: 'rgba(255,255,255,0.93)',
+                          background: 'linear-gradient(135deg, rgba(95,45,215,0.92) 0%, rgba(70,22,185,0.96) 100%)',
+                          border: '1px solid rgba(167,139,250,0.45)',
+                          color: 'rgba(255,255,255,0.97)',
                         } : {
-                          background: 'rgba(255,255,255,0.07)',
-                          border: '1px solid rgba(255,255,255,0.09)',
-                          borderLeft: '2px solid rgba(139,92,246,0.5)',
-                          color: 'rgba(255,255,255,0.82)',
+                          background: 'rgba(10, 6, 28, 1.0)',
+                          border: '1px solid rgba(139,92,246,0.25)',
+                          borderLeft: '2px solid rgba(139,92,246,0.60)',
+                          color: 'rgba(255,255,255,0.92)',
+                          boxShadow: '0 4px 20px rgba(0,0,0,0.55)',
                         }}
                       >
                         {msg.role === 'assistant' && msg.isNew && !seenMsgIdsRef.current.has(msg.id) ? (
@@ -363,7 +366,7 @@ export function ChatBot({ language, context, onContextUsed }: ChatBotProps) {
                   {recommendations.map((rec, i) => (
                     <button
                       key={i}
-                      data-cursor="hover"
+                     
                       onClick={() => {
                         setRecommendations([])
                         handleSendMessage(rec)
@@ -384,7 +387,7 @@ export function ChatBot({ language, context, onContextUsed }: ChatBotProps) {
 
               {/* Limit warning */}
               {(limitWarning || userMsgCount >= 18) && (
-                <p className="px-4 text-[10px] text-amber-400/70 pb-1 shrink-0">
+                <p className="px-4 text-[10px] text-violet-400/70 pb-1 shrink-0">
                   {userMsgCount >= 20 ? 'Message limit reached' : limitWarning ? `Max ${userMsgCount === 0 ? 3000 : 750} characters` : `${20 - userMsgCount} messages left`}
                 </p>
               )}
@@ -409,10 +412,10 @@ export function ChatBot({ language, context, onContextUsed }: ChatBotProps) {
                     rows={1}
                     className="flex-1 bg-transparent text-white/90 text-xs placeholder-white/35 outline-none resize-none leading-relaxed"
                     style={{ maxHeight: 80 }}
-                    data-cursor="hover"
+                   
                   />
                   <button
-                    data-cursor="hover"
+                   
                     onClick={submitInput}
                     disabled={!input.trim() || limitWarning || isLoading || userMsgCount >= 20}
                     className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 mb-0.5 transition-all disabled:opacity-25"
@@ -425,10 +428,10 @@ export function ChatBot({ language, context, onContextUsed }: ChatBotProps) {
                   </button>
                 </div>
               </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </motion.div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
