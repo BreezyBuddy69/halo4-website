@@ -1,0 +1,277 @@
+﻿@import url('https://fonts.cdnfonts.com/css/anurati');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Background boxes — hover-only on real pointer devices, never on touch */
+.box-cell {
+  background-color: transparent;
+  transition: background-color 1.2s ease-out;
+  contain: style layout;
+}
+@media (hover: hover) and (pointer: fine) {
+  .box-cell:hover {
+    background-color: var(--box-hover-color, rgba(139, 92, 246, 0.8));
+    transition-duration: 0s;
+  }
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: #0D0B1A;
+    color: white;
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.14) transparent;
+  }
+
+
+  /* Mobile: allow normal scroll */
+  @media (max-width: 767px) {
+    html, body {
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+  }
+}
+
+/* Animated gradient border for CTA button */
+@property --gradient-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes gradient-rotate {
+  from { --gradient-angle: 0deg; }
+  to   { --gradient-angle: 360deg; }
+}
+
+.gradient-border-auto {
+  animation: gradient-rotate var(--animation-duration, 3s) linear infinite;
+}
+
+.gradient-border-hover {
+  animation: none;
+}
+.gradient-border-hover:hover {
+  animation: gradient-rotate var(--animation-duration, 3s) linear infinite;
+}
+
+.gradient-border-stop-hover {
+  animation: gradient-rotate var(--animation-duration, 3s) linear infinite;
+}
+.gradient-border-stop-hover:hover {
+  animation-play-state: paused;
+}
+
+@layer utilities {
+  .font-anurati {
+    font-family: 'Anurati', sans-serif;
+  }
+
+  .glass {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 0 40px rgba(0, 0, 0, 0.4);
+  }
+
+  .glass-strong {
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    background: rgba(10, 8, 20, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+  }
+
+  .glass-hover:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.20);
+  }
+
+  .text-glow {
+    text-shadow: 0 0 40px rgba(139, 92, 246, 0.5);
+  }
+
+  .pause-marquee:hover * {
+    animation-play-state: paused;
+  }
+
+  /* Scrollbar for chat */
+  .chat-scroll::-webkit-scrollbar { width: 3px; }
+  .chat-scroll::-webkit-scrollbar-track { background: transparent; }
+  .chat-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+  .chat-scroll { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.15) transparent; }
+
+  /* Hero chat — white cloud-style sidebar */
+  .chat-scroll-hero::-webkit-scrollbar { width: 3px; }
+  .chat-scroll-hero::-webkit-scrollbar-track { background: rgba(255,255,255,0.06); border-radius: 99px; }
+  .chat-scroll-hero::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.38); border-radius: 99px; }
+  .chat-scroll-hero::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.65); }
+  .chat-scroll-hero::-webkit-scrollbar-button { display: none; height: 0; width: 0; }
+  .chat-scroll-hero { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.38) transparent; }
+
+  /* Global custom scrollbars */
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.14); border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.26); }
+
+  /* ── Mobile brightness lift ── */
+  @media (max-width: 767px) {
+    html, body { background: #1f1d3a; }
+
+    /* Lighter section backgrounds */
+    .m-bg-about    { background: #28244e !important; }
+    .m-bg-results  { background: #1e2542 !important; }
+    .m-bg-work     { background: #1e2445 !important; }
+    .m-bg-process  { background: #231c3e !important; }
+
+    /* Reduce vanta dark overlays so color bleeds through on mobile */
+    .m-hero-overlay {
+      background: linear-gradient(160deg, rgba(4,6,14,0.22) 0%, rgba(6,10,20,0.10) 40%, rgba(4,6,14,0.26) 100%) !important;
+    }
+    .m-hero-fade {
+      background: linear-gradient(to bottom, transparent, rgba(15,20,34,0.45)) !important;
+    }
+    .m-book-overlay {
+      background: linear-gradient(160deg, rgba(6,2,18,0.44) 0%, rgba(10,4,28,0.30) 50%, rgba(6,2,18,0.48) 100%) !important;
+    }
+
+    /* Reduce edge fades so they don't swallow content */
+    .m-edge-fade { opacity: 0.4 !important; }
+
+    /* Brighter glass cards */
+    .m-card {
+      background: rgba(255,255,255,0.09) !important;
+      border-color: rgba(255,255,255,0.16) !important;
+    }
+
+  }
+}
+
+@keyframes waveBar {
+  from { transform: scaleY(0.35); opacity: 0.40; }
+  to   { transform: scaleY(1.0);  opacity: 0.90; }
+}
+
+.hero-waveform > div {
+  transform-origin: center bottom;
+}
+
+/* ── Giant artistic text (Playfair Display) ── */
+.art-text {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  line-height: 0.88;
+  user-select: none;
+}
+
+/* ── 3D extruded text ── */
+.text-3d-dark {
+  text-shadow:
+    1px 1px 0 rgba(255,255,255,0.08),
+    2px 2px 0 rgba(255,255,255,0.07),
+    3px 3px 0 rgba(255,255,255,0.065),
+    4px 4px 0 rgba(255,255,255,0.06),
+    5px 5px 0 rgba(255,255,255,0.055),
+    6px 6px 0 rgba(255,255,255,0.05),
+    8px 8px 0 rgba(255,255,255,0.04),
+    10px 10px 0 rgba(255,255,255,0.03),
+    14px 14px 0 rgba(255,255,255,0.02),
+    20px 20px 0 rgba(255,255,255,0.01),
+    24px 24px 30px rgba(0,0,0,0.6);
+}
+
+.text-3d-outline-dark {
+  text-shadow:
+    1px 1px 0 rgba(139, 92, 246,0.35),
+    2px 2px 0 rgba(139, 92, 246,0.32),
+    3px 3px 0 rgba(109, 40, 217,0.28),
+    4px 4px 0 rgba(109, 40, 217,0.24),
+    5px 5px 0 rgba(91, 33, 182,0.20),
+    6px 6px 0 rgba(76, 29, 149,0.17),
+    8px 8px 0 rgba(67, 20, 137,0.13),
+    10px 10px 0 rgba(55, 14, 120,0.10),
+    14px 14px 0 rgba(46, 10, 104,0.07),
+    18px 18px 25px rgba(0,0,0,0.55);
+}
+
+.text-3d-on-orange {
+  text-shadow:
+    1px 1px 0 rgba(0,0,0,0.50),
+    2px 2px 0 rgba(0,0,0,0.46),
+    4px 4px 0 rgba(0,0,0,0.38),
+    6px 6px 0 rgba(0,0,0,0.28),
+    10px 10px 0 rgba(0,0,0,0.18),
+    18px 18px 0 rgba(0,0,0,0.09),
+    28px 28px 45px rgba(0,0,0,0.42);
+}
+
+/* ── Section noise grain ── */
+.grain {
+  background-image: url(/gallery/noise.png);
+  background-size: 200px;
+}
+
+/* ── Ticker / marquee ── */
+@keyframes ticker-rtl {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.ticker-track {
+  display: flex;
+  width: max-content;
+  gap: 12px;
+  padding: 8px 12px;
+  animation: ticker-rtl 38s linear infinite;
+}
+.ticker-track:hover {
+  animation-play-state: paused;
+}
+
+/* ── Animated gradient border ── */
+@property --gradient-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes gradient-rotate {
+  from { --gradient-angle: 0deg; }
+  to   { --gradient-angle: 360deg; }
+}
+
+.gradient-border-component {
+  position: relative;
+}
+
+.gradient-border-auto {
+  animation: gradient-rotate var(--animation-duration, 5s) linear infinite;
+}
+
+.gradient-border-hover {
+  animation: none;
+}
+.gradient-border-hover:hover {
+  animation: gradient-rotate var(--animation-duration, 5s) linear infinite;
+}
+
+.gradient-border-stop-hover {
+  animation: gradient-rotate var(--animation-duration, 5s) linear infinite;
+}
+.gradient-border-stop-hover:hover {
+  animation-play-state: paused;
+}
