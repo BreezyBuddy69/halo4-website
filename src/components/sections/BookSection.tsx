@@ -98,7 +98,7 @@ export function BookSection({ language, isActive, onBooking }: BookSectionProps)
             initial={{ opacity: 0, y: 16 }}
             animate={isActive ? { opacity: 1, y: 0 } : {}}
             transition={{ delay: 0.78, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-            className="hidden md:flex items-center mb-10"
+            className="flex flex-wrap justify-center items-center gap-y-3 mb-10"
           >
             {steps.map((step, i) => {
               const lit = activeStep >= i
@@ -167,7 +167,7 @@ export function BookSection({ language, isActive, onBooking }: BookSectionProps)
             transition={{ type: 'spring', damping: 14, stiffness: 160 }}
             className="mb-5"
           >
-            <NeonButton onClick={onBooking} size="lg">
+            <NeonButton onClick={onBooking} size="lg" variant="orange">
               {tr.bookCall}
             </NeonButton>
           </motion.div>

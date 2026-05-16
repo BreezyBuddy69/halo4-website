@@ -33,8 +33,8 @@ export function SideNav({ currentSection, onNavigate, language }: SideNavProps) 
             animate={{ scale, opacity, x: 0 }}
             transition={{ type: 'spring', damping: 24, stiffness: 280, mass: 0.7 }}
             className="relative flex items-center gap-2 rounded-full text-left px-3 py-1.5"
-            style={{ transformOrigin: 'left center' }}
             style={{
+              transformOrigin: 'left center',
               color: isActive ? 'rgba(255,255,255,1)' : 'rgba(255,255,255,0.7)',
               background: isActive
                 ? 'rgba(8, 5, 26, 0.82)'

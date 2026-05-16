@@ -198,7 +198,7 @@ export function SectionStack({ currentSection, children, onSectionChange }: Sect
       />
       {/* Global page counter - positioned below chatbot button */}
       <div className="fixed z-50 text-white/25 text-[10px] font-mono tracking-widest hidden md:block"
-        style={{ bottom: '1.5rem', right: '1.5rem' }}>
+        style={{ bottom: '0.35rem', right: '1.5rem' }}>
         {String(currentSection + 1).padStart(2, '0')} / {String(children.length).padStart(2, '0')}
       </div>
     </>

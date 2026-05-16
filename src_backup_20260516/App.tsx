@@ -62,6 +62,7 @@ function AppInner() {
   const [chatContext, setChatContext] = useState('')
   const [language, setLanguage] = useState<Language>(detectLanguage)
   const [introDone, setIntroDone] = useState(getSplashSeen)
+  const [titleReady, setTitleReady] = useState(getSplashSeen)
   const [mailMessages, setMailMessages] = useState<MailMessage[]>([])
   const [mailboxOpen, setMailboxOpen] = useState(false)
   const heroInputRef = useRef<HTMLTextAreaElement>(null)
@@ -70,6 +71,10 @@ function AppInner() {
     setSplashDone(true)
     setSplashSeen()
     setIntroDone(true)
+  }, [])
+
+  const handleTitleReady = useCallback(() => {
+    setTitleReady(true)
   }, [])
 
   const isMobile = useMediaQuery('(max-width: 767px)')
@@ -167,6 +172,7 @@ function AppInner() {
             inputRef={heroInputRef}
             onIntroDone={() => setIntroDone(true)}
             introDone={introDone}
+            titleReady={titleReady}
             onScrollToVideo={() => handleNavigate(1)}
           />,
           <VideoSection
@@ -222,10 +228,10 @@ function AppInner() {
     <PerformanceProvider tier={tier}>
       <div className="relative w-screen h-screen overflow-hidden" style={{ background: '#0D0B1A' }}>
         <AnimatePresence>
-          {!splashDone && <SplashGate key="splash" onDone={handleSplashDone} />}
+          {!splashDone && <SplashGate key="splash" onDone={handleSplashDone} onTitleReady={handleTitleReady} />}
         </AnimatePresence>
 
-        {splashDone && appContent}
+        {appContent}
       </div>
     </PerformanceProvider>
   )

@@ -50,6 +50,7 @@ export function ChatBot({ language, context, onContextUsed }: ChatBotProps) {
   const [userMsgCount, setUserMsgCount] = useState(0)
   const [limitWarning, setLimitWarning] = useState(false)
   const [buttonBrightness, setButtonBrightness] = useState(0)
+  const [lastFailedMsg, setLastFailedMsg] = useState<string | null>(null)
 
   const scrollRef = useRef<HTMLDivElement>(null)
   const chatRef = useRef<HTMLDivElement>(null)
@@ -184,9 +185,11 @@ export function ChatBot({ language, context, onContextUsed }: ChatBotProps) {
       if (!res.ok) throw new Error('Non-OK response')
       const data = await res.json()
       const raw = data.response ?? data.message ?? data.output ?? data.text ?? 'I apologize, I could not process your request.'
+      setLastFailedMsg(null)
       addMessage({ role: 'assistant', content: sanitizeApiResponse(String(raw)), isNew: true })
     } catch {
-      addMessage({ role: 'assistant', content: 'Error connecting to service.' })
+      setLastFailedMsg(text)
+      addMessage({ role: 'assistant', content: '__retry__' })
     } finally {
       setIsLoading(false)
     }
@@ -288,10 +291,15 @@ export function ChatBot({ language, context, onContextUsed }: ChatBotProps) {
                   </div>
                   <span className="text-xs font-semibold text-white/90 tracking-wide">{tr.chatSub}</span>
                 </div>
-                <button onClick={closeChat}
-                  className="w-6 h-6 rounded-full flex items-center justify-center text-white/40 hover:text-white/80 hover:bg-white/10 transition-all">
-                  <X className="w-3.5 h-3.5" />
-                </button>
+                <div className="flex items-center gap-2">
+                  {userMsgCount > 0 && (
+                    <span className="text-[9px] text-white/30 tabular-nums">{userMsgCount}/20</span>
+                  )}
+                  <button onClick={closeChat}
+                    className="w-6 h-6 rounded-full flex items-center justify-center text-white/40 hover:text-white/80 hover:bg-white/10 transition-all">
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
               </div>
 
               {/* Messages — flex-col with spacer so messages anchor to bottom, growing upward */}
@@ -336,7 +344,17 @@ export function ChatBot({ language, context, onContextUsed }: ChatBotProps) {
                           boxShadow: '0 4px 20px rgba(0,0,0,0.55)',
                         }}
                       >
-                        {msg.role === 'assistant' && msg.isNew && !seenMsgIdsRef.current.has(msg.id) ? (
+                        {msg.role === 'assistant' && msg.content === '__retry__' ? (
+                          <div className="flex flex-col gap-2">
+                            <span className="text-white/50">Connection error.</span>
+                            <button
+                              onClick={() => { if (lastFailedMsg) { setLastFailedMsg(null); handleSendMessage(lastFailedMsg) } }}
+                              className="text-left text-violet-400/80 hover:text-violet-300 text-[10px] underline underline-offset-2 transition-colors"
+                            >
+                              Retry →
+                            </button>
+                          </div>
+                        ) : msg.role === 'assistant' && msg.isNew && !seenMsgIdsRef.current.has(msg.id) ? (
                           <TypingMessage
                             text={msg.content}
                             scrollRef={scrollRef}

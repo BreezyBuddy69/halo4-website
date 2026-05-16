@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 
 const SCREEN_SIZES = ["xs", "sm", "md", "lg", "xl", "2xl"] as const
 
@@ -64,7 +64,7 @@ const useScreenSize = (): ComparableScreenSize => {
     return () => window.removeEventListener("resize", handleResize)
   }, [])
 
-  return new ComparableScreenSize(screenSize)
+  return useMemo(() => new ComparableScreenSize(screenSize), [screenSize])
 }
 
 export { useScreenSize }

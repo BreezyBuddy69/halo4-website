@@ -9,6 +9,7 @@ import { BorderRotate } from '../ui/animated-gradient-border'
 import { DotPattern } from '../ui/dot-pattern-1'
 import { t } from '../../utils/translations'
 import type { Language } from '../../utils/translations'
+import { useScreenSize } from '../../hooks/use-screen-size'
 import { useChatContext } from '../../contexts/ChatContext'
 import { GooeyFilter } from '../ui/gooey-filter'
 import { Boxes } from '../ui/background-boxes'
@@ -187,11 +188,11 @@ function useTypewriterText(texts: string[]) {
           s.phase = 'waiting'
           timerRef.current = setTimeout(tick, 3200)
         } else {
-          timerRef.current = setTimeout(tick, 40)
+          timerRef.current = setTimeout(tick, 28)
         }
       }
     }
-    timerRef.current = setTimeout(tick, 40)
+    timerRef.current = setTimeout(tick, 28)
     return () => clearTimeout(timerRef.current)
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -202,9 +203,11 @@ export function HeroSection({ language, isActive, onBooking, inputRef, introDone
   const tr = t(language)
   const greetingMsg = tr.heroGreeting
   const { messages, isLoading, addMessage, markDone, setIsLoading } = useChatContext()
+  const screenSize = useScreenSize()
+  const isMobile = screenSize.lessThan('md')
   const haloFontPx = useFitFont('HALO', 0.97)
-  // VISION measured independently so it fills ~74% of viewport, leaving room for AI
-  const visionFontPx = useFitFont('VISION', 0.74)
+  // On mobile use 0.62 so AI has room; on desktop 0.74
+  const visionFontPx = useFitFont('VISION', isMobile ? 0.62 : 0.74)
   // AI at 52% of VISION height — together they fill ~97% of the row
   const aiFontPx = Math.floor(visionFontPx * 0.52)
 
@@ -616,13 +619,20 @@ export function HeroSection({ language, isActive, onBooking, inputRef, introDone
                   {userMsgCount >= 20 ? 'Message limit reached' : charWarning ? `Max ${userMsgCount === 0 ? 3000 : 750} characters` : `${20 - userMsgCount} messages left`}
                 </p>
               )}
+              <BorderRotate
+                animationMode="auto-rotate"
+                animationSpeed={4}
+                gradientColors={{ primary: '#3b1e7a', secondary: '#8B5CF6', accent: '#c4b5fd' }}
+                backgroundColor="rgba(8, 5, 26, 0.97)"
+                borderWidth={1}
+                borderRadius={20}
+                style={{ width: '100%', boxShadow: '0 4px 24px rgba(0,0,0,0.50), 0 0 22px rgba(139,92,246,0.18)' }}
+              >
               <GlassPanel
                 className="flex items-end gap-3 rounded-[20px] px-4 py-3"
                 style={{
                   background: 'rgba(8, 5, 26, 0.97)',
-                  border: input.length > 0 ? '1px solid rgba(255,255,255,0.18)' : '1px solid rgba(139,92,246,0.40)',
-                  boxShadow: input.length > 0 ? '0 4px 24px rgba(0,0,0,0.50)' : '0 4px 24px rgba(0,0,0,0.50), 0 0 22px rgba(139,92,246,0.18)',
-                  transition: 'border-color 0.4s ease, box-shadow 0.4s ease',
+                  boxShadow: 'none',
                 }}
               >
                 <textarea
@@ -659,6 +669,7 @@ export function HeroSection({ language, isActive, onBooking, inputRef, introDone
                   <Send className="w-3.5 h-3.5 text-white/90" />
                 </button>
               </GlassPanel>
+              </BorderRotate>
             </motion.div>
           </div>
         </motion.div>
@@ -700,7 +711,7 @@ export function HeroSection({ language, isActive, onBooking, inputRef, introDone
               />
 
               {/* Row 2 — VISION double-outline + AI label */}
-              <div style={{ display: 'flex', alignItems: 'flex-end', gap: '1vw', lineHeight: 0.88, marginTop: '1vh', paddingRight: 'clamp(120px, 18vw, 280px)' }}>
+              <div style={{ display: 'flex', alignItems: 'flex-end', gap: '1vw', lineHeight: 0.88, marginTop: '1vh', paddingRight: isMobile ? 'clamp(12px, 4vw, 40px)' : 'clamp(120px, 18vw, 280px)' }}>
                 {/* VISION — SVG double-stroke: fill="none" = truly transparent, consistent on all glyphs */}
                 <motion.svg
                   initial={{ opacity: 0, y: 60 }}

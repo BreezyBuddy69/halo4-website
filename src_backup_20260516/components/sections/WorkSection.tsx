@@ -278,7 +278,7 @@ export function WorkSection({ language, isActive, onAskAI }: WorkSectionProps) {
                     initial={{ opacity: 0, y: 12 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.15, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                    className="flex flex-col justify-center pl-6 md:pl-52 lg:pl-72 xl:pl-96 pr-6 md:pr-4 w-full md:w-[52%] py-4"
+                    className="flex flex-col justify-center pl-6 md:pl-36 lg:pl-52 pr-6 md:pr-4 w-full md:w-[52%] py-4"
                   >
                     {/* Category filter tabs */}
                     <div className="flex gap-2 mb-8">
@@ -323,8 +323,7 @@ export function WorkSection({ language, isActive, onAskAI }: WorkSectionProps) {
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: -4 }}
                           transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
-                          className="text-white/80 max-md:text-white/90 leading-[1.75] max-w-lg"
-                          style={{ fontSize: 'clamp(1rem, 1.6vw, 1.25rem)' }}
+                          className="text-white/72 max-md:text-white/90 text-[1rem] leading-[1.7] max-w-lg"
                         >
                           {activeDesc}
                         </motion.p>
@@ -388,50 +387,6 @@ export function WorkSection({ language, isActive, onAskAI }: WorkSectionProps) {
 
                   {/* Right: 3D card cascade placeholder (cards rendered separately below) */}
                   <div className="hidden md:block flex-1" />
-
-                  {/* Mobile: active card preview */}
-                  <motion.div
-                    initial={{ opacity: 0, y: 16 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.25, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                    className="block md:hidden px-6 pb-6"
-                  >
-                    <AnimatePresence mode="wait">
-                      <motion.div
-                        key={activeNode.id}
-                        initial={{ opacity: 0, scale: 0.96, y: 8 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.96 }}
-                        transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
-                        className="relative p-5 flex flex-col"
-                        style={{
-                          border: `1px solid ${activeColors.border}`,
-                          background: `linear-gradient(145deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 60%, rgba(0,0,0,0.12) 100%)`,
-                          backdropFilter: 'blur(20px)',
-                          WebkitBackdropFilter: 'blur(20px)',
-                          boxShadow: `0 12px 40px rgba(0,0,0,0.45), 0 0 28px ${activeColors.glow}`,
-                        }}
-                      >
-                        <DotPattern width={5} height={5} className="fill-purple-400/15" />
-                        {/* Corner dots */}
-                        <div className="absolute -left-1.5 -top-1.5 h-3 w-3 bg-purple-400 z-30" style={{ opacity: 0.85 }} />
-                        <div className="absolute -bottom-1.5 -left-1.5 h-3 w-3 bg-purple-400 z-30" style={{ opacity: 0.85 }} />
-                        <div className="absolute -right-1.5 -top-1.5 h-3 w-3 bg-purple-400 z-30" style={{ opacity: 0.85 }} />
-                        <div className="absolute -bottom-1.5 -right-1.5 h-3 w-3 bg-purple-400 z-30" style={{ opacity: 0.85 }} />
-                        <div className="relative z-10 flex items-start justify-between mb-4">
-                          <div className="w-9 h-9 flex items-center justify-center shrink-0"
-                            style={{ borderRadius: 6, background: activeColors.bg, border: `1px solid ${activeColors.border}` }}>
-                            <ActiveIcon className="w-4.5 h-4.5" style={{ color: activeColors.accent }} />
-                          </div>
-                          <span className="text-[10px] font-mono" style={{ color: 'rgba(255,255,255,0.22)' }}>{String(globalIdx + 1).padStart(2, '0')}</span>
-                        </div>
-                        <div className="relative z-10">
-                          <h3 className="text-white/92 text-sm font-medium leading-snug mb-2 tracking-wide">{activeTitle}</h3>
-                          <p className="text-white/52 text-[12px] leading-relaxed">{activeDesc}</p>
-                        </div>
-                      </motion.div>
-                    </AnimatePresence>
-                  </motion.div>
                 </div>
               </motion.div>
             )}
@@ -471,12 +426,12 @@ export function WorkSection({ language, isActive, onAskAI }: WorkSectionProps) {
                       onClick={() => setActiveIdx(i)}
                       style={{
                         position: 'absolute',
-                        width: 220,
-                        height: 140,
+                        width: 280,
+                        height: 330,
                         left: '50%',
                         top: '50%',
-                        marginLeft: -110,
-                        marginTop: -70,
+                        marginLeft: -140,
+                        marginTop: -165,
                         cursor: 'pointer',
                         borderRadius: 10,
                       }}
@@ -492,7 +447,7 @@ export function WorkSection({ language, isActive, onAskAI }: WorkSectionProps) {
                       transition={{ type: 'spring', damping: 32, stiffness: 280, mass: 0.65 }}
                     >
                       <div
-                        className="w-full h-full p-4 flex flex-col relative overflow-hidden"
+                        className="w-full h-full p-6 flex flex-col relative overflow-hidden"
                         style={{
                           borderRadius: offset === 0 ? 0 : 10,
                           background: offset === 0
@@ -521,7 +476,7 @@ export function WorkSection({ language, isActive, onAskAI }: WorkSectionProps) {
                           }}
                         />
 
-                        <div className="flex items-start justify-between mb-3">
+                        <div className="flex items-start justify-between mb-5">
                           <div className="w-9 h-9 flex items-center justify-center shrink-0"
                             style={{
                               borderRadius: 6,
@@ -533,7 +488,15 @@ export function WorkSection({ language, isActive, onAskAI }: WorkSectionProps) {
                           <span className="text-[10px] font-mono" style={{ color: 'rgba(255,255,255,0.22)' }}>{String(i + 1).padStart(2, '0')}</span>
                         </div>
 
-                        <h3 className="text-white/92 text-sm font-medium leading-snug tracking-wide">{title}</h3>
+                        <h3 className="text-white/92 text-sm font-medium leading-snug mb-3 tracking-wide">{title}</h3>
+                        <p className="text-white/52 text-[11px] leading-relaxed line-clamp-5">{desc}</p>
+
+                        <div className="mt-auto pt-3">
+                          <div className="h-px" style={{
+                            width: '50%',
+                            background: `linear-gradient(90deg, ${colors.border}, transparent)`,
+                          }} />
+                        </div>
                       </div>
                     </motion.div>
                   )

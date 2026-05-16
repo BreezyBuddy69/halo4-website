@@ -199,7 +199,7 @@ export function AboutSection({ language, isActive }: AboutSectionProps) {
               initial={{ opacity: 0, y: 12 }}
               animate={isActive ? { opacity: 1, y: 0 } : {}}
               transition={{ delay: 0.4, duration: 0.55 }}
-              className="text-white/55 text-sm leading-relaxed mb-5 md:mb-8 max-w-md hidden md:block"
+              className="text-white/55 text-sm leading-relaxed mb-5 md:mb-8 max-w-md"
             >
               {c.body}
             </motion.p>
@@ -209,7 +209,7 @@ export function AboutSection({ language, isActive }: AboutSectionProps) {
               initial={{ opacity: 0, y: 12 }}
               animate={isActive ? { opacity: 1, y: 0 } : {}}
               transition={{ delay: 0.75, duration: 0.55 }}
-              className="hidden md:block mt-8"
+              className="mt-6 md:mt-8"
             >
               <div
                 className="relative"

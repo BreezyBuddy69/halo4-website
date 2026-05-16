@@ -3,6 +3,9 @@ import { SectionReveal } from '../ui/SectionReveal'
 import { AnimatedBg } from '../ui/AnimatedBg'
 import { CheckCircle } from 'lucide-react'
 import type { Language } from '../../utils/translations'
+import { DotPattern } from '../ui/dot-pattern-1'
+import { useEffect, useState, useRef } from 'react'
+
 
 interface AboutSectionProps {
   language: Language
@@ -20,6 +23,9 @@ const content = {
       { title: 'Long-term support', desc: 'We maintain and improve your system post-launch.' },
     ],
     photoLabel: 'Your photo here',
+    aiosCallout: 'You don\'t have to start with everything.',
+    aiosCalloutSub: 'Begin with one automation. As results compound, we gradually wrap your entire company in a custom AI Operating System — built around how you actually work.',
+    aiosBadge: 'AIOS — AI Operating System',
   },
   de: {
     label: 'Über Uns',
@@ -31,6 +37,9 @@ const content = {
       { title: 'Langfristiger Support', desc: 'Wir betreuen das System dauerhaft nach dem Launch.' },
     ],
     photoLabel: 'Ihr Foto hier',
+    aiosCallout: 'Du musst nicht mit allem auf einmal starten.',
+    aiosCalloutSub: 'Beginne mit einer einzigen Automatisierung. Während die Ergebnisse wachsen, bauen wir schrittweise ein vollständiges KI-Betriebssystem um dein Unternehmen — maßgeschneidert für deine Arbeitsweise.',
+    aiosBadge: 'AIOS — KI-Betriebssystem',
   },
   fr: {
     label: 'À Propos',
@@ -42,11 +51,103 @@ const content = {
       { title: 'Accompagnement à long terme', desc: 'Nous maintenons et améliorons votre système après le lancement.' },
     ],
     photoLabel: 'Votre photo ici',
+    aiosCallout: 'Pas besoin de tout démarrer d\'un coup.',
+    aiosCalloutSub: "Commencez par une seule automatisation. Au fil des résultats, nous construisons progressivement un système d'exploitation IA complet autour de votre entreprise — adapté à votre façon de travailler.",
+    aiosBadge: 'AIOS — Système d\'exploitation IA',
   },
+}
+
+function TypewriterRow({
+  title,
+  desc,
+  active,
+  onDone,
+}: {
+  title: string
+  desc: string
+  active: boolean
+  onDone: () => void
+}) {
+  const full = `${title} — ${desc}`
+  const [chars, setChars] = useState(0)
+  const [done, setDone] = useState(false)
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    if (!active) return
+    setChars(0)
+    setDone(false)
+
+    let i = 0
+    const tick = () => {
+      i++
+      setChars(i)
+      if (i < full.length) {
+        timerRef.current = setTimeout(tick, 30)
+      } else {
+        timerRef.current = setTimeout(() => {
+          setDone(true)
+          setTimeout(onDone, 220)
+        }, 80)
+      }
+    }
+    timerRef.current = setTimeout(tick, 0)
+
+    return () => { if (timerRef.current) clearTimeout(timerRef.current) }
+  }, [active])
+
+  const displayed = full.slice(0, chars)
+  const titleLen = title.length
+  const shownTitle = displayed.slice(0, titleLen)
+  const shownRest = displayed.slice(titleLen)
+
+  return (
+    <div className="flex items-start gap-3">
+      <div className="w-3.5 h-3.5 shrink-0 mt-[3px] relative">
+        <motion.div
+          initial={false}
+          animate={done ? { scale: 1, opacity: 1 } : { scale: 0, opacity: 0 }}
+          transition={{ type: 'spring', stiffness: 500, damping: 22 }}
+          className="absolute inset-0"
+        >
+          <CheckCircle className="w-3.5 h-3.5 text-emerald-400" />
+        </motion.div>
+      </div>
+
+      <p className="text-sm leading-snug">
+        <span style={{ color: 'rgba(255,255,255,0.85)', fontWeight: 500 }}>{shownTitle}</span>
+        <span style={{ color: 'rgba(255,255,255,0.45)' }}>{shownRest}</span>
+        {active && !done && (
+          <motion.span
+            animate={{ opacity: [1, 0, 1] }}
+            transition={{ duration: 0.9, repeat: Infinity, ease: 'easeInOut' }}
+            style={{
+              display: 'inline-block',
+              width: 2,
+              height: 13,
+              background: 'rgba(180,130,255,0.9)',
+              marginLeft: 2,
+              verticalAlign: 'middle',
+              borderRadius: 1,
+            }}
+          />
+        )}
+      </p>
+    </div>
+  )
 }
 
 export function AboutSection({ language, isActive }: AboutSectionProps) {
   const c = content[language]
+  const [currentRow, setCurrentRow] = useState(-1)
+
+  useEffect(() => {
+    if (isActive) {
+      setCurrentRow(0)
+    } else {
+      setCurrentRow(-1)
+    }
+  }, [isActive])
 
   return (
     <SectionReveal isActive={isActive}>
@@ -103,26 +204,40 @@ export function AboutSection({ language, isActive }: AboutSectionProps) {
               {c.body}
             </motion.p>
 
-            <div className="flex flex-col gap-3 md:gap-4">
-              {c.reasons.map((r, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={isActive ? { opacity: 1, x: 0 } : {}}
-                  transition={{ delay: 0.5 + i * 0.1, duration: 0.45 }}
-                  className="flex items-start gap-3"
-                >
-                  <CheckCircle className="w-3.5 h-3.5 text-white/30 max-md:text-white/55 shrink-0 mt-0.5" />
-                  <p className="text-sm leading-snug">
-                    <span className="text-white/75 max-md:text-white/92 font-medium">{r.title}</span>
-                    <span className="text-white/38 hidden md:inline"> — {r.desc}</span>
-                  </p>
-                </motion.div>
-              ))}
-            </div>
+            {/* Quote box */}
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={isActive ? { opacity: 1, y: 0 } : {}}
+              transition={{ delay: 0.75, duration: 0.55 }}
+              className="hidden md:block mt-8"
+            >
+              <div
+                className="relative"
+                style={{ border: '1px solid rgba(160,100,255,0.45)' }}
+              >
+                <DotPattern width={5} height={5} className="fill-purple-400/20" />
+                {/* Corner dots */}
+                <div className="absolute -left-1.5 -top-1.5 h-3 w-3 bg-purple-400" style={{ opacity: 0.85 }} />
+                <div className="absolute -bottom-1.5 -left-1.5 h-3 w-3 bg-purple-400" style={{ opacity: 0.85 }} />
+                <div className="absolute -right-1.5 -top-1.5 h-3 w-3 bg-purple-400" style={{ opacity: 0.85 }} />
+                <div className="absolute -bottom-1.5 -right-1.5 h-3 w-3 bg-purple-400" style={{ opacity: 0.85 }} />
+                <div className="relative z-20 p-5 flex flex-col gap-4">
+                  {c.reasons.map((r, i) => (
+                    <TypewriterRow
+                      key={`${language}-${i}`}
+                      title={r.title}
+                      desc={r.desc}
+                      active={currentRow === i}
+                      onDone={() => setCurrentRow(i + 1)}
+                    />
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+
           </div>
 
-          {/* Right: Photo placeholder (hidden on mobile) */}
+          {/* Right: Photo */}
           <motion.div
             initial={{ opacity: 0, scale: 0.94, y: 20 }}
             animate={isActive ? { opacity: 1, scale: 1, y: 0 } : {}}
@@ -138,7 +253,6 @@ export function AboutSection({ language, isActive }: AboutSectionProps) {
                 border: '1px solid rgba(180,130,255,0.18)',
               }}
             >
-              {/* Photo — zoomed in ~20% via scale */}
               <img
                 src="/gallery/WhatsApp Image 2026-04-04 at 18.13.03.jpeg"
                 alt="Team"
@@ -151,7 +265,6 @@ export function AboutSection({ language, isActive }: AboutSectionProps) {
                   transformOrigin: 'center 35%',
                 }}
               />
-
               {/* Subtle purple tint overlay */}
               <div className="absolute inset-0 pointer-events-none"
                 style={{ background: 'linear-gradient(to top, rgba(80,30,180,0.35) 0%, transparent 55%)' }}

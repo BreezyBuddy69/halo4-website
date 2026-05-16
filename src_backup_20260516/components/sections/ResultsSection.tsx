@@ -129,8 +129,8 @@ export function ResultsSection({ language, isActive }: ResultsSectionProps) {
               {tr.testimonialsTitle}.
             </motion.h2>
 
-            <div className="flex flex-col gap-2.5">
-              {tr.testimonials.map((review, i) => {
+            <div className="flex flex-col gap-5">
+              {tr.testimonials.slice(0, 4).map((review, i) => {
                 const accentPalette = [
                   { border: 'rgba(120,140,255,0.28)', glow: 'rgba(100,120,255,0.06)', avatar: 'linear-gradient(135deg, rgba(100,120,255,0.30) 0%, rgba(80,100,220,0.18) 100%)', avatarBorder: 'rgba(120,140,255,0.30)', starColor: 'rgba(180,195,255,0.90)' },
                   { border: 'rgba(190,110,255,0.26)', glow: 'rgba(170,90,255,0.06)', avatar: 'linear-gradient(135deg, rgba(180,100,255,0.28) 0%, rgba(140,70,220,0.16) 100%)', avatarBorder: 'rgba(190,110,255,0.28)', starColor: 'rgba(210,160,255,0.90)' },
@@ -154,7 +154,7 @@ export function ResultsSection({ language, isActive }: ResultsSectionProps) {
                       className="block group"
                     >
                       <div
-                        className="rounded-xl px-4 py-3 flex flex-col gap-2.5 m-card relative overflow-hidden"
+                        className="px-4 py-3 flex flex-col gap-2.5 m-card relative"
                         style={{
                           background: `linear-gradient(135deg, ${accent.glow.replace('0.06', '0.09')} 0%, rgba(255,255,255,0.02) 100%)`,
                           border: `1px solid ${accent.border}`,
@@ -172,6 +172,11 @@ export function ResultsSection({ language, isActive }: ResultsSectionProps) {
                           el.style.borderColor = accent.border
                         }}
                       >
+                        {/* Corner dots */}
+                        <div className="absolute -left-1.5 -top-1.5 h-3 w-3 z-30" style={{ background: accent.starColor, opacity: 0.75 }} />
+                        <div className="absolute -bottom-1.5 -left-1.5 h-3 w-3 z-30" style={{ background: accent.starColor, opacity: 0.75 }} />
+                        <div className="absolute -right-1.5 -top-1.5 h-3 w-3 z-30" style={{ background: accent.starColor, opacity: 0.75 }} />
+                        <div className="absolute -bottom-1.5 -right-1.5 h-3 w-3 z-30" style={{ background: accent.starColor, opacity: 0.75 }} />
                         {/* Star rating */}
                         <div className="flex items-center gap-0.5">
                           {[...Array(5)].map((_, s) => (

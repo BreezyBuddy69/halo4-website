@@ -6,6 +6,7 @@ import { GlassPanel } from '../ui/GlassPanel'
 import { TypingMessage } from '../chat/TypingMessage'
 import { ThinkingProcess } from '../chat/ThinkingProcess'
 import { BorderRotate } from '../ui/animated-gradient-border'
+import { DotPattern } from '../ui/dot-pattern-1'
 import { t } from '../../utils/translations'
 import type { Language } from '../../utils/translations'
 import { useChatContext } from '../../contexts/ChatContext'
@@ -67,7 +68,10 @@ function AnimatedWord({ word, delay, style, className }: {
           key={i}
           initial={{ opacity: 0, y: 60 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.9, delay: delay + i * 0.06, ease: [0.16, 1, 0.3, 1] }}
+          transition={{
+            y: { duration: 0.85, delay: delay + i * 0.06, ease: [0.16, 1, 0.3, 1] },
+            opacity: { duration: 1.5, delay: delay + i * 0.06, ease: 'easeOut' },
+          }}
           style={{ display: 'inline-block', willChange: 'transform, opacity' }}
         >
           {char}
@@ -123,6 +127,7 @@ interface HeroSectionProps {
   inputRef: React.RefObject<HTMLTextAreaElement>
   onIntroDone?: () => void
   introDone?: boolean
+  titleReady?: boolean
   onScrollToVideo?: () => void
 }
 
@@ -193,7 +198,7 @@ function useTypewriterText(texts: string[]) {
   return displayed
 }
 
-export function HeroSection({ language, isActive, onBooking, inputRef, introDone, onScrollToVideo }: HeroSectionProps) {
+export function HeroSection({ language, isActive, onBooking, inputRef, introDone, titleReady, onScrollToVideo }: HeroSectionProps) {
   const tr = t(language)
   const greetingMsg = tr.heroGreeting
   const { messages, isLoading, addMessage, markDone, setIsLoading } = useChatContext()
@@ -392,7 +397,7 @@ export function HeroSection({ language, isActive, onBooking, inputRef, introDone
         {/* Chat area — input fixed at center, messages grow upward */}
         <motion.div
           className="absolute inset-x-0 flex flex-col items-center px-4 md:px-12 lg:px-20 z-[5]"
-          style={{ top: '10%', bottom: '8%' }}
+          style={{ top: '0%', bottom: '30%' }}
           animate={{ opacity: chatAreaVisible ? 1 : 0 }}
           transition={{ duration: 1.2, ease: 'easeOut' }}
         >
@@ -425,16 +430,15 @@ export function HeroSection({ language, isActive, onBooking, inputRef, introDone
                 }}
               />
               <motion.span
-                className="text-[11px] tracking-[0.14em] uppercase font-semibold px-2 py-0.5 rounded"
-                animate={{ opacity: [0.75, 1, 0.75] }}
-                transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+                className="text-[10px] tracking-[0.22em] uppercase font-medium px-3 py-1 rounded-full"
+                animate={{ opacity: [0.6, 0.9, 0.6] }}
+                transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
                 style={{
                   willChange: 'opacity',
-                  color: 'rgba(255,255,255,0.92)',
-                  textShadow: '0 1px 4px rgba(0,0,0,0.9), 0 0 12px rgba(0,0,0,0.7)',
-                  background: 'rgba(0,0,0,0.28)',
-                  backdropFilter: 'blur(6px)',
-                  WebkitBackdropFilter: 'blur(6px)',
+                  color: 'rgba(200,180,255,0.85)',
+                  background: 'rgba(8,5,20,0.92)',
+                  border: '1px solid rgba(139,92,246,0.28)',
+                  letterSpacing: '0.20em',
                 }}
               >
                 {tr.talkToIntegratedAI}
@@ -491,39 +495,53 @@ export function HeroSection({ language, isActive, onBooking, inputRef, introDone
                         {renderContent(msg.content)}
                       </div>
                     ) : (
-                      /* AI bubble */
-                      <BorderRotate
-                        className="max-w-[86%] px-5 py-4 text-[13px] leading-[1.70]"
-                        animationSpeed={6}
-                        borderWidth={1}
-                        borderRadius={20}
-                        gradientColors={{ primary: '#1a0b40', secondary: '#6d28d9', accent: '#c4b5fd' }}
-                        backgroundColor="rgba(7,4,24,1)"
-                        style={{
-                          color: 'rgba(255,255,255,0.96)',
-                          boxShadow: '0 8px 40px rgba(0,0,0,0.72), 0 0 0 1px rgba(139,92,246,0.10), inset 0 1px 0 rgba(255,255,255,0.05)',
-                          backdropFilter: 'blur(20px)',
-                          WebkitBackdropFilter: 'blur(20px)',
-                        }}
-                      >
-                        {/* Halo AI label */}
-                        {msg.isNew ? (
-                          <TypingMessage
-                            text={msg.content}
-                            scrollRef={scrollContainerRef}
-                            isActive={isActive}
-                            onComplete={() => {
-                              markDone(msg.id)
-                              setTimeout(() => inputRef.current?.focus(), 150)
-                              const count = userMsgCountRef.current
-                              if (count >= 1) setTimeout(() => setShowScrollBtn(true), 300)
-                              if (count >= 3 && !_continueShownOnce) setTimeout(() => { _continueShownOnce = true; setShowContinue(true) }, 500)
-                            }}
+                      /* AI bubble — DotPattern bordered style */
+                      <div className="relative max-w-[86%]" style={{ isolation: 'isolate' }}>
+                        {/* Corner squares — centered on border corners (half inside, half outside) */}
+                        <div className="absolute w-3 h-3 z-10" style={{ background: 'rgba(139,92,246,0.95)', left: -6, top: -6 }} />
+                        <div className="absolute w-3 h-3 z-10" style={{ background: 'rgba(139,92,246,0.95)', left: -6, bottom: -6 }} />
+                        <div className="absolute w-3 h-3 z-10" style={{ background: 'rgba(139,92,246,0.95)', right: -6, top: -6 }} />
+                        <div className="absolute w-3 h-3 z-10" style={{ background: 'rgba(139,92,246,0.95)', right: -6, bottom: -6 }} />
+
+                        <div
+                          className="relative overflow-hidden px-5 py-4 text-[13px] leading-[1.70]"
+                          style={{
+                            background: 'rgba(7,4,24,1)',
+                            border: '1px solid rgba(139,92,246,0.38)',
+                            color: 'rgba(255,255,255,0.96)',
+                            boxShadow: '0 4px 32px rgba(0,0,0,0.18)',
+                            backdropFilter: 'blur(20px)',
+                            WebkitBackdropFilter: 'blur(20px)',
+                          }}
+                        >
+                          <DotPattern
+                            width={6}
+                            height={6}
+                            cx={1}
+                            cy={1}
+                            cr={0.7}
+                            className="fill-violet-400/[0.07] md:fill-violet-400/[0.07]"
                           />
-                        ) : (
-                          renderContent(msg.content)
-                        )}
-                      </BorderRotate>
+                          <div className="relative z-10">
+                            {msg.isNew ? (
+                              <TypingMessage
+                                text={msg.content}
+                                scrollRef={scrollContainerRef}
+                                isActive={isActive}
+                                onComplete={() => {
+                                  markDone(msg.id)
+                                  setTimeout(() => inputRef.current?.focus(), 150)
+                                  const count = userMsgCountRef.current
+                                  if (count >= 1) setTimeout(() => setShowScrollBtn(true), 300)
+                                  if (count >= 3 && !_continueShownOnce) setTimeout(() => { _continueShownOnce = true; setShowContinue(true) }, 500)
+                                }}
+                              />
+                            ) : (
+                              renderContent(msg.content)
+                            )}
+                          </div>
+                        </div>
+                      </div>
                     )}
                   </motion.div>
                 ))}
@@ -533,7 +551,7 @@ export function HeroSection({ language, isActive, onBooking, inputRef, introDone
                       style={{
                         background: 'rgba(7, 4, 24, 1.0)',
                         border: '1px solid rgba(139, 92, 246, 0.32)',
-                        boxShadow: '0 8px 40px rgba(0,0,0,0.72), 0 0 0 1px rgba(139,92,246,0.10)',
+                        boxShadow: '0 20px 120px rgba(0,0,0,0.38), 0 8px 60px rgba(0,0,0,0.28)',
                         backdropFilter: 'blur(20px)',
                         WebkitBackdropFilter: 'blur(20px)',
                       }}>
@@ -646,7 +664,7 @@ export function HeroSection({ language, isActive, onBooking, inputRef, introDone
         </motion.div>
 
         {/* Giant background titles — HALO / VISION stacked, always fills viewport width */}
-        {introDone && isActive && (
+        {(titleReady ?? introDone) && isActive && (
           <div
             aria-hidden
             className="absolute inset-0 z-0 select-none pointer-events-none"
@@ -677,39 +695,64 @@ export function HeroSection({ language, isActive, onBooking, inputRef, introDone
                   lineHeight: 0.88,
                   whiteSpace: 'nowrap',
                   letterSpacing: '0.02em',
-                  textShadow: `0 0 160px ${ORANGE}44, 0 4px 40px rgba(0,0,0,0.5)`,
+                  textShadow: `0 0 120px rgba(185,155,255,0.55), 0 0 40px rgba(139,92,246,0.35), 0 0 8px rgba(255,255,255,0.20)`,
                 }}
               />
 
-              {/* Row 2 — VISION outline + AI label */}
-              <div style={{ display: 'flex', alignItems: 'flex-end', gap: '1vw', lineHeight: 0.88, marginTop: '1vh' }}>
-                {/* VISION — outline only, no backdrop */}
-                <div style={{ position: 'relative', lineHeight: 0.88 }}>
-                <AnimatedWord
-                  word="VISION"
-                  delay={0.22}
-                  className="font-anurati"
-                  style={{
-                    fontSize: visionFontPx + 'px',
-                    color: 'transparent',
-                    fontWeight: 900,
-                    WebkitTextFillColor: 'transparent',
-                    WebkitTextStroke: `1.8px rgba(139,92,246,0.68)`,
-                    lineHeight: 0.88,
-                    whiteSpace: 'nowrap',
-                    letterSpacing: '0.02em',
-                    position: 'relative',
-                    zIndex: 1,
-                    textShadow: '0 0 80px rgba(88,28,235,0.18)',
-                    filter: 'drop-shadow(0 0 14px rgba(88,28,235,0.50)) drop-shadow(0 4px 18px rgba(0,0,0,0.90))',
+              {/* Row 2 — VISION double-outline + AI label */}
+              <div style={{ display: 'flex', alignItems: 'flex-end', gap: '1vw', lineHeight: 0.88, marginTop: '1vh', paddingRight: 'clamp(120px, 18vw, 280px)' }}>
+                {/* VISION — SVG double-stroke: fill="none" = truly transparent, consistent on all glyphs */}
+                <motion.svg
+                  initial={{ opacity: 0, y: 60 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{
+                    y: { duration: 0.85, delay: 0.85, ease: [0.16, 1, 0.3, 1] },
+                    opacity: { duration: 1.5, delay: 0.85, ease: 'easeOut' },
                   }}
-                />
-                </div>
+                  style={{ display: 'block', overflow: 'visible', flexShrink: 1 }}
+                  height={Math.ceil(visionFontPx * 0.88)}
+                  width="auto"
+                >
+                  <defs>
+                    <filter id="vision-glow" x="-10%" y="-40%" width="120%" height="180%">
+                      <feGaussianBlur stdDeviation="10" result="blur" />
+                      <feFlood floodColor="rgba(88,28,235,0.5)" result="color" />
+                      <feComposite in="color" in2="blur" operator="in" result="glow" />
+                      <feMerge><feMergeNode in="glow" /><feMergeNode in="SourceGraphic" /></feMerge>
+                    </filter>
+                  </defs>
+                  {/* Outer stroke — thin soft halo band */}
+                  <text
+                    y={Math.ceil(visionFontPx * 0.82)}
+                    fontFamily="anurati, sans-serif"
+                    fontSize={visionFontPx}
+                    fontWeight={900}
+                    letterSpacing={visionFontPx * 0.02}
+                    fill="none"
+                    stroke="rgba(139,92,246,0.55)"
+                    strokeWidth={5}
+                  >VISION</text>
+                  {/* Inner crisp stroke — bright neon line on path center */}
+                  <text
+                    y={Math.ceil(visionFontPx * 0.82)}
+                    fontFamily="anurati, sans-serif"
+                    fontSize={visionFontPx}
+                    fontWeight={900}
+                    letterSpacing={visionFontPx * 0.02}
+                    fill="none"
+                    stroke="rgba(220,200,255,0.98)"
+                    strokeWidth={1.6}
+                    filter="url(#vision-glow)"
+                  >VISION</text>
+                </motion.svg>
                 <motion.span
                   className="font-anurati"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.9, delay: 0.9, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{
+                    y: { duration: 0.85, delay: 1.55, ease: [0.16, 1, 0.3, 1] },
+                    opacity: { duration: 1.5, delay: 1.55, ease: 'easeOut' },
+                  }}
                   style={{
                     fontSize: aiFontPx + 'px',
                     color: 'rgba(185,155,255,0.97)',

@@ -68,15 +68,12 @@ export function TypingMessage({ text, scrollRef, onComplete, isActive = true }: 
   const isActiveRef = useRef(isActive)
   const doneRef     = useRef(false)
 
-  function nextDelay(char: string, index: number): number {
-    if (char === '\n') return 90 + Math.random() * 60
-    if (char === '.') return 160 + Math.random() * 120
-    if (char === ',') return 90 + Math.random() * 70
-    if (char === ' ') return Math.random() < 0.18 ? 120 + Math.random() * 180 : 40 + Math.random() * 55
-    // Occasional hesitation — slightly more frequent near the start
-    const hesitateChance = index < 20 ? 0.10 : 0.05
-    const base = 38 + Math.random() * 42
-    return Math.random() < hesitateChance ? base + 160 + Math.random() * 200 : base
+  function nextDelay(char: string): number {
+    if (char === '\n') return 70
+    if (char === '.') return 110
+    if (char === ',') return 55
+    if (char === ' ') return 24
+    return 20
   }
 
   // Keep ref in sync without restarting the animation
@@ -91,13 +88,13 @@ export function TypingMessage({ text, scrollRef, onComplete, isActive = true }: 
         setCharCount(indexRef.current)
         if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight
         if (indexRef.current < cleanText.length) {
-          timerRef.current = setTimeout(tick, nextDelay(char, indexRef.current))
+          timerRef.current = setTimeout(tick, nextDelay(char))
         } else {
           doneRef.current = true
           onComplete()
         }
       }
-      timerRef.current = setTimeout(tick, 42)
+      timerRef.current = setTimeout(tick, 20)
     }
     return () => clearTimeout(timerRef.current)
   }, [isActive]) // eslint-disable-line react-hooks/exhaustive-deps
@@ -115,14 +112,14 @@ export function TypingMessage({ text, scrollRef, onComplete, isActive = true }: 
       setCharCount(indexRef.current)
       if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight
       if (indexRef.current < cleanText.length) {
-        timerRef.current = setTimeout(tick, nextDelay(char, indexRef.current))
+        timerRef.current = setTimeout(tick, nextDelay(char))
       } else {
         doneRef.current = true
         onComplete()
       }
     }
 
-    timerRef.current = setTimeout(tick, 42)
+    timerRef.current = setTimeout(tick, 20)
     return () => clearTimeout(timerRef.current)
   }, [text]) // eslint-disable-line react-hooks/exhaustive-deps
 

@@ -39,7 +39,7 @@ export function BookingModal({ isOpen, onClose, onConfirmed, onOpenMailbox, onAI
   const [selectedTimezone, setSelectedTimezone] = useState('')
   const [formData, setFormData] = useState<FormData | null>(null)
   const [confirmEmail, setConfirmEmail] = useState('')
-  const [isSubmitting] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
 
   useEffect(() => {
@@ -85,11 +85,12 @@ export function BookingModal({ isOpen, onClose, onConfirmed, onOpenMailbox, onAI
       return
     }
     lastSubmitTime = now
+    setIsSubmitting(true)
 
     const params = new URLSearchParams()
     Object.entries(formData).forEach(([k, v]) => params.append(k, v))
     params.set('email', confirmEmail)
-    params.set('fullPhone', formData.countryCode + formData.phone)
+    params.set('fullPhone', `${formData.countryCode} ${formData.phone}`)
     params.set('date', selectedDate.toISOString().split('T')[0])
     params.set('time', selectedTime)
     params.set('timezone', selectedTimezone)
@@ -97,6 +98,7 @@ export function BookingModal({ isOpen, onClose, onConfirmed, onOpenMailbox, onAI
 
     // Show "Booking Sent" immediately — don't wait for webhook
     setIsSuccess(true)
+    setIsSubmitting(false)
     onConfirmed?.()
 
     // Fetch webhook in background — may take 30-60 seconds
@@ -148,14 +150,23 @@ export function BookingModal({ isOpen, onClose, onConfirmed, onOpenMailbox, onAI
         style={{ maxHeight: '92vh' }}
       >
         <div
-          className="rounded-t-3xl md:rounded-2xl flex flex-col overflow-hidden"
+          className="gradient-border-auto rounded-t-3xl md:rounded-2xl flex flex-col overflow-hidden"
           style={{
             maxHeight: 'inherit',
-            background: 'rgba(10,7,18,0.82)',
-            border: '1px solid rgba(255,255,255,0.10)',
+            backgroundImage: `
+              linear-gradient(rgba(10,7,18,0.92), rgba(10,7,18,0.92)),
+              conic-gradient(
+                from var(--gradient-angle, 0deg),
+                #2e1065 0%, #7c3aed 25%, #c4b5fd 50%, #7c3aed 75%, #2e1065 100%
+              )
+            `,
+            backgroundClip: 'padding-box, border-box',
+            backgroundOrigin: 'padding-box, border-box',
+            border: '1.5px solid transparent',
+            '--animation-duration': '4s',
             backdropFilter: 'blur(48px)',
-            boxShadow: '0 32px 80px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,255,255,0.05) inset, inset 0 1px 0 rgba(255,255,255,0.12)',
-          }}
+            boxShadow: '0 32px 80px rgba(0,0,0,0.65), 0 0 40px rgba(109,40,217,0.12), inset 0 1px 0 rgba(255,255,255,0.08)',
+          } as React.CSSProperties}
         >
           {/* Ambient top glow */}
           <div className="absolute top-0 left-0 right-0 h-px rounded-full pointer-events-none"
@@ -185,7 +196,7 @@ export function BookingModal({ isOpen, onClose, onConfirmed, onOpenMailbox, onAI
                   className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-medium transition-all duration-400 shrink-0"
                   title={label}
                   style={i < currentStepIdx
-                    ? { background: 'rgba(109,40,217,0.25)', border: '1px solid rgba(139,92,246,0.55)', color: 'rgba(167,139,250,0.9)', boxShadow: '0 0 8px rgba(139,92,246,0.3)' }
+                    ? { background: 'rgba(52,211,153,0.12)', border: '1px solid rgba(52,211,153,0.45)', color: 'rgba(52,211,153,0.9)', boxShadow: '0 0 8px rgba(52,211,153,0.25)' }
                     : i === currentStepIdx
                     ? { background: 'rgba(139,92,246,0.12)', border: '1px solid rgba(139,92,246,0.50)', color: 'rgba(255,255,255,0.85)' }
                     : { background: 'transparent', border: '1px solid rgba(255,255,255,0.10)', color: 'rgba(255,255,255,0.22)' }
@@ -195,7 +206,7 @@ export function BookingModal({ isOpen, onClose, onConfirmed, onOpenMailbox, onAI
                 </div>
                 {i < stepLabels.length - 1 && (
                   <div className="flex-1 mx-2 h-px transition-all duration-400"
-                    style={{ background: i < currentStepIdx ? 'rgba(139,92,246,0.40)' : 'rgba(255,255,255,0.06)' }}
+                    style={{ background: i < currentStepIdx ? 'rgba(52,211,153,0.30)' : 'rgba(255,255,255,0.06)' }}
                   />
                 )}
               </div>

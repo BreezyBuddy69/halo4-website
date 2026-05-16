@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 const TAGLINE = 'Rolling out the red carpet.'
 const VIOLET = '#8B5CF6'
 
-// Linear smooth typewriter — consistent speed, no randomness
+// Human-like typewriter — variable speed, hesitation pauses between words
 function useHumanTypewriter(text: string, started: boolean) {
   const [displayed, setDisplayed] = useState('')
   const timerRef = useRef<ReturnType<typeof setTimeout>>(undefined)
@@ -21,15 +21,23 @@ function useHumanTypewriter(text: string, started: boolean) {
       setDisplayed(text.slice(0, i))
 
       let delay: number
-      if (char === '.') delay = 90
-      else if (char === ',') delay = 50
-      else if (char === ' ') delay = 28
-      else delay = 22
+      if (char === ' ') {
+        delay = Math.random() < 0.25 ? 126 + Math.random() * 154 : 42 + Math.random() * 56
+      } else if (char === '.') {
+        delay = 196 + Math.random() * 84
+      } else if (char === ',') {
+        delay = 98 + Math.random() * 56
+      } else {
+        const base = 38 + Math.random() * 38
+        delay = Math.random() < 0.08 ? base + 126 + Math.random() * 140 : base
+      }
+
+      if (i < 8 && Math.random() < 0.15) delay += 140 + Math.random() * 210
 
       timerRef.current = setTimeout(tick, delay)
     }
 
-    timerRef.current = setTimeout(tick, 120)
+    timerRef.current = setTimeout(tick, 200)
     return () => clearTimeout(timerRef.current)
   }, [started, text])
 
@@ -48,42 +56,22 @@ export function SplashGate({ onDone, onTitleReady }: SplashGateProps) {
   const [typewriterStarted, setTypewriterStarted] = useState(false)
   const [cursorVisible, setCursorVisible] = useState(true)
   const taglineDisplay = useHumanTypewriter(TAGLINE, typewriterStarted)
-  const timersRef = useRef<ReturnType<typeof setTimeout>[]>([])
-
-  const skip = useRef(() => {})
 
   useEffect(() => {
-    // Skip immediately if user prefers reduced motion
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      onTitleReady?.()
-      onDone()
-      return
-    }
-
-    const doSkip = () => {
-      timersRef.current.forEach(clearTimeout)
-      onTitleReady?.()
-      setCursorVisible(false)
-      setPhase('exit')
-      setTimeout(() => onDone(), 600)
-    }
-    skip.current = doSkip
-
+    // Start typewriter immediately
     const t1 = setTimeout(() => setTypewriterStarted(true), 80)
-    const t2 = setTimeout(() => setPhase('hold'), 1100)
-    const t3 = setTimeout(() => onTitleReady?.(), 1300)
-    const t4 = setTimeout(() => setCursorVisible(false), 1400)
-    const t5 = setTimeout(() => setPhase('exit'), 1600)
-    const t6 = setTimeout(() => onDone(), 2200)
-    timersRef.current = [t1, t2, t3, t4, t5, t6]
-    return () => timersRef.current.forEach(clearTimeout)
+    // Brief hold after typewriter finishes (~2.5s avg)
+    const t2 = setTimeout(() => setPhase('hold'), 3400)
+    // Signal background title to start animating (fires before gate disappears)
+    const t3 = setTimeout(() => onTitleReady?.(), 3600)
+    // Fade cursor out before exit
+    const t4 = setTimeout(() => setCursorVisible(false), 3700)
+    // Gate exits
+    const t5 = setTimeout(() => setPhase('exit'), 3900)
+    // Gate fully gone → introDone
+    const t6 = setTimeout(() => onDone(), 4500)
+    return () => [t1, t2, t3, t4, t5, t6].forEach(clearTimeout)
   }, [onDone, onTitleReady])
-
-  useEffect(() => {
-    const onKey = () => skip.current()
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [])
 
   return (
     <AnimatePresence>
@@ -93,8 +81,7 @@ export function SplashGate({ onDone, onTitleReady }: SplashGateProps) {
           initial={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
-          className="fixed inset-0 z-[300] flex flex-col items-center justify-center cursor-pointer"
-          onClick={() => skip.current()}
+          className="fixed inset-0 z-[300] flex flex-col items-center justify-center"
           style={{ background: '#0D0B1A' }}
         >
           {/* Ambient glow */}

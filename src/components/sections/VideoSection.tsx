@@ -182,9 +182,9 @@ export function VideoSection({ isActive, language }: VideoSectionProps) {
         </span>
       </div>
 
-      {/* Sound indicator top-right */}
+      {/* Sound indicator top-right — desktop only (cursor button replaces it on desktop, but we still keep it) */}
       <motion.div
-        className="absolute top-24 right-8 md:right-16"
+        className="absolute top-24 right-8 md:right-16 hidden md:block"
         initial={{ opacity: 0 }}
         animate={isActive ? { opacity: 1 } : { opacity: 0 }}
         transition={{ delay: 0.5 }}
@@ -195,6 +195,36 @@ export function VideoSection({ isActive, language }: VideoSectionProps) {
             {isMuted ? 'ZUM ENTSTUMMEN KLICKEN' : 'TON AN'}
           </span>
         </div>
+      </motion.div>
+
+      {/* Mobile tap-to-unmute button */}
+      <motion.div
+        className="absolute bottom-10 left-1/2 -translate-x-1/2 md:hidden"
+        initial={{ opacity: 0, y: 12 }}
+        animate={isActive ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }}
+        transition={{ delay: 0.8, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+      >
+        <motion.div
+          animate={{ scale: [1, 1.04, 1] }}
+          transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
+        >
+          <button
+            onClick={handleClick}
+            className="pointer-events-auto flex items-center gap-3 rounded-full px-6 py-3"
+            style={{
+              background: 'rgba(255,255,255,0.10)',
+              border: `1px solid ${isMuted ? 'rgba(255,255,255,0.35)' : 'rgba(255,255,255,0.55)'}`,
+              backdropFilter: 'blur(16px)',
+              WebkitBackdropFilter: 'blur(16px)',
+              boxShadow: '0 4px 24px rgba(0,0,0,0.45)',
+            }}
+          >
+            <span style={{ fontSize: 18 }}>{isMuted ? '🔇' : '🔊'}</span>
+            <span className="text-white/90 text-xs tracking-widest uppercase font-medium">
+              {isMuted ? (language === 'de' ? 'Ton an' : 'Unmute') : (language === 'de' ? 'Stumm' : 'Mute')}
+            </span>
+          </button>
+        </motion.div>
       </motion.div>
     </div>
   )
