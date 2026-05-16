@@ -90,7 +90,7 @@ export function BookingModal({ isOpen, onClose, onConfirmed, onOpenMailbox, onAI
     const params = new URLSearchParams()
     Object.entries(formData).forEach(([k, v]) => params.append(k, v))
     params.set('email', confirmEmail)
-    params.set('fullPhone', `${formData.countryCode} ${formData.phone}`)
+    params.set('fullPhone', `${formData.countryCode}${formData.phone}`)
     params.set('date', selectedDate.toISOString().split('T')[0])
     params.set('time', selectedTime)
     params.set('timezone', selectedTimezone)
