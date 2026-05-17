@@ -53,7 +53,7 @@ function AppInner() {
   const [isBookingOpen, setIsBookingOpen] = useState(false)
   const [chatContext, setChatContext] = useState('')
   const [language, setLanguage] = useState<Language>(detectLanguage)
-  const [introDone] = useState(true)
+  const [introDone, setIntroDone] = useState(true)
   const [titleReady] = useState(true)
   const [uiVisible, setUiVisible] = useState(true)
   const [mailMessages, setMailMessages] = useState<MailMessage[]>([])
