@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { SectionReveal } from '../ui/SectionReveal'
 import { AnimatedBg } from '../ui/AnimatedBg'
 import { CheckCircle } from 'lucide-react'
@@ -10,6 +10,7 @@ import { useEffect, useState, useRef } from 'react'
 interface AboutSectionProps {
   language: Language
   isActive: boolean
+  onBooking: () => void
 }
 
 const content = {
@@ -137,15 +138,21 @@ function TypewriterRow({
   )
 }
 
-export function AboutSection({ language, isActive }: AboutSectionProps) {
+const bookingLabel = { en: 'Book a Call', de: 'Jetzt Buchen', fr: 'Réserver' }
+
+export function AboutSection({ language, isActive, onBooking }: AboutSectionProps) {
   const c = content[language]
   const [currentRow, setCurrentRow] = useState(-1)
+  const [showBookingBtn, setShowBookingBtn] = useState(false)
 
   useEffect(() => {
     if (isActive) {
       setCurrentRow(0)
+      const timer = setTimeout(() => setShowBookingBtn(true), 50000)
+      return () => clearTimeout(timer)
     } else {
       setCurrentRow(-1)
+      setShowBookingBtn(false)
     }
   }, [isActive])
 
@@ -273,6 +280,48 @@ export function AboutSection({ language, isActive }: AboutSectionProps) {
           </motion.div>
 
         </div>
+
+        {/* Delayed booking CTA — appears after 50 seconds of reading */}
+        <AnimatePresence>
+          {showBookingBtn && (
+            <motion.div
+              initial={{ opacity: 0, y: 32, scale: 0.92 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 20, scale: 0.94 }}
+              transition={{ type: 'spring', damping: 18, stiffness: 200 }}
+              className="absolute bottom-10 left-1/2 -translate-x-1/2 z-30 flex flex-col items-center gap-2"
+            >
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.3 }}
+                className="text-white/40 text-[10px] tracking-[0.22em] uppercase"
+              >
+                {language === 'de' ? 'Bereit loszulegen?' : language === 'fr' ? 'Prêt à commencer ?' : 'Ready to get started?'}
+              </motion.p>
+              <button
+                onClick={onBooking}
+                className="group relative px-8 py-3 rounded-full text-sm font-medium tracking-wider overflow-hidden"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(160,100,255,0.18) 0%, rgba(100,60,220,0.14) 100%)',
+                  border: '1px solid rgba(180,130,255,0.40)',
+                  boxShadow: '0 0 32px rgba(140,80,255,0.22), 0 0 64px rgba(140,80,255,0.10), inset 0 1px 0 rgba(220,180,255,0.14)',
+                  color: 'rgba(230,205,255,0.92)',
+                  backdropFilter: 'blur(16px)',
+                }}
+              >
+                {/* Animated glow sweep */}
+                <motion.span
+                  className="absolute inset-0 rounded-full pointer-events-none"
+                  animate={{ opacity: [0, 0.18, 0] }}
+                  transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
+                  style={{ background: 'radial-gradient(ellipse 60% 50% at 50% 50%, rgba(180,130,255,0.5), transparent)' }}
+                />
+                <span className="relative z-10">{bookingLabel[language]}</span>
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </SectionReveal>
   )

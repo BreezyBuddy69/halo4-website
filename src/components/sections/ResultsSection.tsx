@@ -130,7 +130,7 @@ export function ResultsSection({ language, isActive }: ResultsSectionProps) {
             </motion.h2>
 
             <div className="flex flex-col gap-5">
-              {tr.testimonials.slice(0, 4).map((review, i) => {
+              {tr.testimonials.slice(0, 3).map((review, i) => {
                 const accentPalette = [
                   { border: 'rgba(120,140,255,0.28)', glow: 'rgba(100,120,255,0.06)', avatar: 'linear-gradient(135deg, rgba(100,120,255,0.30) 0%, rgba(80,100,220,0.18) 100%)', avatarBorder: 'rgba(120,140,255,0.30)', starColor: 'rgba(180,195,255,0.90)' },
                   { border: 'rgba(190,110,255,0.26)', glow: 'rgba(170,90,255,0.06)', avatar: 'linear-gradient(135deg, rgba(180,100,255,0.28) 0%, rgba(140,70,220,0.16) 100%)', avatarBorder: 'rgba(190,110,255,0.28)', starColor: 'rgba(210,160,255,0.90)' },

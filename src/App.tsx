@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
-import { AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { Header } from './components/layout/Header'
 import { SideNav } from './components/layout/SideNav'
 import { SectionStack } from './components/layout/SectionStack'
@@ -9,7 +9,6 @@ import { WorkSection } from './components/sections/WorkSection'
 import { ResultsSection } from './components/sections/ResultsSection'
 import { AboutSection } from './components/sections/AboutSection'
 import { BookSection } from './components/sections/BookSection'
-import { SplashGate } from './components/ui/SplashGate'
 import { ChatBot } from './components/chat/ChatBot'
 import { BookingModal } from './components/booking/BookingModal'
 import { useSectionScroll } from './hooks/useSectionScroll'
@@ -22,20 +21,14 @@ import type { Language } from './utils/translations'
 import { GradientBackground } from './components/ui/paper-design-shader-background'
 
 const SECTION_COLORS = [
-  ['hsl(258, 60%, 40%)', 'hsl(278, 55%, 35%)', 'hsl(220, 50%, 35%)'], // 0: Hero
+  ['hsl(258, 40%, 6%)', 'hsl(278, 35%, 5%)', 'hsl(220, 30%, 6%)'], // 0: Hero — very dark, no edge bleed
   ['hsl(240, 60%, 35%)', 'hsl(260, 55%, 30%)', 'hsl(220, 50%, 30%)'], // 1: Video
   ['hsl(228, 72%, 52%)', 'hsl(255, 68%, 48%)', 'hsl(210, 62%, 46%)'], // 2: Results
-  ['hsl(243, 68%, 50%)', 'hsl(263, 63%, 46%)', 'hsl(223, 58%, 46%)'], // 3: Work
-  ['hsl(268, 68%, 52%)', 'hsl(283, 62%, 47%)', 'hsl(250, 58%, 50%)'], // 4: About
-  ['hsl(270, 72%, 48%)', 'hsl(255, 70%, 44%)', 'hsl(285, 65%, 44%)'], // 5: Book
+  ['hsl(270, 72%, 48%)', 'hsl(255, 70%, 44%)', 'hsl(285, 65%, 44%)'], // 3: Book
+  ['hsl(243, 68%, 50%)', 'hsl(263, 63%, 46%)', 'hsl(223, 58%, 46%)'], // 4: Work
+  ['hsl(268, 68%, 52%)', 'hsl(283, 62%, 47%)', 'hsl(250, 58%, 50%)'], // 5: About
 ]
 
-function getSplashSeen() {
-  try { return sessionStorage.getItem('splash_seen') === '1' } catch { return false }
-}
-function setSplashSeen() {
-  try { sessionStorage.setItem('splash_seen', '1') } catch { /* */ }
-}
 
 const TOTAL_SECTIONS = 6
 
@@ -56,26 +49,17 @@ function detectLanguage(): Language {
 
 function AppInner() {
   const tier = usePerformanceTier()
-  const [splashDone, setSplashDone] = useState(getSplashSeen)
   const [currentSection, setCurrentSection] = useState(0)
   const [isBookingOpen, setIsBookingOpen] = useState(false)
   const [chatContext, setChatContext] = useState('')
   const [language, setLanguage] = useState<Language>(detectLanguage)
-  const [introDone, setIntroDone] = useState(getSplashSeen)
-  const [titleReady, setTitleReady] = useState(getSplashSeen)
+  const [introDone] = useState(true)
+  const [titleReady] = useState(true)
+  const [uiVisible, setUiVisible] = useState(true)
   const [mailMessages, setMailMessages] = useState<MailMessage[]>([])
   const [mailboxOpen, setMailboxOpen] = useState(false)
   const heroInputRef = useRef<HTMLTextAreaElement>(null)
 
-  const handleSplashDone = useCallback(() => {
-    setSplashDone(true)
-    setSplashSeen()
-    setIntroDone(true)
-  }, [])
-
-  const handleTitleReady = useCallback(() => {
-    setTitleReady(true)
-  }, [])
 
   const isMobile = useMediaQuery('(max-width: 767px)')
 
@@ -155,11 +139,17 @@ function AppInner() {
         onBooking={() => setIsBookingOpen(true)}
       />
 
-      <SideNav
-        currentSection={currentSection}
-        onNavigate={handleNavigate}
-        language={language}
-      />
+      <motion.div
+        animate={{ opacity: uiVisible ? 1 : 0, x: uiVisible ? 0 : -14 }}
+        transition={{ duration: 0.75, ease: [0.16, 1, 0.3, 1] }}
+        style={{ pointerEvents: uiVisible ? 'auto' : 'none' }}
+      >
+        <SideNav
+          currentSection={currentSection}
+          onNavigate={handleNavigate}
+          language={language}
+        />
+      </motion.div>
 
       <SectionStack currentSection={currentSection} onSectionChange={handleNavigate}>
         {[
@@ -174,6 +164,7 @@ function AppInner() {
             introDone={introDone}
             titleReady={titleReady}
             onScrollToVideo={() => handleNavigate(1)}
+            onUIReady={() => setUiVisible(true)}
           />,
           <VideoSection
             key="video"
@@ -185,19 +176,20 @@ function AppInner() {
             language={language}
             isActive={currentSection === 2}
           />,
+          <BookSection
+            key="book"
+            language={language}
+            isActive={currentSection === 3}
+            onBooking={() => setIsBookingOpen(true)}
+          />,
           <WorkSection
             key="work"
             language={language}
-            isActive={currentSection === 3}
+            isActive={currentSection === 4}
             onAskAI={setChatContext}
           />,
           <AboutSection
             key="about"
-            language={language}
-            isActive={currentSection === 4}
-          />,
-          <BookSection
-            key="book"
             language={language}
             isActive={currentSection === 5}
             onBooking={() => setIsBookingOpen(true)}
@@ -227,10 +219,6 @@ function AppInner() {
   return (
     <PerformanceProvider tier={tier}>
       <div className="relative w-screen h-screen overflow-hidden" style={{ background: '#0D0B1A' }}>
-        <AnimatePresence>
-          {!splashDone && <SplashGate key="splash" onDone={handleSplashDone} onTitleReady={handleTitleReady} />}
-        </AnimatePresence>
-
         {appContent}
       </div>
     </PerformanceProvider>

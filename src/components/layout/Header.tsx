@@ -53,10 +53,10 @@ export function Header({
   const [cityIdx, setCityIdx] = useState(0)
   const [cityTime, setCityTime] = useState('')
   const [langHover, setLangHover] = useState(false)
-  const [mailHover, setMailHover] = useState(false)
+
   const [menuOpen, setMenuOpen] = useState(false)
   const langTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined)
-  const mailTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined)
+
 
   const tr = t(language)
   const navLabels = [tr.navHome, tr.navVideo, tr.navResults, tr.navWork, tr.navAbout, tr.navBook]
@@ -92,8 +92,7 @@ export function Header({
 
   const handleLangEnter = () => { clearTimeout(langTimerRef.current); setLangHover(true) }
   const handleLangLeave = () => { langTimerRef.current = setTimeout(() => setLangHover(false), 180) }
-  const handleMailEnter = () => { clearTimeout(mailTimerRef.current); setMailHover(true) }
-  const handleMailLeave = () => { mailTimerRef.current = setTimeout(() => setMailHover(false), 180) }
+
 
   return (
     <>
@@ -159,7 +158,7 @@ export function Header({
         <div className="absolute left-1/2 -translate-x-1/2">
           <ScrambleText
             text="HALOVISION AI"
-            className="font-anurati text-white text-sm tracking-[0.3em] select-none"
+            className="font-anurati text-white text-sm tracking-[0.3em] select-none cursor-default"
           />
         </div>
 
@@ -191,36 +190,20 @@ export function Header({
           </div>
 
           {/* Get in contact — expands left from icon */}
-          <motion.button
-           
-            className="rounded-full flex items-center justify-center overflow-hidden cursor-pointer"
-            style={PILL_STYLE}
-            animate={{
-              paddingLeft: mailHover ? 14 : 8,
-              paddingRight: mailHover ? 14 : 8,
-              paddingTop: 8,
-              paddingBottom: 8,
-            }}
-            transition={{ duration: 0.8, ease: [0.25, 1, 0.25, 1] }}
-            onMouseEnter={handleMailEnter}
-            onMouseLeave={handleMailLeave}
+          <button
             onClick={() => onBooking?.()}
+            className="rounded-full flex items-center gap-2 px-4 py-2 cursor-pointer transition-opacity duration-200 hover:opacity-80"
+            style={{
+              background: 'rgba(139,92,246,0.85)',
+              border: '1px solid rgba(167,139,250,0.55)',
+              boxShadow: '0 0 18px rgba(139,92,246,0.35), inset 0 1px 0 rgba(255,255,255,0.18)',
+            }}
           >
-            <Mail className="w-3.5 h-3.5 text-white/55 shrink-0" />
-            <AnimatePresence>
-              {mailHover && (
-                <motion.span
-                  className="text-[11px] font-medium text-white/75 tracking-wide whitespace-nowrap overflow-hidden"
-                  initial={{ opacity: 0, maxWidth: 0, marginLeft: 0 }}
-                  animate={{ opacity: 1, maxWidth: 160, marginLeft: 8 }}
-                  exit={{ opacity: 0, maxWidth: 0, marginLeft: 0 }}
-                  transition={{ duration: 0.7, ease: [0.25, 1, 0.25, 1] }}
-                >
-                  {GET_IN_CONTACT[language]}
-                </motion.span>
-              )}
-            </AnimatePresence>
-          </motion.button>
+            <Mail className="w-3 h-3 text-white/90 shrink-0" />
+            <span className="text-[11px] font-semibold text-white tracking-wide whitespace-nowrap">
+              {GET_IN_CONTACT[language]}
+            </span>
+          </button>
         </div>
       </header>
 
@@ -243,7 +226,7 @@ export function Header({
               <div />
               <ScrambleText
                 text="HALOVISION AI"
-                className="font-anurati text-white text-sm tracking-[0.3em] select-none"
+                className="font-anurati text-white text-sm tracking-[0.3em] select-none cursor-default"
               />
               <button
                 onClick={() => setMenuOpen(false)}

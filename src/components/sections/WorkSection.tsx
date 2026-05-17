@@ -65,7 +65,7 @@ export function WorkSection({ language, isActive, onAskAI }: WorkSectionProps) {
       if (ti >= titleLen) {
         clearInterval(titleInterval)
 
-        // 2. Pause after title, then start typing description
+        // 2. Short pause then type description
         const t1 = setTimeout(() => {
           let di = 0
           const descInterval = setInterval(() => {
@@ -74,16 +74,16 @@ export function WorkSection({ language, isActive, onAskAI }: WorkSectionProps) {
             if (di >= descLen) {
               clearInterval(descInterval)
 
-              // 3. Reading pause after desc is fully typed, then settle
-              const t2 = setTimeout(() => setPhase('settled'), 2200)
+              // 3. Quick reading pause, then settle
+              const t2 = setTimeout(() => setPhase('settled'), 800)
               timers.push(t2)
             }
-          }, 22)
+          }, 12)
           intervals.push(descInterval)
-        }, 480)
+        }, 200)
         timers.push(t1)
       }
-    }, 55)
+    }, 22)
     intervals.push(titleInterval)
 
     return () => {

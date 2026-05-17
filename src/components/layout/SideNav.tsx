@@ -11,7 +11,7 @@ interface SideNavProps {
 
 export function SideNav({ currentSection, onNavigate, language }: SideNavProps) {
   const tr = t(language)
-  const labels = [tr.navHome, tr.navVideo, tr.navResults, tr.navWork, tr.navAbout, tr.navBook]
+  const labels = [tr.navHome, tr.navVideo, tr.navResults, tr.navBook, tr.navWork, tr.navAbout]
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null)
 
   return (
@@ -80,7 +80,7 @@ export function SideNav({ currentSection, onNavigate, language }: SideNavProps) 
                   exit={{ opacity: 0, width: 0 }}
                   className="text-[9px] text-white/35 whitespace-nowrap overflow-hidden relative z-10"
                 >
-                  {i === 0 ? 'Brand' : i === 1 ? 'Intro' : i === 2 ? 'ROI' : i === 3 ? 'Solutions' : i === 4 ? 'About' : 'Book'}
+                  {i === 0 ? 'Brand' : i === 1 ? 'Intro' : i === 2 ? 'ROI' : i === 3 ? 'Book' : i === 4 ? 'Solutions' : 'About'}
                 </motion.span>
               )}
             </AnimatePresence>

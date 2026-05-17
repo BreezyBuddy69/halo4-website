@@ -91,7 +91,8 @@ export function SectionStack({ currentSection, children, onSectionChange }: Sect
   useEffect(() => {
     setShowHint(false)
     if (isLastSection) return
-    const t = setTimeout(() => setShowHint(true), 3500)
+    const delay = currentSection === 0 ? 14000 : 3500
+    const t = setTimeout(() => setShowHint(true), delay)
     return () => clearTimeout(t)
   }, [currentSection, isLastSection])
 
