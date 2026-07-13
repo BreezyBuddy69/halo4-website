@@ -34,14 +34,6 @@ function CountUp({ target, suffix = '', duration = 1800 }: { target: number; suf
 export function ResultsSection({ language, isActive }: ResultsSectionProps) {
   const tr = t(language)
 
-  const testimonialLinks = [
-    'https://www.linkedin.com',
-    'https://www.instagram.com',
-    'https://twitter.com',
-    'https://www.facebook.com',
-    'https://teams.microsoft.com',
-  ]
-
   const stats = [
     { value: 20, suffix: '+', label: tr.statHrs },
     { value: 24, suffix: '/7', label: tr.statAvailability },
@@ -118,7 +110,7 @@ export function ResultsSection({ language, isActive }: ResultsSectionProps) {
           {/* Divider */}
           <div className="hidden md:block w-px self-stretch shrink-0" style={{ background: 'linear-gradient(to bottom, transparent, rgba(255,255,255,0.08) 20%, rgba(255,255,255,0.08) 80%, transparent)' }} />
 
-          {/* Right: testimonials — capped width */}
+          {/* Right: case studies — capped width */}
           <div className="flex flex-col justify-center gap-4 flex-1 min-w-0 max-w-[560px] md:pl-8 lg:pl-12">
             <motion.h2
               initial={{ opacity: 0, y: 16 }}
@@ -126,17 +118,15 @@ export function ResultsSection({ language, isActive }: ResultsSectionProps) {
               transition={{ delay: 0.25, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
               className="text-xl md:text-2xl font-serif text-white mb-1"
             >
-              {tr.testimonialsTitle}.
+              {tr.caseStudiesTitle}.
             </motion.h2>
 
             <div className="flex flex-col gap-5">
-              {tr.testimonials.slice(0, 3).map((review, i) => {
+              {tr.caseStudies.map((cs, i) => {
                 const accentPalette = [
-                  { border: 'rgba(120,140,255,0.28)', glow: 'rgba(100,120,255,0.06)', avatar: 'linear-gradient(135deg, rgba(100,120,255,0.30) 0%, rgba(80,100,220,0.18) 100%)', avatarBorder: 'rgba(120,140,255,0.30)', starColor: 'rgba(180,195,255,0.90)' },
-                  { border: 'rgba(190,110,255,0.26)', glow: 'rgba(170,90,255,0.06)', avatar: 'linear-gradient(135deg, rgba(180,100,255,0.28) 0%, rgba(140,70,220,0.16) 100%)', avatarBorder: 'rgba(190,110,255,0.28)', starColor: 'rgba(210,160,255,0.90)' },
-                  { border: 'rgba(52,211,153,0.24)', glow: 'rgba(52,211,153,0.05)', avatar: 'linear-gradient(135deg, rgba(52,211,153,0.24) 0%, rgba(32,180,130,0.14) 100%)', avatarBorder: 'rgba(52,211,153,0.26)', starColor: 'rgba(100,230,170,0.90)' },
-                  { border: 'rgba(139,92,246,0.24)', glow: 'rgba(109,40,217,0.05)', avatar: 'linear-gradient(135deg, rgba(139,92,246,0.24) 0%, rgba(109,40,217,0.14) 100%)', avatarBorder: 'rgba(139,92,246,0.26)', starColor: 'rgba(167,139,250,0.90)' },
-                  { border: 'rgba(196,181,253,0.26)', glow: 'rgba(167,139,250,0.05)', avatar: 'linear-gradient(135deg, rgba(196,181,253,0.26) 0%, rgba(167,139,250,0.14) 100%)', avatarBorder: 'rgba(196,181,253,0.28)', starColor: 'rgba(221,214,254,0.90)' },
+                  { border: 'rgba(120,140,255,0.28)', glow: 'rgba(100,120,255,0.06)', accentColor: 'rgba(180,195,255,0.90)' },
+                  { border: 'rgba(190,110,255,0.26)', glow: 'rgba(170,90,255,0.06)', accentColor: 'rgba(210,160,255,0.90)' },
+                  { border: 'rgba(52,211,153,0.24)', glow: 'rgba(52,211,153,0.05)', accentColor: 'rgba(100,230,170,0.90)' },
                 ]
                 const accent = accentPalette[i % accentPalette.length]
                 return (
@@ -147,10 +137,9 @@ export function ResultsSection({ language, isActive }: ResultsSectionProps) {
                     transition={{ delay: 0.4 + i * 0.08, duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
                   >
                     <a
-                      href={testimonialLinks[i % testimonialLinks.length]}
+                      href={cs.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                     
                       className="block group"
                     >
                       <div
@@ -173,37 +162,27 @@ export function ResultsSection({ language, isActive }: ResultsSectionProps) {
                         }}
                       >
                         {/* Corner dots */}
-                        <div className="absolute -left-1.5 -top-1.5 h-3 w-3 z-30" style={{ background: accent.starColor, opacity: 0.75 }} />
-                        <div className="absolute -bottom-1.5 -left-1.5 h-3 w-3 z-30" style={{ background: accent.starColor, opacity: 0.75 }} />
-                        <div className="absolute -right-1.5 -top-1.5 h-3 w-3 z-30" style={{ background: accent.starColor, opacity: 0.75 }} />
-                        <div className="absolute -bottom-1.5 -right-1.5 h-3 w-3 z-30" style={{ background: accent.starColor, opacity: 0.75 }} />
-                        {/* Star rating */}
-                        <div className="flex items-center gap-0.5">
-                          {[...Array(5)].map((_, s) => (
-                            <svg key={s} width="9" height="9" viewBox="0 0 10 10" fill="none">
-                              <path d="M5 1l1.12 2.27 2.5.36-1.81 1.76.43 2.49L5 6.77 2.76 7.88l.43-2.49L1.38 3.63l2.5-.36L5 1z"
-                                fill={accent.starColor} />
-                            </svg>
-                          ))}
+                        <div className="absolute -left-1.5 -top-1.5 h-3 w-3 z-30" style={{ background: accent.accentColor, opacity: 0.75 }} />
+                        <div className="absolute -bottom-1.5 -left-1.5 h-3 w-3 z-30" style={{ background: accent.accentColor, opacity: 0.75 }} />
+                        <div className="absolute -right-1.5 -top-1.5 h-3 w-3 z-30" style={{ background: accent.accentColor, opacity: 0.75 }} />
+                        <div className="absolute -bottom-1.5 -right-1.5 h-3 w-3 z-30" style={{ background: accent.accentColor, opacity: 0.75 }} />
+                        {/* Tag */}
+                        <div className="flex items-center gap-1.5">
+                          <span className="w-1 h-1 rounded-full shrink-0" style={{ background: accent.accentColor }} />
+                          <span className="text-[9px] tracking-[0.18em] uppercase font-medium" style={{ color: accent.accentColor }}>
+                            {cs.tag}
+                          </span>
                         </div>
 
-                        <p className="text-white/58 max-md:text-white/82 text-xs leading-relaxed line-clamp-3">"{review.review}"</p>
+                        <div className="flex flex-col gap-1">
+                          <p className="text-white/85 max-md:text-white/92 text-sm font-medium">{cs.title}</p>
+                          <p className="text-white/58 max-md:text-white/82 text-xs leading-relaxed line-clamp-3">{cs.description}</p>
+                        </div>
 
                         <div className="flex items-center justify-between gap-2">
-                          <div className="flex items-center gap-2 min-w-0">
-                            <div
-                              className="w-6 h-6 rounded-full flex items-center justify-center shrink-0 text-[9px] text-white/80 font-semibold"
-                              style={{ background: accent.avatar, border: `1px solid ${accent.avatarBorder}` }}
-                            >
-                              {review.name[0].toUpperCase()}
-                            </div>
-                            <div className="min-w-0">
-                              <p className="text-white/65 max-md:text-white/88 text-[11px] font-medium truncate">{review.name}</p>
-                              <p className="text-white/30 max-md:text-white/55 text-[10px] truncate">{review.role}</p>
-                            </div>
-                          </div>
+                          <span className="text-white/30 max-md:text-white/55 text-[10px] truncate">{cs.domain}</span>
                           <span className="text-white/18 text-[9px] tracking-wider whitespace-nowrap group-hover:text-white/48 transition-colors shrink-0">
-                            ↗
+                            {tr.viewCaseStudy} ↗
                           </span>
                         </div>
                       </div>

@@ -90,10 +90,9 @@ export interface Translations {
   nodeR6Title: string; nodeR6Desc: string
   node24Title: string; node24Desc: string
   // Results
-  testimonialsTitle: string
-  testimonialsOpen: string
-  goToReview: string
-  testimonials: { name: string; role: string; review: string }[]
+  caseStudiesTitle: string
+  viewCaseStudy: string
+  caseStudies: { tag: string; title: string; description: string; domain: string; url: string }[]
   whyUsTitle: string
   reasons: string[]
   reasonsDesc: string[]
@@ -275,15 +274,12 @@ const en: Translations = {
   nodeR6Desc: 'Manual mistakes in data entry cost businesses thousands every year. Automation catches errors before they cause any damage.',
   node24Title: 'Measurable ROI',
   node24Desc: 'Every system we build is tied to clear KPIs. You see the return on investment in the first month of operation — not a quarter later.',
-  testimonialsTitle: 'What People Say',
-  testimonialsOpen: 'Open',
-  goToReview: 'Go to Review',
-  testimonials: [
-    { name: '@sarah_tech',  role: 'CEO, TechStart',      review: 'HaloVision transformed our customer service with their AI agents. Response times dropped by 80% and satisfaction is at an all-time high.' },
-    { name: '@mike_growth', role: 'Founder, GrowthLab',  review: 'The automation solutions they built for us freed up our team to focus on strategic work. ROI was evident within the first month.' },
-    { name: '@emma_sales',  role: 'Director, SalesForce', review: 'Their lead generation AI is incredible. We\'re now capturing and qualifying leads 24/7 without effort. Conversion is way up.' },
-    { name: '@david_cloud', role: 'Manager, CloudSync',   review: 'Working with HaloVision was seamless. They delivered a custom solution that exceeded expectations. Highly responsive team.' },
-    { name: '@lisa_ops',    role: 'COO, ScaleUp',         review: 'The workflow automation cut our manual processing by 70%. The team was professional, fast, and incredibly responsive throughout.' },
+  caseStudiesTitle: 'Proof, Not Promises',
+  viewCaseStudy: 'View live',
+  caseStudies: [
+    { tag: 'AI Automation', title: 'Sable — AI Desktop Agent', description: 'An AI agent that sees your screen and runs it for you — clicks, typing, full workflows, with approval before every action.', domain: 'halovisionai.cloud/sidequest', url: 'https://halovisionai.cloud/sidequest' },
+    { tag: 'Website & Booking', title: 'Seelenhafen', description: 'A full branded site for a funeral & life-celebration planning service — designed, built, and live.', domain: 'halovisionai.cloud/seelenhafen', url: 'https://halovisionai.cloud/seelenhafen/' },
+    { tag: 'Product Launch', title: 'Hydron One', description: 'A product landing page for a hydrogen-inhalation device — positioning, pricing, and a live pre-launch waitlist.', domain: 'halovisionai.cloud/hydron', url: 'https://halovisionai.cloud/hydron' },
   ],
   whyUsTitle: 'Why Work With Us',
   reasons: [
@@ -473,9 +469,13 @@ const de: Translations = {
   nodeR6Desc: 'Fehler bei der manuellen Dateneingabe kosten Unternehmen jährlich Tausende. Automatisierung erkennt Fehler, bevor sie Schaden anrichten.',
   node24Title: 'Messbarer ROI',
   node24Desc: 'Jedes System, das wir bauen, wird an klaren KPIs gemessen. Sie sehen den Return on Investment bereits im ersten Monat — nicht erst ein Quartal später.',
-  testimonialsTitle: 'Was andere sagen',
-  testimonialsOpen: 'Öffnen',
-  goToReview: 'Zur Bewertung',
+  caseStudiesTitle: 'Beweise statt Versprechen',
+  viewCaseStudy: 'Live ansehen',
+  caseStudies: [
+    { tag: 'KI-Automatisierung', title: 'Sable — KI-Desktop-Agent', description: 'Ein KI-Agent, der Ihren Bildschirm sieht und den PC für Sie bedient — Klicks, Eingaben, ganze Workflows, mit Bestätigung vor jeder Aktion.', domain: 'halovisionai.cloud/sidequest', url: 'https://halovisionai.cloud/sidequest' },
+    { tag: 'Website & Buchung', title: 'Seelenhafen', description: 'Eine komplette, live geschaltete Website für einen Bestattungs- und Abschiedsfeier-Dienst — konzipiert, gebaut, im Einsatz.', domain: 'halovisionai.cloud/seelenhafen', url: 'https://halovisionai.cloud/seelenhafen/' },
+    { tag: 'Produkt-Launch', title: 'Hydron One', description: 'Eine Produktseite für ein Wasserstoff-Inhalationsgerät — Positionierung, Preise und eine aktive Warteliste vor dem Launch.', domain: 'halovisionai.cloud/hydron', url: 'https://halovisionai.cloud/hydron' },
+  ],
   whyUsTitle: 'Warum wir?',
   reasons: [
     'Experten für KI & Automatisierung',
@@ -664,9 +664,13 @@ const fr: Translations = {
   nodeR6Desc: "Les erreurs manuelles de saisie coûtent des milliers aux entreprises chaque année. L'automatisation détecte les erreurs avant qu'elles ne causent des dommages.",
   node24Title: 'ROI mesurable',
   node24Desc: "Chaque système que nous construisons est mesuré selon des KPIs clairs. Vous voyez le retour sur investissement dès le premier mois — pas un trimestre plus tard.",
-  testimonialsTitle: "Ce qu'ils disent",
-  testimonialsOpen: 'Ouvrir',
-  goToReview: "Voir l'avis",
+  caseStudiesTitle: 'Des preuves, pas des promesses',
+  viewCaseStudy: 'Voir en ligne',
+  caseStudies: [
+    { tag: 'Automatisation IA', title: 'Sable — Agent IA de bureau', description: 'Un agent IA qui voit votre écran et pilote votre PC à votre place — clics, saisies, workflows complets, validation avant chaque action.', domain: 'halovisionai.cloud/sidequest', url: 'https://halovisionai.cloud/sidequest' },
+    { tag: 'Site & Réservation', title: 'Seelenhafen', description: 'Un site complet pour un service de planification de funérailles et de célébrations de vie — conçu, développé et en ligne.', domain: 'halovisionai.cloud/seelenhafen', url: 'https://halovisionai.cloud/seelenhafen/' },
+    { tag: 'Lancement produit', title: 'Hydron One', description: "Une page produit pour un appareil d'inhalation d'hydrogène — positionnement, tarifs et liste d'attente active avant lancement.", domain: 'halovisionai.cloud/hydron', url: 'https://halovisionai.cloud/hydron' },
+  ],
   whyUsTitle: 'Pourquoi nous ?',
   reasons: [
     'Experts en IA & Automatisation',
