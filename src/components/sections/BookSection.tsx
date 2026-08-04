@@ -27,12 +27,12 @@ export function BookSection({ language, isActive, onBooking }: BookSectionProps)
   const [showText, setShowText] = useState(false)
   const [showButton, setShowButton] = useState(false)
 
-  // Steps start at 1.1s, each 420ms apart → last step lights at ~1.1 + 3×0.42 = 2.36s
-  // Text appears ~0.5s after last step, button 0.6s after text
-  const STEP_BASE = 1100
-  const STEP_GAP = 420
-  const TEXT_DELAY = STEP_BASE + (steps.length - 1) * STEP_GAP + 600
-  const BUTTON_DELAY = TEXT_DELAY + 550
+  // The step chain is decoration — the CTA must not wait for it to finish.
+  // Steps still light up in sequence, but text and button land inside the first second.
+  const STEP_BASE = 400
+  const STEP_GAP = 260
+  const TEXT_DELAY = 600
+  const BUTTON_DELAY = 900
 
   useEffect(() => {
     if (!isActive) {

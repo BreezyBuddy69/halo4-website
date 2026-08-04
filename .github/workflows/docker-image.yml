@@ -15,4 +15,10 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+      # Placeholder build-args: this job only checks that the image builds.
+      # The real values are injected from repo secrets in docker-publish.yml.
+      run: |
+        docker build . --file Dockerfile \
+          --build-arg VITE_BOOKING_URL=https://example.invalid/webhook/booking \
+          --build-arg VITE_CHATBOT_URL=https://example.invalid/webhook/chat \
+          --tag my-image-name:$(date +%s)

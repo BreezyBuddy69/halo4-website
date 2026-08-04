@@ -58,6 +58,10 @@ export function SectionStack({ currentSection, children, onSectionChange }: Sect
   const isScrollSection = (i: number) => i >= SCROLL_TRANSITION_FROM
   const useScrollTransition = isScrollSection(currentSection) && isScrollSection(prevSection)
 
+  // Tracks the section the observer last reported, so we can tell scroll-driven
+  // changes apart from external navigation (menu taps).
+  const observedRef = useRef(currentSection)
+
   // Mobile: sync currentSection with native scroll via IntersectionObserver
   useEffect(() => {
     if (!isMobile || !onSectionChange) return
@@ -66,7 +70,7 @@ export function SectionStack({ currentSection, children, onSectionChange }: Sect
         entries.forEach(entry => {
           if (entry.isIntersecting) {
             const idx = parseInt(entry.target.id.replace('section-', ''), 10)
-            if (!isNaN(idx)) onSectionChange(idx)
+            if (!isNaN(idx)) { observedRef.current = idx; onSectionChange(idx) }
           }
         })
       },
@@ -80,6 +84,15 @@ export function SectionStack({ currentSection, children, onSectionChange }: Sect
     }, 100)
     return () => { clearTimeout(timer); observer.disconnect() }
   }, [isMobile, children.length]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Mobile: the menu and hero CTAs only set state — nothing moves the scroll
+  // container, so without this the mobile menu navigates nowhere.
+  useEffect(() => {
+    if (!isMobile) return
+    if (currentSection === observedRef.current) return // came from scrolling, don't fight it
+    observedRef.current = currentSection
+    document.getElementById(`section-${currentSection}`)?.scrollIntoView({ behavior: 'smooth' })
+  }, [isMobile, currentSection])
 
   useEffect(() => {
     if (currentSection !== prevSection) {

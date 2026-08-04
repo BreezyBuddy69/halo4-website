@@ -4,3 +4,8 @@ CLAUDE.md
 CLAUDE (1).md
 .env
 .env.*
+
+# Build artifact — the Docker image runs 
+pm run build itself.
+# Committing it also leaked VITE_* webhook URLs into this public repo.
+dist/

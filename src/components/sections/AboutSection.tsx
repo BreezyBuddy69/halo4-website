@@ -148,7 +148,7 @@ export function AboutSection({ language, isActive, onBooking }: AboutSectionProp
   useEffect(() => {
     if (isActive) {
       setCurrentRow(0)
-      const timer = setTimeout(() => setShowBookingBtn(true), 50000)
+      const timer = setTimeout(() => setShowBookingBtn(true), 1200)
       return () => clearTimeout(timer)
     } else {
       setCurrentRow(-1)

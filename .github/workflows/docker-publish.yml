@@ -79,6 +79,9 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            VITE_BOOKING_URL=${{ secrets.VITE_BOOKING_URL }}
+            VITE_CHATBOT_URL=${{ secrets.VITE_CHATBOT_URL }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 

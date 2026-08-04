@@ -192,22 +192,25 @@ export function HeroSection({ language, isActive, onBooking, inputRef, introDone
   const showMarketingRef = useRef(false)
   useEffect(() => { showMarketingRef.current = showMarketingText }, [showMarketingText])
 
-  // CTA button: show 3s after chat area becomes visible; also signals UI chrome to spawn
+  // Booking CTA is never gated behind the intro choreography — it is the primary
+  // conversion action and must be clickable from the first frame.
   useEffect(() => {
-    if (ctaVisible || !chatAreaVisible) return
-    const t = setTimeout(() => { setCtaVisible(true); onUIReady?.() }, 1500)
+    if (ctaVisible) return
+    const t = setTimeout(() => { setCtaVisible(true); onUIReady?.() }, 400)
     return () => clearTimeout(t)
-  }, [ctaVisible, chatAreaVisible]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [ctaVisible]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Sequence: introDone → bg fades → marketing text → box → slides up (stays visible) → chat spawns
+  // Timings roughly halved: the value proposition has to be readable inside the
+  // first second, and the chat has to be reachable well before a visitor bounces.
   // Marketing box only fully despawns when user sends their first message
   useEffect(() => {
     if (!introDone) return
-    const t1 = setTimeout(() => setHideBackground(true), 2200)
-    const t2 = setTimeout(() => setShowMarketingText(true), 2200)
-    const t3 = setTimeout(() => setMarketingBoxVisible(true), 2400)
-    const t4 = setTimeout(() => setMarketingSliding(true), 5200)
-    const t5 = setTimeout(() => setChatSpawned(true), 5800)
+    const t1 = setTimeout(() => setHideBackground(true), 900)
+    const t2 = setTimeout(() => setShowMarketingText(true), 900)
+    const t3 = setTimeout(() => setMarketingBoxVisible(true), 1050)
+    const t4 = setTimeout(() => setMarketingSliding(true), 3400)
+    const t5 = setTimeout(() => setChatSpawned(true), 3900)
     return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(t4); clearTimeout(t5) }
   }, [introDone])
 
@@ -861,12 +864,7 @@ export function HeroSection({ language, isActive, onBooking, inputRef, introDone
 
               {/* Headline — word-by-word particle reveal / scatter */}
               <p style={{ fontFamily: '"Playfair Display", Georgia, serif', fontSize: 'clamp(1.92rem, 4.56vw, 3.12rem)', color: 'rgba(255,255,255,0.96)', fontWeight: 700, lineHeight: 1.15, letterSpacing: '-0.015em', textShadow: '0 2px 60px rgba(139,92,246,0.40)', margin: 0, textAlign: 'center' }}>
-                {(language === 'de'
-                  ? 'KI ist da. Der Abstand wächst. Wir schließen ihn.'
-                  : language === 'fr'
-                  ? "L'IA est là. L'écart se creuse. On le comble."
-                  : "AI is here. The gap is forming. We close it."
-                ).split(' ').map((word, i) => (
+                {tr.heroTitle1.split(' ').map((word, i) => (
                   <motion.span
                     key={i}
                     initial={{ opacity: 0, x: -22, filter: 'blur(6px)' }}
@@ -887,12 +885,7 @@ export function HeroSection({ language, isActive, onBooking, inputRef, introDone
 
               {/* Body — word-by-word with later stagger / scatter */}
               <p style={{ fontFamily: '"Inter", sans-serif', fontSize: 'clamp(1.12rem, 2.1vw, 1.4rem)', color: 'rgba(200,185,255,0.68)', lineHeight: 1.65, margin: 0, maxWidth: '42ch', textAlign: 'center' }}>
-                {(language === 'de'
-                  ? 'Wir analysieren dein Unternehmen, finden heraus wo KI echten Hebel schafft, und bauen die Automatisierungen die alles verbinden. Dein Team gewinnt Zeit, Geld, Fokus — und neue Kunden.'
-                  : language === 'fr'
-                  ? "On cartographie votre activité, on identifie où l'IA crée le plus de levier, et on construit les automatisations qui relient tout. Votre équipe gagne du temps, de l'argent, de la clarté — et de nouveaux clients."
-                  : "We map your operation, identify where AI creates real leverage, and build the automations that tie it all together. Your team gains time, money, focus — and new customers."
-                ).split(' ').map((word, i) => (
+                {tr.heroSubtitle.split(' ').map((word, i) => (
                   <motion.span
                     key={i}
                     initial={{ opacity: 0, x: -14, filter: 'blur(4px)' }}
@@ -902,7 +895,7 @@ export function HeroSection({ language, isActive, onBooking, inputRef, introDone
                     }
                     transition={marketingParticle
                       ? { duration: 0.42, delay: 0.05 + i * 0.03, ease: [0.4, 0, 1, 1] }
-                      : { duration: 0.45, delay: 0.55 + i * 0.055, ease: [0.16, 1, 0.3, 1] }
+                      : { duration: 0.45, delay: 0.45 + i * 0.03, ease: [0.16, 1, 0.3, 1] }
                     }
                     style={{ display: 'inline-block', marginRight: '0.28em', willChange: 'transform, opacity, filter' }}
                   >

@@ -11,7 +11,8 @@ interface SideNavProps {
 
 export function SideNav({ currentSection, onNavigate, language }: SideNavProps) {
   const tr = t(language)
-  const labels = [tr.navHome, tr.navVideo, tr.navResults, tr.navBook, tr.navWork, tr.navAbout]
+  // Must match the section order in App.tsx
+  const labels = [tr.navHome, tr.navVideo, tr.navWork, tr.navResults, tr.navAbout, tr.navBook]
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null)
 
   return (
@@ -28,7 +29,7 @@ export function SideNav({ currentSection, onNavigate, language }: SideNavProps) 
           <motion.button
             key={i}
             onClick={() => onNavigate(i)}
-            onHoverStart={() => { setHoveredIdx(i); onNavigate(i) }}
+            onHoverStart={() => setHoveredIdx(i)}
             onHoverEnd={() => setHoveredIdx(null)}
             animate={{ scale, opacity, x: 0 }}
             transition={{ type: 'spring', damping: 24, stiffness: 280, mass: 0.7 }}
@@ -80,7 +81,7 @@ export function SideNav({ currentSection, onNavigate, language }: SideNavProps) 
                   exit={{ opacity: 0, width: 0 }}
                   className="text-[9px] text-white/35 whitespace-nowrap overflow-hidden relative z-10"
                 >
-                  {i === 0 ? 'Brand' : i === 1 ? 'Intro' : i === 2 ? 'ROI' : i === 3 ? 'Book' : i === 4 ? 'Solutions' : 'About'}
+                  {i === 0 ? 'Brand' : i === 1 ? 'Intro' : i === 2 ? 'Solutions' : i === 3 ? 'ROI' : i === 4 ? 'About' : 'Book'}
                 </motion.span>
               )}
             </AnimatePresence>

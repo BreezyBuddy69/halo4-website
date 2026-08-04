@@ -20,13 +20,14 @@ import { t } from './utils/translations'
 import type { Language } from './utils/translations'
 import { GradientBackground } from './components/ui/paper-design-shader-background'
 
+// Journey order: understand → see it → what we do → proof → who we are → act
 const SECTION_COLORS = [
   ['hsl(258, 40%, 6%)', 'hsl(278, 35%, 5%)', 'hsl(220, 30%, 6%)'], // 0: Hero — very dark, no edge bleed
   ['hsl(240, 60%, 35%)', 'hsl(260, 55%, 30%)', 'hsl(220, 50%, 30%)'], // 1: Video
-  ['hsl(228, 72%, 52%)', 'hsl(255, 68%, 48%)', 'hsl(210, 62%, 46%)'], // 2: Results
-  ['hsl(270, 72%, 48%)', 'hsl(255, 70%, 44%)', 'hsl(285, 65%, 44%)'], // 3: Book
-  ['hsl(243, 68%, 50%)', 'hsl(263, 63%, 46%)', 'hsl(223, 58%, 46%)'], // 4: Work
-  ['hsl(268, 68%, 52%)', 'hsl(283, 62%, 47%)', 'hsl(250, 58%, 50%)'], // 5: About
+  ['hsl(243, 68%, 50%)', 'hsl(263, 63%, 46%)', 'hsl(223, 58%, 46%)'], // 2: Work
+  ['hsl(228, 72%, 52%)', 'hsl(255, 68%, 48%)', 'hsl(210, 62%, 46%)'], // 3: Results
+  ['hsl(268, 68%, 52%)', 'hsl(283, 62%, 47%)', 'hsl(250, 58%, 50%)'], // 4: About
+  ['hsl(270, 72%, 48%)', 'hsl(255, 70%, 44%)', 'hsl(285, 65%, 44%)'], // 5: Book
 ]
 
 
@@ -171,25 +172,25 @@ function AppInner() {
             isActive={currentSection === 1}
             language={language}
           />,
-          <ResultsSection
-            key="results"
-            language={language}
-            isActive={currentSection === 2}
-          />,
-          <BookSection
-            key="book"
-            language={language}
-            isActive={currentSection === 3}
-            onBooking={() => setIsBookingOpen(true)}
-          />,
           <WorkSection
             key="work"
             language={language}
-            isActive={currentSection === 4}
+            isActive={currentSection === 2}
             onAskAI={setChatContext}
+          />,
+          <ResultsSection
+            key="results"
+            language={language}
+            isActive={currentSection === 3}
           />,
           <AboutSection
             key="about"
+            language={language}
+            isActive={currentSection === 4}
+            onBooking={() => setIsBookingOpen(true)}
+          />,
+          <BookSection
+            key="book"
             language={language}
             isActive={currentSection === 5}
             onBooking={() => setIsBookingOpen(true)}

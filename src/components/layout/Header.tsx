@@ -59,7 +59,8 @@ export function Header({
 
 
   const tr = t(language)
-  const navLabels = [tr.navHome, tr.navVideo, tr.navResults, tr.navWork, tr.navAbout, tr.navBook]
+  // Must match the section order in App.tsx — a mismatch sends taps to the wrong section
+  const navLabels = [tr.navHome, tr.navVideo, tr.navWork, tr.navResults, tr.navAbout, tr.navBook]
 
   // Keep city time updated
   useEffect(() => {
@@ -154,8 +155,9 @@ export function Header({
           </motion.div>
         </div>
 
-        {/* ── CENTER: brand ── */}
-        <div className="absolute left-1/2 -translate-x-1/2">
+        {/* ── CENTER: brand ── hidden on small screens, where it collided with
+            the contact CTA. The brand still shows in the hero and the mobile menu. */}
+        <div className="absolute left-1/2 -translate-x-1/2 hidden sm:block">
           <ScrambleText
             text="HALOVISION AI"
             className="font-anurati text-white text-sm tracking-[0.3em] select-none cursor-default"
